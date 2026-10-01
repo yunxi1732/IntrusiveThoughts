@@ -102,3 +102,6 @@ InitTestScene*.unity*
 
 #Builds
 build/
+
+#vscode settings
+.vscode/*
