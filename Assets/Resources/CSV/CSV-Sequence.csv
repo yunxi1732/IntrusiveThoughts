@@ -1,0 +1,7 @@
+﻿id,sceneName,npc,relic,priority,once,conditions,onFinishSet,,
+testSeq,,char1,,,FALSE,story.emgSeqDone == 0,,,
+testSeq2,,char1,,,FALSE,story.emgSeqDone ==1,,,
+emgSeq,,,遗物1,10,TRUE,,story.emgSeqDone = 1,,
+test2Seq,,char2,,,FALSE,story.emg2SeqDone == 0,,,
+test2Seq2,,char2,,,FALSE,story.emg2SeqDone ==1,,,
+emg2Seq,,,遗物2,10,TRUE,,story.emg2SeqDone = 1,,
