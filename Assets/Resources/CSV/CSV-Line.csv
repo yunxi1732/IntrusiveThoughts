@@ -1,0 +1,11 @@
+﻿sequenceId,character,content,relic
+testSeq,我,这是一句<color=red>可交互对白</color>,遗物1
+testSeq,你,这是一句不可交互对白,
+testSeq2,我,你已经拿到钥匙了,
+emgSeq,我,哇，解锁隐藏剧情~,
+emgSeq,你,谢谢，给你一把钥匙~,
+,,,
+test2Seq,我,这又是一句<color=blue>可交互对白</color>,遗物2
+test2Seq,你,这又是一句不可交互对白,
+test2Seq2,我,你已经拿到箱子了,
+emg2Seq,我,恭喜你拿到箱子~,
