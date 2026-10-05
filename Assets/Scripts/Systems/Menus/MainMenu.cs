@@ -22,9 +22,9 @@ public class MainMenu : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject MainPanel;
+    public GameObject DataChoosePanel;
     public GameObject SettingsPanel;
-    public Button newGameButton;
-    public Button oldGameButton;
+    public Button startGameButton;
     public Button settingsButton;
     public Button quitButton;
 
@@ -33,32 +33,24 @@ public class MainMenu : MonoBehaviour
         //初始化菜单界面
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
+        DataChoosePanel.SetActive(false);
 
         //注册按钮事件
-        newGameButton.onClick.AddListener(OnNewGameClicked);
-        oldGameButton.onClick.AddListener(OnOldGameClicked);
+        startGameButton.onClick.AddListener(OnStartGameClicked);
         settingsButton.onClick.AddListener(OnSettingsClicked);
         quitButton.onClick.AddListener(OnQuitClicked);
     }
 
     //处理新游戏按钮点击事件
-    private void OnNewGameClicked()
+    private void OnStartGameClicked()
     {
+        MainPanel.SetActive(false);
+        DataChoosePanel.SetActive(true);
         //清空存档
         //根据当前状态初始化游戏数据
-        GameState.instance.InitializeGameState();
+        //GameState.instance.InitializeGameState();
         //加载卧室场景
-        UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
-    }
-
-    //处理继续游戏按钮点击事件
-    private void OnOldGameClicked()
-    {
-        //读取存档
-        //根据当前状态初始化游戏数据
-        GameState.instance.InitializeGameState();
-        //加载卧室场景
-        UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
+        //UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
     }
 
     //处理设置按钮点击事件
@@ -74,5 +66,11 @@ public class MainMenu : MonoBehaviour
     {
         //处理退出按钮点击事件
         Application.Quit();
+    }
+
+    public void OnReturnButtonClicked()
+    {
+        DataChoosePanel.SetActive(false);
+        MainPanel.SetActive(true);
     }
 }
