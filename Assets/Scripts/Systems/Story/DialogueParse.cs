@@ -8,7 +8,7 @@ public static class DialogueParse
     //CsvToJson 输出的值都是字符串，这里先按字符串读取再手动转换
     [Serializable] private class SequenceRow
     {
-        public string id, sceneName, npc, relic, priority, once, conditions, onFinishSet;
+        public string id, location, npc, relic, priority, once, conditions, onFinishSet;
     }
     [Serializable] private class SequenceRows { public SequenceRow[] rows; }
     [Serializable] private class LineRow { public string sequenceId, character, content, relic; }
@@ -38,7 +38,7 @@ public static class DialogueParse
             var seq = new DialogueSequence
             {
                 id = r.id,
-                sceneName = r.sceneName,
+                location = r.location,
                 npc = r.npc,
                 relic = r.relic,
                 priority = priority,

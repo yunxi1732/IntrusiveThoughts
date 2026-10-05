@@ -20,6 +20,8 @@ public class NPCJsons
     public NPCData[] npcs;
 }
 
+
+//用csv-json解析
 [System.Serializable]
 public class NPCScheduleData
 {

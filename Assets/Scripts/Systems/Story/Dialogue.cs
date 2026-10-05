@@ -44,7 +44,7 @@ public class DialogueCondition
 public class DialogueSequence
 {
     public string id;
-    public string sceneName;        //留空表示任意场景
+    public string location;        //留空表示任意场景
     public string npc;              //留空表示无需特定 NPC
     public string relic;            //留空表示无需特定遗物
     public int priority;
