@@ -1,4 +1,4 @@
-﻿id,sceneName,npc,relic,priority,once,conditions,onFinishSet,,
+id,location,npc,relic,priority,once,conditions,onFinishSet,,
 testSeq,,char1,,,FALSE,story.emgSeqDone == 0,,,
 testSeq2,,char1,,,FALSE,story.emgSeqDone ==1,,,
 emgSeq,,,遗物1,10,TRUE,,story.emgSeqDone = 1,,
