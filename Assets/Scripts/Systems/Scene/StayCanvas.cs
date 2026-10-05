@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
+//管理常驻Canvas，确保在场景切换时保持不被销毁，并自动绑定当前场景的相机
 public class StayCanvas : MonoBehaviour
 {
     public static StayCanvas instance { get; private set; }

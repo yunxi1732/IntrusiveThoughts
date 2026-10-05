@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 
 
 //theater中的可交互NPC
+//挂载在场景中可交互的NPC对象上
 
 public class NPCEntry : MonoBehaviour, IPointerClickHandler
 {
@@ -11,15 +12,16 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
     public NPCData npcData;   //NPC数据
     private Image iconImage;
 
-    void Start()
+    public void Initialize(NPCData data)
     {
-        npcData = NPCManager.instance.GetNPCDataByName(npcData.id);
+        npcData = data;
         iconImage = GetComponent<Image>();
         if (iconImage != null && npcData != null)
         {
             iconImage.sprite = npcData.icon;
         }
     }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         //如果当前在播放剧情，禁止交互

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-//对话剧情管理：根据场景、玩家和NPC状态选择并播放对话
+//对话剧情管理
+//管理所有的对白和剧情信息，控制剧情播放，根据状态触发合适的剧情
+//挂载在GameRoot场景中，不销毁
+
 public class StoryManager : MonoBehaviour
 {
     public static StoryManager instance { get; private set; }

@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
+//剧场模块，管理剧场内的角色显示，对白显示与交互
 
 public class TheaterController : MonoBehaviour
 {
@@ -25,6 +23,7 @@ public class TheaterController : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject TheaterPanel;   //剧场主界面
+    public GameObject npcmodelPanel;   //角色模型面板
     public GameObject DialoguePanel;   //对白窗口
     public Button ExitBut;     //退出剧场按钮
     public Button DialogueBut;     //确认对白
@@ -60,17 +59,20 @@ public class TheaterController : MonoBehaviour
         //根据角色 + 地点初始化剧场
         TheaterPanel.SetActive(true);
         //设置背景图
+
         //生成角色并放置位置
+        GameObject npcPrefab = NPCManager.instance.npcBodyPrefab;
+        foreach (Transform child in npcmodelPanel.transform) Destroy(child.gameObject);
+        foreach (var npc in location.npcList)
+        {
+            GameObject npcObj = Instantiate(npcPrefab, npcmodelPanel.transform);
+            //初始化npcObj
+            npcObj.GetComponent<NPCEntry>().Initialize(npc);
+        }
+
         
         //关闭对话框
         DialoguePanel.SetActive(false);
-    }
-
-    void PlayStory()
-    {
-        //如果多个角色，需要选中目标再播放对白？
-        //播放剧本逻辑
-        StoryManager.instance.TryStart();
     }
 
     void HandleDialogueLine(DialogueLine line)
@@ -107,6 +109,5 @@ public class TheaterController : MonoBehaviour
         Inventory.instance.DisableInventory();
         TheaterPanel.SetActive(false);
     }
-
 
 }

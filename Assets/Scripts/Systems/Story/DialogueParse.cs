@@ -68,7 +68,7 @@ public static class DialogueParse
         return result;
     }
 
-    private static List<DialogueCondition> ParseConditions(string text, string seqId)
+    public static List<DialogueCondition> ParseConditions(string text, string seqId)
     {
         var list = new List<DialogueCondition>();
         if (string.IsNullOrWhiteSpace(text)) return list;
