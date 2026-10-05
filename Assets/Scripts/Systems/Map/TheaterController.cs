@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
+//剧场模块，管理剧场内的角色显示，对白显示与交互
 
 public class TheaterController : MonoBehaviour
 {

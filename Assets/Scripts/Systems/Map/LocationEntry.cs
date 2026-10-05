@@ -20,7 +20,7 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
 
     public void ShowNPCs()
     {
-        //根据npc刷新大地图图标显示
+        //刷新大地图NPC显示位置
         GameObject iconPrefab = NPCManager.instance.npcIconPrefab;
         foreach (Transform child in npcIconPanel.transform) Destroy(child.gameObject);
         npcList.Clear();

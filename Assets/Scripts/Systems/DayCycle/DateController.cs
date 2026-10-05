@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
+//时间管理系统 todo
+//挂载在GameRoot场景中，不销毁
 
 public class DateController : MonoBehaviour
 {

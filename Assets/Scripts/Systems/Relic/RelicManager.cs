@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 
 //遗物信息管理
+//挂载在GameRoot场景中，不销毁
 
 public class RelicManager : MonoBehaviour
 {

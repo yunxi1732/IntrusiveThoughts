@@ -3,9 +3,8 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
+//NPC管理器，挂载在GameRoot中，不销毁
+//负责管理游戏中的所有NPC，包括其信息、日程安排以及在不同地点的出现情况
 
 public class NPCManager : MonoBehaviour
 {

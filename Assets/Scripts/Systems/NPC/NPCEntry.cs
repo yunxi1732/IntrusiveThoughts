@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 
 
 //theater中的可交互NPC
+//挂载在场景中可交互的NPC对象上
 
 public class NPCEntry : MonoBehaviour, IPointerClickHandler
 {
