@@ -1,0 +1,4 @@
+npcid,location,priority,conditions
+char1,LocationA,0,
+char1,LocationB,1,story.emgSeqDone = 1
+char2,LocationB,0,

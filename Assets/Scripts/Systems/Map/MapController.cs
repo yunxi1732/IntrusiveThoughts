@@ -3,9 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
+//管理大地图功能，包括地点选择、角色显示以及结束当天的操作
 
 public class MapController : MonoBehaviour
 {
@@ -44,8 +42,7 @@ public class MapController : MonoBehaviour
     {
         //关闭背包功能
         Inventory.instance.DisableInventory();
-        //刷新地点显示
-        //清空并重新生成entry
+        foreach (var entry in locationEntries) entry.ShowNPCs();
     }
 
     public void SelectLocationEntry(LocationEntry entry)

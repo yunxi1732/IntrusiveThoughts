@@ -1777,6 +1777,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCManager
   FullNPCList: []
+  npcIconPrefab: {fileID: 156165821845845366, guid: 1b4600912953a3743ac16c2344d13fb2, type: 3}
+  npcBodyPrefab: {fileID: 5512579003159515492, guid: 23574ba9d66df31428ac868a5ad95458, type: 3}
 --- !u!1 &685302461
 GameObject:
   m_ObjectHideFlags: 0

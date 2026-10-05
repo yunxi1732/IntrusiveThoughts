@@ -19,3 +19,27 @@ public class NPCJsons
 {
     public NPCData[] npcs;
 }
+
+[System.Serializable]
+public class NPCScheduleData
+{
+    public string npcid;
+    public string location;
+    public string priority;
+    public string conditions;
+}
+
+//解析后的出现规则：条件满足时 NPC 出现在 location，多条满足取 priority 最大
+public class NPCSchedule
+{
+    public string npcid;
+    public string location;
+    public int priority;
+    public System.Collections.Generic.List<DialogueCondition> conditions;
+}
+
+[System.Serializable]
+public class NPCScheduleJsons
+{
+    public NPCScheduleData[] schedules;
+}

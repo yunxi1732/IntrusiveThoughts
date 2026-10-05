@@ -94,7 +94,7 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-
+    //限制同时播放的音效数量，放置声音过大
     public void PlayWithCap(AudioClip clip, float volume = 1f)
     {
         playingCount.TryGetValue(clip, out int current);
