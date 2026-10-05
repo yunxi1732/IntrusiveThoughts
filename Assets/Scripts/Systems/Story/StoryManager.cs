@@ -62,13 +62,13 @@ public class StoryManager : MonoBehaviour
     }
 
     //选出当前场景下满足条件、优先级最高的对话
-    public DialogueSequence Select(string npc = null, string sceneName = null, RelicData relicData = null)
+    public DialogueSequence Select(string npc = null, string location = null, RelicData relicData = null)
     {
         DialogueSequence best = null;
         foreach (var s in sequences)
         {
             if (s.once && played.Contains(s.id)) continue;
-            if (!string.IsNullOrEmpty(s.sceneName) && s.sceneName != sceneName) continue;
+            if (!string.IsNullOrEmpty(s.location) && s.location != location) continue;
             if (!string.IsNullOrEmpty(s.npc) && s.npc != npc) continue;
             if (!string.IsNullOrEmpty(s.relic) && s.relic != relicData?.id) continue;
             if (!MeetsConditions(s)) continue;
@@ -88,7 +88,8 @@ public class StoryManager : MonoBehaviour
     public bool TryStart(string npc = null, RelicData relicData = null)
     {
         //if (IsPlaying) return false;
-        var seq = Select(npc, null, relicData);
+        string location = TheaterController.instance.currentLocation.locationName;
+        var seq = Select(npc, location, relicData);
         Debug.Log("Selected dialogue sequence: " + (seq != null ? seq.id : "null"));
         if (seq == null || seq.lines.Count == 0) return false;
         current = seq;

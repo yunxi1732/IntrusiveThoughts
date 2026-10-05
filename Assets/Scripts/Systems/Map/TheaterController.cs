@@ -31,6 +31,7 @@ public class TheaterController : MonoBehaviour
     public TextMeshProUGUI DialogueText;   //对白文本
 
     public string interactiveRelic;  //可交互气泡
+    public LocationEntry currentLocation;
 
     void Start()
     {
@@ -56,6 +57,8 @@ public class TheaterController : MonoBehaviour
         Inventory.instance.EnableInventory();
         Inventory.instance.ShowBubblePanel();
 
+
+        currentLocation = location;
         //根据角色 + 地点初始化剧场
         TheaterPanel.SetActive(true);
         //设置背景图
