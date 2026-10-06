@@ -19,7 +19,8 @@ public static class DialogueParse
     {
         (">=", CompareOp.GreaterEqual), ("<=", CompareOp.LessEqual),
         ("==", CompareOp.Equal), ("!=", CompareOp.NotEqual),
-        (">", CompareOp.Greater), ("<", CompareOp.Less), ("=", CompareOp.Equal),
+        (">", CompareOp.Greater), ("<", CompareOp.Less), 
+        ("=", CompareOp.Assign),("+=", CompareOp.Add),("-=", CompareOp.Dec),
     };
 
     //解析两张表，返回对话列表；allLines 收集全部台词

@@ -15,7 +15,7 @@ public class DialogueLineJsons
     public DialogueLine[] lines;
 }
 
-public enum CompareOp { Equal, NotEqual, Greater, GreaterEqual, Less, LessEqual }
+public enum CompareOp { Equal, NotEqual, Greater, GreaterEqual, Less, LessEqual, Assign, Add, Dec }
 
 //条件：读取状态值（key）并与 value 比较。玩家状态用 "player.xxx"，NPC 状态用 "npc.<名字>.xxx"
 [Serializable]
@@ -34,7 +34,18 @@ public class DialogueCondition
             case CompareOp.Greater: return current > value;
             case CompareOp.GreaterEqual: return current >= value;
             case CompareOp.Less: return current < value;
-            default: return current <= value;
+            case CompareOp.LessEqual: return current <= value;
+            default: return false;
+        }
+    }
+    public int Set(int current)
+    {
+        switch (op)
+        {
+            case CompareOp.Assign: return value;
+            case CompareOp.Add: return current + value;
+            case CompareOp.Dec: return current - value;
+            default: return current;
         }
     }
 }
