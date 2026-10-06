@@ -111,7 +111,7 @@ public class StoryManager : MonoBehaviour
         var finished = current;
         current = null;
         played.Add(finished.id);
-        foreach (var c in finished.onFinishSet) SetState(c.key, c.value);
+        foreach (var c in finished.onFinishSet) states[c.key] = c.Set(GetState(c.key));
         OnDialogueEnd?.Invoke(finished);
     }
 
