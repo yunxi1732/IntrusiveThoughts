@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     public RelicData relicData;
+    public BubbleData bubbleData;
     private RectTransform rect;
     private Canvas canvas;
     private CanvasGroup canvasGroup;
@@ -29,9 +30,10 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         originalParent = rect.parent;
     }
 
-    public void init(RelicData data)
+    public void init(RelicData data, BubbleData record)
     {
         relicData = data;
+        bubbleData = record;
         if (icon != null && relicData != null)
         {
             icon.sprite = relicData.icon;
@@ -71,9 +73,10 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
             {
                 Debug.Log("遗物使用成功: " + relicData.id + ", 期望: " + relicName);
                 //开始涌现剧情
-                StoryManager.instance.TryStart(null, relicData);
-                //删除遗物
-                Inventory.instance.RemoveRelic(relicData);
+                // 缓存 ID，刷新气泡槽位后本组件可能绑定到另一件物品。
+                string instanceId = bubbleData.sourceInstanceId;
+                if (StoryManager.instance.TryStart(null, relicData))
+                    Inventory.instance.RemoveRelic(instanceId);
                 //gameObject.SetActive(false);
             } else
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,7 +15,7 @@ public class StoryManager : MonoBehaviour
 
     public List<DialogueSequence> sequences = new List<DialogueSequence>();
 
-    //状态表：player.xxx / npc.<名字>.xxx
+    // 仅保存 story.* 剧情标记。
     private readonly Dictionary<string, int> states = new Dictionary<string, int>();
     private readonly HashSet<string> played = new HashSet<string>();
 
@@ -41,10 +41,23 @@ public class StoryManager : MonoBehaviour
         }
     }
 
-    public int GetState(string key) => states.TryGetValue(key, out var v) ? v : 0;
-    public void SetState(string key, int value) => states[key] = value;
-    public void SetNpcState(string npc, string key, int value) => SetState($"npc.{npc}.{key}", value);
-    public void SetPlayerState(string key, int value) => SetState($"player.{key}", value);
+    // 兼容旧调用；数据路由由 GameStateAccess 负责。
+    public int GetState(string key) => GameStateAccess.Get(key);
+    public void SetState(string key, int value) => GameStateAccess.Set(key, value);
+    public void SetNpcState(string npc, string key, int value) => GameStateAccess.Set($"npc.{npc}.{key}", value);
+    public void SetPlayerState(string key, int value) => GameStateAccess.Set($"player.{key}", value);
+
+    public int GetStoryState(string key)
+    {
+        if (!key.StartsWith("story.", StringComparison.Ordinal)) throw new ArgumentException("剧情状态必须使用 story. 前缀。");
+        return states.TryGetValue(key, out var value) ? value : 0;
+    }
+
+    public void SetStoryState(string key, int value)
+    {
+        if (!key.StartsWith("story.", StringComparison.Ordinal)) throw new ArgumentException("剧情状态必须使用 story. 前缀。");
+        states[key] = value;
+    }
 
     //从 Resources 下的 DialogueSequence.csv 和 DialogueLine.csv 加载对话
     public void InitSequences()
@@ -80,7 +93,7 @@ public class StoryManager : MonoBehaviour
     private bool MeetsConditions(DialogueSequence s)
     {
         foreach (var c in s.conditions)
-            if (!c.Check(GetState(c.key))) return false;
+            if (!c.Check(GameStateAccess.Get(c.key))) return false;
         return true;
     }
 
@@ -111,7 +124,7 @@ public class StoryManager : MonoBehaviour
         var finished = current;
         current = null;
         played.Add(finished.id);
-        foreach (var c in finished.onFinishSet) SetState(c.key, c.value);
+        foreach (var c in finished.onFinishSet) GameStateAccess.Set(c.key, c.value);
         OnDialogueEnd?.Invoke(finished);
     }
 
@@ -119,5 +132,23 @@ public class StoryManager : MonoBehaviour
     {
         current = null;
         lineIndex = 0;
+    }
+
+    public void RestoreProgress(GameData data)
+    {
+        ResetStory();
+        states.Clear();
+        played.Clear();
+        if (data == null) return;
+        foreach (var entry in data.storyStates ?? new List<StateValueData>()) SetStoryState(entry.key, entry.value);
+        foreach (var id in data.completedSequenceIds ?? new List<string>()) played.Add(id);
+    }
+
+    public void CaptureProgress(GameData data)
+    {
+        data.storyStates = new List<StateValueData>();
+        foreach (var entry in states)
+            data.storyStates.Add(new StateValueData { key = entry.Key, value = entry.Value });
+        data.completedSequenceIds = new List<string>(played);
     }
 }

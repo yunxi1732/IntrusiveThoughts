@@ -10,16 +10,49 @@ using UnityEngine.EventSystems;
 public class RelicEntry : MonoBehaviour, IPointerClickHandler
 {
     public RelicData relicData;
+    [Tooltip("场景内唯一摆放编号；未填写时使用层级路径。")]
+    public string placementId;
+    public BedroomRelicData record;
 
-    void Start()
+    public bool InitializeRecord(bool createIfMissing)
     {
-        if (relicData.id == null || relicData.id == "")
+        if (GameState.instance == null || RelicManager.instance == null) return false;
+        if (string.IsNullOrWhiteSpace(placementId))
         {
-            relicData = RelicManager.instance.GetRandomRelicData();
-        } else
-        {
-            relicData = RelicManager.instance.GetRelicDataByName(relicData.id);
+            placementId = "";
+            for (Transform node = transform; node != null; node = node.parent)
+                placementId = node.name + "[" + node.GetSiblingIndex() + "]/" + placementId;
         }
+        record = GameState.instance.bedroomRelics.Find(item => item.placementId == placementId);
+        if (record == null)
+        {
+            // 恢复时不能重新随机或生成新 ID。存档未记录的位置保持隐藏。
+            if (!createIfMissing)
+            {
+                gameObject.SetActive(false);
+                return false;
+            }
+            var data = relicData == null || string.IsNullOrEmpty(relicData.id)
+                ? RelicManager.instance.GetRandomRelicData()
+                : RelicManager.instance.GetRelicDataByName(relicData.id);
+            if (data == null)
+            {
+                Debug.LogError($"遗物配置不存在：{name}", this);
+                return false;
+            }
+            record = new BedroomRelicData
+            {
+                instanceId = System.Guid.NewGuid().ToString("N"),
+                relicId = data.id,
+                placementId = placementId,
+            };
+            GameState.instance.bedroomRelics.Add(record);
+        }
+        relicData = RelicManager.instance.GetRelicDataByName(record.relicId);
+        if (relicData == null)
+            Debug.LogError($"卧室记录引用了不存在的遗物：{record.relicId}", this);
+        gameObject.SetActive(relicData != null && !record.collected);
+        return relicData != null;
     }
     public void OnPointerClick(PointerEventData eventData)
     {

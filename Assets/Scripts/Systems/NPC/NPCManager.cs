@@ -16,6 +16,7 @@ public class NPCManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            Initialize();
         }
         else
         {
@@ -28,9 +29,46 @@ public class NPCManager : MonoBehaviour
     public GameObject npcIconPrefab;    //大地图中的npc图标预制体
     public GameObject npcBodyPrefab;    //场景中的npc预制体
 
-    void Start()
+    private NPCData RequireNpc(string npcId)
     {
-        Initialize();
+        if (string.IsNullOrWhiteSpace(npcId))
+            throw new System.ArgumentException("NPC ID 不能为空。", nameof(npcId));
+        var npc = GetNPCDataByName(npcId);
+        if (npc == null)
+            throw new System.InvalidOperationException($"NPC 尚未加载或 ID 不存在：{npcId}");
+        return npc;
+    }
+
+    public int GetNpcState(string npcId, string attribute)
+    {
+        return RequireNpc(npcId).GetValue(attribute);
+    }
+
+    public void SetNpcState(string npcId, string attribute, int value)
+    {
+        if (string.IsNullOrWhiteSpace(attribute))
+            throw new System.ArgumentException("NPC 属性名不能为空。", nameof(attribute));
+        RequireNpc(npcId).SetValue(attribute, value);
+    }
+
+    // 情绪累加/扣减，最低为 0。CSV 的 +=/-= 解析仍需另行接入。
+    public void AddNpcState(string npcId, string attribute, int amount)
+    {
+        long result = (long)GetNpcState(npcId, attribute) + amount;
+        SetNpcState(npcId, attribute, (int)System.Math.Max(0L, System.Math.Min(int.MaxValue, result)));
+    }
+
+    public bool HasTag(string npcId, string tag)
+    {
+        return RequireNpc(npcId).tags.Contains(tag);
+    }
+
+    public void AddTag(string npcId, string tag)
+    {
+        if (string.IsNullOrWhiteSpace(tag))
+            throw new System.ArgumentException("NPC 标签不能为空。", nameof(tag));
+        var npc = RequireNpc(npcId);
+        if (!npc.tags.Contains(tag)) npc.tags.Add(tag);
     }
 
     void Initialize()
@@ -64,7 +102,19 @@ public class NPCManager : MonoBehaviour
             Debug.Log("Adding NPC: " + data.id);
             //初始化icon
             data.icon = Resources.Load<Sprite>("Sprites/" + data.iconString);
-            FullNPCList.Add(data);
+            // CSV 不含运行时字段；显式初始化，避免集合为空引用。
+            data.attributes = new List<StateValueData>();
+            data.tags = new List<string>();
+            var existing = GetNPCDataByName(data.id);
+            if (existing != null)
+            {
+                existing.desc = data.desc;
+                existing.iconString = data.iconString;
+                existing.modelString = data.modelString;
+                existing.icon = data.icon;
+            }
+            else
+                FullNPCList.Add(data);
         }
     }
 
@@ -108,7 +158,7 @@ public class NPCManager : MonoBehaviour
         foreach (var s in Schedules)
         {
             if (s.npcid != npcId) continue;
-            if (!s.conditions.TrueForAll(c => c.Check(StoryManager.instance.GetState(c.key)))) continue;
+            if (!s.conditions.TrueForAll(c => c.Check(GameStateAccess.Get(c.key)))) continue;
             if (best == null || s.priority > best.priority) best = s;
         }
         return best?.location;

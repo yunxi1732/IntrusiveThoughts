@@ -16,6 +16,7 @@ public class RelicManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            Initialize();
             //DontDestroyOnLoad(gameObject);
         }
         else
@@ -25,12 +26,7 @@ public class RelicManager : MonoBehaviour
     }
 
     //[Header("UI Panels")]
-    public List<RelicData> FullRelicList;   //全部遗物信息
-    void Start()
-    {
-        Initialize();
-    }
-
+    public List<RelicData> FullRelicList = new List<RelicData>();   //全部遗物信息
     void Initialize()
     {
         // 初始化遗物管理器
@@ -55,10 +51,24 @@ public class RelicManager : MonoBehaviour
         //Debug.Log("JSON Data: " + jsonData); // 打印 JSON 数据
 
         // 解析 JSON 数据
-        RelicJsons gameData = JsonUtility.FromJson<RelicJsons>(wrappedJson);
+        RelicCsvRows gameData = JsonUtility.FromJson<RelicCsvRows>(wrappedJson);
         Debug.Log(wrappedJson);
 
-        foreach(RelicData data in gameData.relics) {
+        foreach (RelicCsvRow row in gameData.relics) {
+            int priority = 0;
+            if (!string.IsNullOrWhiteSpace(row.priority) && !int.TryParse(row.priority, out priority))
+            {
+                Debug.LogError($"遗物 {row.id} 的 priority 必须是整数：{row.priority}");
+                continue;
+            }
+            var data = new RelicData
+            {
+                id = row.id,
+                desc = row.desc,
+                iconString = row.iconString,
+                condition = row.condition,
+                priority = priority,
+            };
             Debug.Log("Adding relic: " + data.id);
             //初始化icon
             data.icon = Resources.Load<Sprite>(data.iconString);

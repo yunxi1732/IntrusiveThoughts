@@ -30,7 +30,6 @@ public class DateController : MonoBehaviour
 
     void Start()
     {
-        currentDate = 0;
         UpdateDateText();
         ShowDatePanel(false);
     }
@@ -43,6 +42,14 @@ public class DateController : MonoBehaviour
     public void PassDay()
     {
         currentDate++;
+        UpdateDateText();
+    }
+
+    // 新游戏传入 0，读档传入存档日期；Start 不覆盖已恢复的数据。
+    public void SetDate(int date)
+    {
+        if (date < 0) throw new System.ArgumentOutOfRangeException(nameof(date));
+        currentDate = date;
         UpdateDateText();
     }
 

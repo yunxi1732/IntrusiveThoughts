@@ -31,9 +31,37 @@ public class Settings : MonoBehaviour
         returnButton.onClick.AddListener(OnReturnButtonClicked);
     }
 
+    // 设置界面的存档按钮入口；槽位由进入游戏时的选择决定。
+    public void OnSaveButtonClicked()
+    {
+        if (SaveManager.instance == null)
+        {
+            Debug.LogError("存档管理器尚未初始化。", this);
+            return;
+        }
+        if (SaveManager.instance.CurrentSlotId == 0)
+        {
+            Debug.LogWarning("尚未选择游戏槽位，无法保存。", this);
+            return;
+        }
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "BedRoomScene")
+        {
+            Debug.LogWarning("只能在卧室保存游戏。", this);
+            return;
+        }
+        if (StoryManager.instance == null || StoryManager.instance.IsPlaying)
+        {
+            Debug.LogWarning("剧情尚未就绪或正在播放，无法保存。", this);
+            return;
+        }
+        SaveManager.instance.SaveGame();
+    }
+
     void OnReturnButtonClicked()
     {
         SettingsPanel.SetActive(false);
-        MainMenu.instance.MainPanel.SetActive(true);
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainScene"
+            && MainMenu.instance != null)
+            MainMenu.instance.MainPanel.SetActive(true);
     }
 }

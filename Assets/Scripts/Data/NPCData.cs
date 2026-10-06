@@ -1,6 +1,5 @@
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 
 [System.Serializable]
@@ -9,9 +8,31 @@ public class NPCData
     public string id;
     public string desc;
     public string iconString;
-    public string state;
-    public int stateValue;
+    public string modelString;
+    // 运行时情绪和属性，key 如 happy、regret、emotion.anxiety。
+    public List<StateValueData> attributes = new List<StateValueData>();
+    public List<string> tags = new List<string>();
+
+    public int GetValue(string attribute)
+    {
+        var entry = attributes.Find(item => item.key == attribute);
+        return entry == null ? 0 : entry.value;
+    }
+
+    public void SetValue(string attribute, int value)
+    {
+        var entry = attributes.Find(item => item.key == attribute);
+        if (entry == null)
+            attributes.Add(new StateValueData { key = attribute, value = value });
+        else
+            entry.value = value;
+    }
+
+    // 加载后的资源缓存，不写入进度存档。
+    [System.NonSerialized]
     public Sprite icon;
+    [System.NonSerialized]
+    public Sprite model;
 }
 
 [System.Serializable]

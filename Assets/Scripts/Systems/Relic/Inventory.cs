@@ -12,6 +12,7 @@ public class RelicBubbleEntry
     public GameObject item;
     public int index;
     public RelicData relicData;
+    public BubbleData bubbleData;
 }
 
 public class Inventory : MonoBehaviour
@@ -62,21 +63,7 @@ public class Inventory : MonoBehaviour
 
     public void InitInventory()
     {
-        //清空背包内物品
-        foreach (var item in inventoryItems)
-        {
-            if (item != null)
-            {
-                Destroy(item.item);
-            }
-        }
-        inventoryItems.Clear();
-
-        // 初始化背包内物品
-        // foreach (var relic in RelicManager.instance.FullRelicList)
-        // {
-        //     AddBubbleItem(relic);
-        // }
+        ClearInventory();
 
         if (inventoryItems.Count > 0)
         {
@@ -89,7 +76,8 @@ public class Inventory : MonoBehaviour
         InventoryGroup.SetActive(true);
         inventoryButton.gameObject.SetActive(true);
         InventoryPanel.SetActive(false);
-        BubblePanel.SetActive(false);
+        // 进入卧室时背包可能已从存档恢复，立即显示并绑定已有气泡。
+        ShowBubblePanel();
     }
     public void DisableInventory()
     {
@@ -119,7 +107,7 @@ public class Inventory : MonoBehaviour
             if (i < inventoryItems.Count && inventoryItems[i] != null)
             {
                 bubbleEntries[i].gameObject.SetActive(true);
-                bubbleEntries[i].init(inventoryItems[i].relicData);
+                bubbleEntries[i].init(inventoryItems[i].relicData, inventoryItems[i].bubbleData);
             } else
             {
                 bubbleEntries[i].gameObject.SetActive(false);
@@ -144,8 +132,10 @@ public class Inventory : MonoBehaviour
         ShowInventoryButton();
     }
 
-    public void AddBubbleItem(RelicData relic)
+    public bool AddBubbleItem(RelicData relic, string instanceId)
     {
+        if (relic == null || string.IsNullOrWhiteSpace(instanceId)) return false;
+        if (inventoryItems.Exists(entry => entry.bubbleData.sourceInstanceId == instanceId)) return false;
         if (relic != null)
         {
             //创建背包项预制体
@@ -164,25 +154,58 @@ public class Inventory : MonoBehaviour
                 itemButton.onClick.AddListener(() => RenderBubbleInfo(relic));
             }
 
-            inventoryItems.Add(new RelicBubbleEntry { item = item, relicData = relic });
+            inventoryItems.Add(new RelicBubbleEntry
+            {
+                item = item,
+                relicData = relic,
+                bubbleData = new BubbleData { sourceInstanceId = instanceId, relicId = relic.id },
+            });
 
             //刷新bubble显示
             ShowBubblePanel();
         }
+        return true;
     }
 
-    public void RemoveRelic(RelicData relicData)
+    public bool RemoveRelic(string instanceId)
     {
-        inventoryItems.RemoveAll(entry => {
-            if (entry.relicData.id == relicData.id)
-            {
-                Destroy(entry.item);
-                return true;
-            }
-            return false;
-        });
+        int index = inventoryItems.FindIndex(entry => entry.bubbleData.sourceInstanceId == instanceId);
+        if (index < 0) return false;
+        Destroy(inventoryItems[index].item);
+        inventoryItems.RemoveAt(index);
         //刷新bubble显示
         ShowBubblePanel();
+        return true;
+    }
+
+    // 存档快照不包含 UI 引用，也不共享可变的数据对象。
+    public List<BubbleData> GetBubbleRecords()
+    {
+        return inventoryItems.ConvertAll(entry => new BubbleData
+        {
+            sourceInstanceId = entry.bubbleData.sourceInstanceId,
+            relicId = entry.bubbleData.relicId,
+        });
+    }
+
+    public void RestoreBubbleRecords(List<BubbleData> records)
+    {
+        // 先校验再清空，避免无效存档导致当前背包丢失。
+        var ids = new HashSet<string>();
+        var relics = new List<RelicData>();
+        foreach (var record in records)
+        {
+            if (record == null || string.IsNullOrWhiteSpace(record.sourceInstanceId)
+                || !ids.Add(record.sourceInstanceId))
+                throw new System.ArgumentException("背包存档含空记录或重复实例 ID。", nameof(records));
+            var relic = RelicManager.instance.GetRelicDataByName(record.relicId);
+            if (relic == null)
+                throw new System.ArgumentException($"背包存档引用了不存在的遗物：{record.relicId}", nameof(records));
+            relics.Add(relic);
+        }
+        ClearInventory();
+        for (int i = 0; i < records.Count; i++)
+            AddBubbleItem(relics[i], records[i].sourceInstanceId);
     }
 
     public void ClearInventory()
@@ -208,7 +231,7 @@ public class Inventory : MonoBehaviour
             }
             if (itemDescText != null)
             {
-                itemDescText.text = relic.desc;
+                itemDescText.text = relic.description;
             }
             if (itemIcon != null)
             {

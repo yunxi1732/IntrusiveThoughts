@@ -30,11 +30,6 @@ public class MainMenu : MonoBehaviour
 
     void Start()
     {
-        //初始化菜单界面
-        MainPanel.SetActive(true);
-        SettingsPanel.SetActive(false);
-        DataChoosePanel.SetActive(false);
-
         //注册按钮事件
         startGameButton.onClick.AddListener(OnStartGameClicked);
         settingsButton.onClick.AddListener(OnSettingsClicked);

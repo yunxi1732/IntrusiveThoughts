@@ -57,11 +57,12 @@ public class BedroomController : MonoBehaviour
 
     void CollectRelic()
     {
+        if (selectedRelic == null || selectedRelic.record == null || selectedRelic.record.collected) return;
+        var record = selectedRelic.record;
+        if (!Inventory.instance.AddBubbleItem(selectedRelic.relicData, record.instanceId)) return;
+        record.collected = true;
         RelicInfoPanel.SetActive(false);
-        //在背包中加入指定遗物
-        Inventory.instance.AddBubbleItem(selectedRelic.relicData);
-        //删除entry
-        Destroy(selectedRelic.gameObject);
+        selectedRelic.gameObject.SetActive(false);
         selectedRelic = null;
     }
 
@@ -75,18 +76,31 @@ public class BedroomController : MonoBehaviour
 
     public void InitBedroom()
     {
-        //清空房间遗物
-        foreach (RelicEntry entry in relicEntries)
-        {
-            if (entry != null)
-            {
-                Destroy(entry.gameObject);
-            }
-        }
+        CloseRelicInfo();
+        selectedRelic = null;
+        bool createRecords = !GameState.instance.bedroomInitialized;
+        bool initializedSuccessfully = true;
         relicEntries.Clear();
-
-        //清空背包遗物
-        Inventory.instance.ClearInventory();
+        var placements = new HashSet<string>();
+        foreach (var entry in Object.FindObjectsByType<RelicEntry>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (entry.gameObject.scene != gameObject.scene) continue;
+            if (!entry.InitializeRecord(createRecords))
+            {
+                if (createRecords) initializedSuccessfully = false;
+                continue;
+            }
+            if (!placements.Add(entry.placementId))
+            {
+                Debug.LogError($"卧室遗物摆放编号重复：{entry.placementId}", entry);
+                entry.gameObject.SetActive(false);
+                initializedSuccessfully = false;
+                continue;
+            }
+            relicEntries.Add(entry);
+        }
+        if (createRecords && initializedSuccessfully)
+            GameState.instance.bedroomInitialized = true;
         //根据游戏状态重新生成房间遗物entry
         //GenerateRelicEntry();
 
@@ -103,6 +117,7 @@ public class BedroomController : MonoBehaviour
 
     public void SelectRelicEntry(RelicEntry entry)
     {
+        if (entry.record == null || entry.record.collected) return;
         selectedRelic = entry;
         ShowRelicInfo(entry.transform.position);
     }
@@ -112,7 +127,7 @@ public class BedroomController : MonoBehaviour
         RelicInfoPanel.SetActive(true);
         //MoveToWorldPosition(canvas, RelicInfoPanel.GetComponent<RectTransform>(), worldPosition);
         relicIcon.sprite = selectedRelic.relicData.icon;
-        relicDescription.text = selectedRelic.relicData.desc;
+        relicDescription.text = selectedRelic.relicData.description;
     }
 
     public void MoveToWorldPosition(Canvas canvas, RectTransform uiElement, Vector3 worldPos)
