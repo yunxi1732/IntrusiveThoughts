@@ -22,11 +22,8 @@ public class TheaterController : MonoBehaviour
     }
 
     [Header("UI Panels")]
-    public GameObject TheaterPanel;   //剧场主界面
     public GameObject npcmodelPanel;   //角色模型面板
     public GameObject DialoguePanel;   //对白窗口
-    public Button ExitBut;     //退出剧场按钮
-    public Button DialogueBut;     //确认对白
     public TextMeshProUGUI DialogueCharacter;   //对白角色名
     public TextMeshProUGUI DialogueText;   //对白文本
 
@@ -35,8 +32,6 @@ public class TheaterController : MonoBehaviour
 
     void Start()
     {
-        DialogueBut?.onClick.AddListener(NextDialogue);
-        ExitBut?.onClick.AddListener(ExitTheater);
         StoryManager.instance.OnLine += HandleDialogueLine;
         StoryManager.instance.OnDialogueEnd += HandleDialogueEnd;
     }
@@ -50,7 +45,6 @@ public class TheaterController : MonoBehaviour
         }
     }
 
-
     public void InitTheater(LocationEntry location)
     {
         //显示背包按钮，并显示可用气泡
@@ -60,7 +54,7 @@ public class TheaterController : MonoBehaviour
 
         currentLocation = location;
         //根据角色 + 地点初始化剧场
-        TheaterPanel.SetActive(true);
+        Map_UI.instance.ShowTheaterPanel();
         //设置背景图
 
         //生成角色并放置位置
@@ -94,7 +88,7 @@ public class TheaterController : MonoBehaviour
         interactiveRelic = line.relic;
     }
 
-    void NextDialogue()
+    public void OnDialogueClicked()
     {
         StoryManager.instance.NextDialogue();
     }
@@ -102,15 +96,6 @@ public class TheaterController : MonoBehaviour
     void HandleDialogueEnd(DialogueSequence sequence)
     {
         DialoguePanel.SetActive(false);
-    }
-
-    void ExitTheater()
-    {
-        //结束剧情交互
-        StoryManager.instance.ResetStory();
-        //关闭背包按钮
-        Inventory.instance.DisableInventory();
-        TheaterPanel.SetActive(false);
     }
 
 }

@@ -3,10 +3,6 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 
-//管理卧室的交互循环
-//点击遗物可以查看遗物信息
-//点击背包可以查看背包物品
-
 public class DropTarget : MonoBehaviour, IDropHandler
 {
     public System.Action<Bubble> OnItemDropped;

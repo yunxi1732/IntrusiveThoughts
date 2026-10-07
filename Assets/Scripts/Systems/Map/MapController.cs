@@ -21,11 +21,6 @@ public class MapController : MonoBehaviour
             Destroy(gameObject);
         }
     }
-
-    [Header("UI Panels")]
-    public GameObject endConfirmPanel;   //结束当天确认窗口
-    public Button endDayButton;     //结束当天按钮
-
     
     [Header("交互场景展示")]
     private LocationEntry selectedLocationEntry;
@@ -33,7 +28,6 @@ public class MapController : MonoBehaviour
 
     void Start()
     {
-        endDayButton?.onClick.AddListener(EndDay);
         InitMap();
     }
 
@@ -53,12 +47,4 @@ public class MapController : MonoBehaviour
         TheaterController.instance.InitTheater(entry);
     }
 
-    void EndDay()
-    {
-        //endConfirmPanel.SetActive(true);
-        //结算当天数据，保存状态，更新游戏时间
-        DateController.instance.PassDay();
-        //加载卧室场景
-        UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
-    }
 }

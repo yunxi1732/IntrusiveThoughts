@@ -35,30 +35,15 @@ public class Inventory : MonoBehaviour
 
     public GameObject inventoryItemPrefab;  //背包项预制体
     [Header("UI Panels")]
-    public GameObject InventoryGroup;   //背包按钮+背包窗口
     public GameObject BubblePanel;   //气泡panel
-    public GameObject InventoryPanel;   //背包窗口
     public GameObject InventoryContent; //背包内容区域
-    public GameObject ItemInfoPanel;   //遗物说明窗口
-    public Button inventoryButton;  //气泡背包
-    public Button closeInventoryButton;  //关闭背包按钮
     public List<RelicBubbleEntry> inventoryItems = new List<RelicBubbleEntry>(); //背包内物品列表
     public List<Bubble> bubbleEntries = new List<Bubble>(); //背包内物品列表
-    [Header("Item Info")]
-    public TextMeshProUGUI itemNameText;
-    public TextMeshProUGUI itemDescText;
-    public Image itemIcon;
 
 
 
     void Start()
     {
-        InventoryGroup.SetActive(false);
-        InventoryPanel.SetActive(false);
-        inventoryButton.gameObject.SetActive(true);
-
-        inventoryButton?.onClick.AddListener(ShowInventory);
-        closeInventoryButton?.onClick.AddListener(CloseInventory);
     }
 
     public void InitInventory()
@@ -67,37 +52,23 @@ public class Inventory : MonoBehaviour
 
         if (inventoryItems.Count > 0)
         {
-            RenderBubbleInfo(inventoryItems[0].relicData);
+            Inventory_UI.instance.RenderBubbleInfo(inventoryItems[0].relicData);
         }
     }
 
+    //启用背包功能 - 显示按钮/关闭背包面包/渲染气泡
     public void EnableInventory()
     {
-        InventoryGroup.SetActive(true);
-        inventoryButton.gameObject.SetActive(true);
-        InventoryPanel.SetActive(false);
+        Inventory_UI.instance.EnableInventory();
         // 进入卧室时背包可能已从存档恢复，立即显示并绑定已有气泡。
         ShowBubblePanel();
     }
+    //禁用背包功能 - 隐藏按钮/关闭背包面板/隐藏气泡面板
     public void DisableInventory()
     {
-        InventoryGroup.SetActive(false);
-        inventoryButton.gameObject.SetActive(false);
-        InventoryPanel.SetActive(false);
-        BubblePanel.SetActive(false);
+        Inventory_UI.instance.DisableInventory();
     }
 
-    public void ShowInventoryButton()
-    {
-        inventoryButton.gameObject.SetActive(true);
-        ShowBubblePanel();
-    }
-
-    public void HideInventoryButton()
-    {
-        inventoryButton.gameObject.SetActive(false);
-        HideBubblePanel();
-    }
     public void ShowBubblePanel()
     {
         BubblePanel.SetActive(true);
@@ -113,23 +84,6 @@ public class Inventory : MonoBehaviour
                 bubbleEntries[i].gameObject.SetActive(false);
             }
         }
-    }
-
-    public void HideBubblePanel()
-    {
-        BubblePanel.SetActive(false);
-    }
-
-    public void ShowInventory()
-    {
-        InventoryPanel.SetActive(true);
-        HideInventoryButton();
-    }
-
-    public void CloseInventory()
-    {
-        InventoryPanel.SetActive(false);
-        ShowInventoryButton();
     }
 
     public bool AddBubbleItem(RelicData relic, string instanceId)
@@ -151,7 +105,7 @@ public class Inventory : MonoBehaviour
             Button itemButton = item.GetComponent<Button>();
             if (itemButton != null)
             {
-                itemButton.onClick.AddListener(() => RenderBubbleInfo(relic));
+                itemButton.onClick.AddListener(() => Inventory_UI.instance.RenderBubbleInfo(relic));
             }
 
             inventoryItems.Add(new RelicBubbleEntry
@@ -219,24 +173,5 @@ public class Inventory : MonoBehaviour
 
         //刷新bubble显示
         ShowBubblePanel();
-    }
-
-    public void RenderBubbleInfo(RelicData relic)
-    {
-        if (relic != null)
-        {
-            if (itemNameText != null)
-            {
-                itemNameText.text = relic.id;
-            }
-            if (itemDescText != null)
-            {
-                itemDescText.text = relic.description;
-            }
-            if (itemIcon != null)
-            {
-                itemIcon.sprite = relic.icon;
-            }
-        }
     }
 }

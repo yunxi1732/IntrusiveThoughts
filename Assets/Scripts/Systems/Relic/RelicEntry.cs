@@ -58,15 +58,6 @@ public class RelicEntry : MonoBehaviour, IPointerClickHandler
     {
         Debug.Log("Relic clicked: " + gameObject.name);
         // 当鼠标点击遗物时，显示遗物信息
-        BedroomController bedroomController = BedroomController.instance;
-        if (bedroomController != null)
-        {
-            bedroomController.SelectRelicEntry(this);
-        }
+        BedroomController.instance?.SelectRelicEntry(this);
     }
-
-    // public void OnMouseDown()
-    // {
-    //     Debug.Log("Relic mouse down: " + gameObject.name);
-    // }
 }

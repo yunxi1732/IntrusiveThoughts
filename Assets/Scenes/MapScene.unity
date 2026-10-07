@@ -987,7 +987,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 762497625}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1185707788}
+        m_TargetAssemblyTypeName: TheaterController, Assembly-CSharp
+        m_MethodName: OnDialogueClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &762497628
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1529,7 +1541,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1104931600}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1185707790}
+        m_TargetAssemblyTypeName: Map_UI, Assembly-CSharp
+        m_MethodName: OnEndDayClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1104931600
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1579,6 +1603,7 @@ GameObject:
   - component: {fileID: 1185707787}
   - component: {fileID: 1185707788}
   - component: {fileID: 1185707789}
+  - component: {fileID: 1185707790}
   m_Layer: 0
   m_Name: MapController
   m_TagString: Untagged
@@ -1613,14 +1638,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c32d37a93032d642b0c03330e30ee9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TheaterController
-  TheaterPanel: {fileID: 312169756}
   npcmodelPanel: {fileID: 70637246}
   DialoguePanel: {fileID: 762497623}
-  ExitBut: {fileID: 1204794299}
-  DialogueBut: {fileID: 762497627}
   DialogueCharacter: {fileID: 1240765855}
   DialogueText: {fileID: 91549711}
   interactiveRelic: 
+  currentLocation: {fileID: 0}
 --- !u!114 &1185707789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1633,11 +1656,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fd98a8341d87d74292cb4fd624db921, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapController
-  endConfirmPanel: {fileID: 0}
-  endDayButton: {fileID: 1104931599}
   locationEntries:
   - {fileID: 1808517334}
   - {fileID: 1707242433}
+--- !u!114 &1185707790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185707786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a67d1a9bdb7db54a9c70d007bac7f44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Map_UI
+  TheaterPanel: {fileID: 312169756}
 --- !u!1 &1204794297
 GameObject:
   m_ObjectHideFlags: 0
@@ -1720,7 +1754,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1204794300}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1185707790}
+        m_TargetAssemblyTypeName: Map_UI, Assembly-CSharp
+        m_MethodName: OnExitTheaterClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1204794300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1995,6 +2041,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d249eaee7621e644db485f6e439b4a2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocationEntry
+  canvasGroup: {fileID: 0}
   locationName: LocationB
   npcList: []
   npcIconPanel: {fileID: 1707242429}
@@ -2230,6 +2277,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d249eaee7621e644db485f6e439b4a2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LocationEntry
+  canvasGroup: {fileID: 0}
   locationName: LocationA
   npcList: []
   npcIconPanel: {fileID: 1808517329}

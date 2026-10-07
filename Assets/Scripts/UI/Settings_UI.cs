@@ -3,10 +3,10 @@ using UnityEngine.UI;
 
 //设置游戏
 //管理游戏设置，音量，语言等
-public class Settings : MonoBehaviour
+public class Settings_UI : MonoBehaviour
 {
     //单例模式，跨场景不销毁
-    public static Settings instance { get; private set; }
+    public static Settings_UI instance { get; private set; }
 
     private void Awake()
     {
@@ -23,12 +23,10 @@ public class Settings : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject SettingsPanel;
-    public Button returnButton;
 
     void Start()
     {
         SettingsPanel.SetActive(false);
-        returnButton.onClick.AddListener(OnReturnButtonClicked);
     }
 
     // 设置界面的存档按钮入口；槽位由进入游戏时的选择决定。
@@ -57,11 +55,11 @@ public class Settings : MonoBehaviour
         SaveManager.instance.SaveGame();
     }
 
-    void OnReturnButtonClicked()
+    public void OnReturnButtonClicked()
     {
         SettingsPanel.SetActive(false);
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainScene"
-            && MainMenu.instance != null)
-            MainMenu.instance.MainPanel.SetActive(true);
+            && Menu_UI.instance != null)
+            Menu_UI.instance.MainPanel.SetActive(true);
     }
 }

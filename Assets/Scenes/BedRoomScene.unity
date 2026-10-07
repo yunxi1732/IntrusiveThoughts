@@ -479,7 +479,7 @@ GameObject:
   - component: {fileID: 221763561}
   - component: {fileID: 221763562}
   m_Layer: 0
-  m_Name: Bedroom1_0
+  m_Name: BedroomBG
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1764,7 +1764,7 @@ GameObject:
   - component: {fileID: 981550337}
   - component: {fileID: 981550336}
   m_Layer: 5
-  m_Name: Text (TMP)
+  m_Name: DescText (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2263,9 +2263,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1185707790}
         m_TargetAssemblyTypeName: Bedroom_UI, Assembly-CSharp
-        m_MethodName: OnCollectClicked
+        m_MethodName: OnCollectRelicClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2445,6 +2445,7 @@ GameObject:
   - component: {fileID: 1185707787}
   - component: {fileID: 1185707788}
   - component: {fileID: 1185707789}
+  - component: {fileID: 1185707790}
   m_Layer: 0
   m_Name: BedroomController
   m_TagString: Untagged
@@ -2492,14 +2493,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392c58dcb709e2f4283b5ec3e87259f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BedroomController
+  relicEntryPrefab: {fileID: 0}
+  selectedRelic: {fileID: 0}
+--- !u!114 &1185707790
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1185707786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fee540acd0c39d4ca1a68a59f032153, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bedroom_UI
   canvas: {fileID: 356614531}
   RelicInfoPanel: {fileID: 1250254250}
   collectButton: {fileID: 1111503701}
   closeButton: {fileID: 1336842679}
-  outButton: {fileID: 1318265944}
+  outdoorButton: {fileID: 1318265944}
   relicIcon: {fileID: 1843539652}
   relicDescription: {fileID: 981550336}
-  relicEntryPrefab: {fileID: 0}
 --- !u!1 &1250254250
 GameObject:
   m_ObjectHideFlags: 0
@@ -2592,7 +2606,7 @@ GameObject:
   - component: {fileID: 1318265945}
   - component: {fileID: 1318265944}
   m_Layer: 5
-  m_Name: OutButton
+  m_Name: OutdoorButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2661,7 +2675,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1318265945}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1185707790}
+        m_TargetAssemblyTypeName: Bedroom_UI, Assembly-CSharp
+        m_MethodName: OnOutdoorButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1318265945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2783,9 +2809,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1185707790}
         m_TargetAssemblyTypeName: Bedroom_UI, Assembly-CSharp
-        m_MethodName: OnCloseClicked
+        m_MethodName: CloseRelicInfo
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

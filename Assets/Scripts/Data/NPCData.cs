@@ -58,7 +58,7 @@ public class NPCSchedule
     public string npcid;
     public string location;
     public int priority;
-    public System.Collections.Generic.List<DialogueCondition> conditions;
+    public List<DialogueCondition> conditions;
 }
 
 [System.Serializable]
