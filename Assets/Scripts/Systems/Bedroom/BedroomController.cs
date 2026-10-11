@@ -26,11 +26,16 @@ public class BedroomController : MonoBehaviour
     }
 
     //卧室状态
-    [SerializeField] private RelicEntry relicEntryPrefab;   //房间遗物entry预制体
     public RelicEntry selectedRelic;
     private List<RelicEntry> relicEntries = new List<RelicEntry>();
     void Start()
     {
+        //如果是第0天，播放开场剧情
+        if (DateController.instance.currentDate == 0)
+        {
+            StoryManager.instance.TryStart();
+        }
+
         InitBedroom();
     }
 
@@ -45,35 +50,36 @@ public class BedroomController : MonoBehaviour
         selectedRelic = null;
     }
 
+    public void SelectRelicEntry(RelicEntry entry)
+    {
+        if (entry.record == null || entry.record.collected) return;
+        selectedRelic = entry;
+        Bedroom_UI.instance.ShowRelicInfo(entry, entry.transform.position);
+    }
+
     public void InitBedroom()
     {
         Bedroom_UI.instance.CloseRelicInfo();
-        selectedRelic = null;
         bool createRecords = !GameState.instance.bedroomInitialized;
         bool initializedSuccessfully = true;
+        selectedRelic = null;
         relicEntries.Clear();
-        var placements = new HashSet<string>();
         foreach (var entry in FindObjectsByType<RelicEntry>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
-            if (entry.gameObject.scene != gameObject.scene) continue;
-            if (!entry.InitializeRecord(createRecords))
-            {
-                if (createRecords) initializedSuccessfully = false;
-                continue;
-            }
-            if (!placements.Add(entry.placementId))
-            {
-                Debug.LogError($"卧室遗物摆放编号重复：{entry.placementId}", entry);
-                entry.gameObject.SetActive(false);
-                initializedSuccessfully = false;
-                continue;
-            }
+            // if (!entry.InitializeRecord(createRecords))
+            // {
+            //     if (createRecords) initializedSuccessfully = false;
+            //     continue;
+            // }
+            entry.InitializeRecord(createRecords);
             relicEntries.Add(entry);
         }
+
+        Debug.Log("createRecords: " + createRecords + ", initializedSuccessfully: " + initializedSuccessfully);
         if (createRecords && initializedSuccessfully)
+        {
             GameState.instance.bedroomInitialized = true;
-        //根据游戏状态重新生成房间遗物entry
-        //GenerateRelicEntry();
+        }
 
         //显示背包按钮
         Inventory.instance.EnableInventory();
@@ -81,15 +87,4 @@ public class BedroomController : MonoBehaviour
         DateController.instance.ShowDatePanel(true);
     }
 
-    private void GenerateRelicEntry()
-    {
-        //根据游戏状态生成房间遗物entry
-    }
-
-    public void SelectRelicEntry(RelicEntry entry)
-    {
-        if (entry.record == null || entry.record.collected) return;
-        selectedRelic = entry;
-        Bedroom_UI.instance.ShowRelicInfo(entry, entry.transform.position);
-    }
 }

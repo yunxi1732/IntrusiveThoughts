@@ -58,7 +58,7 @@ public class SaveManager : MonoBehaviour
 
     private void ApplyVolumePreferences()
     {
-        foreach (var control in UnityEngine.Object.FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var control in FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
             control.LoadSlider(GetVolumePreference(control.parameter));
     }
 
@@ -66,7 +66,7 @@ public class SaveManager : MonoBehaviour
     {
         if (!globalLoaded && !LoadGlobalProgress())
             throw new InvalidDataException("全局数据未能读取，已停止覆盖保存。");
-        foreach (var control in UnityEngine.Object.FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (var control in FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
         {
             if (control.slider == null || string.IsNullOrWhiteSpace(control.parameter)) continue;
             var entry = globalProgress.volumeSettings.Find(item => item.parameter == control.parameter);
@@ -99,7 +99,7 @@ public class SaveManager : MonoBehaviour
             if (File.Exists(path))
             {
                 data = JsonUtility.FromJson<GameData>(File.ReadAllText(path));
-                if (data == null || (data.version != 1 && data.version != 2) || data.slotId != slotId || !data.bedroomInitialized)
+                if (data == null || (data.version != 1 && data.version != 2 && data.version != 3) || data.slotId != slotId || !data.bedroomInitialized)
                     throw new InvalidDataException("存档格式或槽位不正确。");
                 MigrateProgress(data);
                 ValidateProgress(data);
@@ -148,8 +148,8 @@ public class SaveManager : MonoBehaviour
         foreach (var relic in data.bedroomRelics ?? new List<BedroomRelicData>())
         {
             if (relic == null || string.IsNullOrWhiteSpace(relic.instanceId)
-                || string.IsNullOrWhiteSpace(relic.placementId) || instances.ContainsKey(relic.instanceId)
-                || !placements.Add(relic.placementId) || RelicManager.instance.GetRelicDataByName(relic.relicId) == null)
+                || instances.ContainsKey(relic.instanceId)
+                || RelicManager.instance.GetRelicDataByName(relic.relicId) == null)
                 throw new InvalidDataException("卧室遗物记录无效或重复。");
             instances.Add(relic.instanceId, relic);
         }
@@ -195,7 +195,7 @@ public class SaveManager : MonoBehaviour
             }
         }
         data.states = new List<StateValueData>();
-        data.version = 2;
+        data.version = 3;
     }
 
     private void Awake()

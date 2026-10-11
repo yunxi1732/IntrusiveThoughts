@@ -5,7 +5,7 @@ using System.Collections.Generic;
 [Serializable]
 public class GameData
 {
-    public int version = 2;
+    public int version = 3;
     public int slotId;
     public string savedAtUtc;
     // 与 DateController 一致：0 表示第一天。

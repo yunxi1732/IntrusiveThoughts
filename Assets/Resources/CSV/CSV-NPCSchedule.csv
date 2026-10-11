@@ -1,0 +1,9 @@
+﻿npcid,location,priority,conditions
+万蕊,楼道,0,day==0; story.tut.3 = 0
+麻雀,楼道,1,day==0; npc.麻雀.start = 0
+路过的外卖员,楼道,0,day==0; npc.路过的外卖员.finished = 0; npc.麻雀.start == 1
+余宏志,商圈,,day==1
+可疑的人,商圈,,day==1
+可疑的人,楼道,1,day==2
+辰星Walker,出租屋,0,day==2;  story.seq_day2_chenxing2 =1
+麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 =1

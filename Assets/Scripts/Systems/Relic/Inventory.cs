@@ -90,6 +90,11 @@ public class Inventory : MonoBehaviour
     {
         if (relic == null || string.IsNullOrWhiteSpace(instanceId)) return false;
         if (inventoryItems.Exists(entry => entry.bubbleData.sourceInstanceId == instanceId)) return false;
+        if (inventoryItems.Count >= bubbleEntries.Count)
+        {
+            Debug.LogWarning("背包遗物栏已满，无法收集更多遗物。");
+            return false;
+        }
         if (relic != null)
         {
             //创建背包项预制体
@@ -114,6 +119,13 @@ public class Inventory : MonoBehaviour
                 relicData = relic,
                 bubbleData = new BubbleData { sourceInstanceId = instanceId, relicId = relic.id },
             });
+
+            //触发收集遗物的相关剧情
+            Debug.Log("bedroomInitialized: " + GameState.instance.bedroomInitialized + ", inventoryItems.Count: " + inventoryItems.Count + ", bubbleEntries.Count: " + bubbleEntries.Count);
+            if(GameState.instance.bedroomInitialized && inventoryItems.Count == bubbleEntries.Count )
+            {
+                StoryManager.instance.SetState("story.tutorial.1", 1);
+            }
 
             //刷新bubble显示
             ShowBubblePanel();
@@ -142,6 +154,11 @@ public class Inventory : MonoBehaviour
         });
     }
 
+    public bool HasRelic(string relicId)
+    {
+        return inventoryItems.Exists(entry => entry.relicData.id == relicId);
+    }
+
     public void RestoreBubbleRecords(List<BubbleData> records)
     {
         // 先校验再清空，避免无效存档导致当前背包丢失。
@@ -157,6 +174,9 @@ public class Inventory : MonoBehaviour
                 throw new System.ArgumentException($"背包存档引用了不存在的遗物：{record.relicId}", nameof(records));
             relics.Add(relic);
         }
+        if (records.Count > bubbleEntries.Count)
+            throw new System.ArgumentException("背包存档中的遗物数量超过可用栏位。", nameof(records));
+
         ClearInventory();
         for (int i = 0; i < records.Count; i++)
             AddBubbleItem(relics[i], records[i].sourceInstanceId);

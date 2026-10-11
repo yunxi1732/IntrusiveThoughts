@@ -1,7 +1,21 @@
-id,location,npc,relic,priority,once,conditions,onFinishSet,,
-testSeq,,char1,,,FALSE,story.emgSeqDone == 0,,,
-testSeq2,,char1,,,FALSE,story.emgSeqDone ==1,,,
-emgSeq,,,遗物1,10,TRUE,,story.emgSeqDone = 1,,
-test2Seq,,char2,,,FALSE,story.emg2SeqDone == 0,,,
-test2Seq2,,char2,,,FALSE,story.emg2SeqDone ==1,,,
-emg2Seq,,,遗物2,10,TRUE,,story.emg2SeqDone = 1,,
+﻿id,location,npc,relic,seqType,priority,once,conditions,onFinishSet,action
+seq_tut_1,出租屋,,,,,TRUE,,story.tut.1 = 1,
+seq_tut_2,出租屋,,,auto,,TRUE,story.tut.1 == 1;story.tutorial.1==1,story.tut.2 = 1;story.tutorial.2==1,
+seq_tut_3,楼道,万蕊,,,,TRUE,story.tut.2 == 1; relic.游戏卡带.collected == 1,story.tut.3 = 1,updatenpc
+seq_tut_4,楼道,麻雀,,,,FALSE,story.tut.3 == 1,story.tut.4 = 1,
+seq_tut_4_emg,楼道,麻雀,游戏卡带,,1,TRUE,story.tut.3 == 1,npc.麻雀.start = 1,updatenpc
+seq_tut_5,楼道,路过的外卖员,,,,FALSE,npc.麻雀.start  == 1,story.seq_tut_5 = 1,
+seq_tut_5_emg,楼道,路过的外卖员,any,,,TRUE,npc.麻雀.start = 1,npc.路过的外卖员.finished = 1;story.tutorial.3 = 1,updatenpc
+seq_day1_start,出租屋,麻雀,,,,TRUE,day == 1; npc.路过的外卖员.finished == 1; npc.麻雀.start == 1,story.seq_day1_start = 1,
+seq_day1_mom,公园,万蕊,,,,TRUE,day == 1; day == 1;story.seq_day1_start == 1,,
+seq_day1_chenxing1,商圈,余宏志,,,,FALSE,day == 1; day == 1;story.seq_day1_start == 1,,
+seq_day1_chenxing1_emg,商圈,余宏志,没吃完的止痛片,,,TRUE,day == 1,npc.辰星Walker.someconfidence = 1; npc.余宏志.regret += 1; story.seq_day2_chenxing1_emg=1,
+seq_day1_chenxing1_postemg,商圈,余宏志,,,,FALSE,day == 1; story.seq_day2_chenxing1_emg == 1,,
+seq_day2_chenxing2,楼道,可疑的人,,,,TRUE,day == 2,story.seq_day2_chenxing2 =1,
+seq_day2_chenxing3,出租屋,辰星Walker,,,,TRUE,day == 2; story.seq_day2_chenxing2 ==1,story.seq_day2_chenxing3 =1,
+seq_day2_chenxing4,出租屋,辰星Walker,,,,FALSE,day == 2; story.seq_day2_chenxing3 ==1,,
+seq_day2_chenxing4_emg,出租屋,辰星Walker,多余的挂件,,,TRUE,day == 2,npc.辰星Walker.honest = 1,
+seq_day2_chenxing4_postemg,出租屋,辰星Walker,,,,FALSE,day == 2; npc.辰星Walker.honest == 1,,
+outdoor_lock_seq,,,,tutorial1,,FALSE,story.tutorial.2==0,,
+bed_lock_seq,,,,tutorial2,,FALSE,story.tutorial.3==0,,
+stair_lock_seq,,,,tutorial3,,FALSE,story.tutorial.3==0,,

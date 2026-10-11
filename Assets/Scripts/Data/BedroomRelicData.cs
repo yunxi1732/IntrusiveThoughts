@@ -7,6 +7,5 @@ public class BedroomRelicData
     public string instanceId;
     public string relicId;
     // 对应场景内固定摆放位置的唯一编号。
-    public string placementId;
     public bool collected;
 }

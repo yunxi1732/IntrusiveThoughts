@@ -29,6 +29,9 @@ public class NPCManager : MonoBehaviour
     public GameObject npcIconPrefab;    //大地图中的npc图标预制体
     public GameObject npcBodyPrefab;    //场景中的npc预制体
 
+    [Header("Player Info")]
+    public Sprite playerIcon;
+
     private NPCData RequireNpc(string npcId)
     {
         if (string.IsNullOrWhiteSpace(npcId))
@@ -81,7 +84,7 @@ public class NPCManager : MonoBehaviour
 
     public void ParseNPCCSV()
     {
-        TextAsset csvFile = Resources.Load<TextAsset>("CSV/NPC");
+        TextAsset csvFile = Resources.Load<TextAsset>("CSV/CSV-NPC");
         if (csvFile == null)
         {
             Debug.LogError("CSV file not found in Resources folder!");
@@ -102,6 +105,8 @@ public class NPCManager : MonoBehaviour
             Debug.Log("Adding NPC: " + data.id);
             //初始化icon
             data.icon = Resources.Load<Sprite>("Sprites/" + data.iconString);
+            //多个不同表情图片，使用逗号分隔解析 todo
+            data.model = Resources.Load<Sprite>("Sprites/" + data.modelString);
             // CSV 不含运行时字段；显式初始化，避免集合为空引用。
             data.attributes = new List<StateValueData>();
             data.tags = new List<string>();
@@ -112,6 +117,7 @@ public class NPCManager : MonoBehaviour
                 existing.iconString = data.iconString;
                 existing.modelString = data.modelString;
                 existing.icon = data.icon;
+                existing.model = data.model;
             }
             else
                 FullNPCList.Add(data);
@@ -120,7 +126,7 @@ public class NPCManager : MonoBehaviour
 
     public void ParseNPCScheduleCSV()
     {
-        TextAsset csvFile = Resources.Load<TextAsset>("CSV/NPCSchedule");
+        TextAsset csvFile = Resources.Load<TextAsset>("CSV/CSV-NPCSchedule");
         if (csvFile == null)
         {
             Debug.LogError("CSV file not found in Resources folder!");
@@ -161,6 +167,7 @@ public class NPCManager : MonoBehaviour
             if (!s.conditions.TrueForAll(c => c.Check(GameStateAccess.Get(c.key)))) continue;
             if (best == null || s.priority > best.priority) best = s;
         }
+        Debug.Log("Best location for NPC " + npcId + ": " + (best?.location ?? "None"));
         return best?.location;
     }
 

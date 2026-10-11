@@ -63,18 +63,20 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         if (droppedSuccessfully)
         {
             //检查遗物是否匹配
-            string relicName = TheaterController.instance.interactiveRelic;
-            if (!string.IsNullOrEmpty(relicName) && TheaterController.instance.interactiveRelic == relicData.id)
+            string relicName = StoryPlayer.instance.interactiveRelic;
+            string target = StoryPlayer.instance.currentCharacter;
+            if (!string.IsNullOrEmpty(relicName) && StoryPlayer.instance.IsMatchRelic(relicData.id))
             {
                 Debug.Log("遗物使用成功: " + relicData.id + ", 期望: " + relicName);
                 //开始涌现剧情
                 // 缓存 ID，刷新气泡槽位后本组件可能绑定到另一件物品。
                 string instanceId = bubbleData.sourceInstanceId;
-                if (StoryManager.instance.TryStart(null, relicData))
+                if (StoryManager.instance.TryStart(target, relicData))
                     Inventory.instance.RemoveRelic(instanceId);
-                //gameObject.SetActive(false);
             } else
             {
+                //获取使用对象
+                StoryManager.instance.TryStart(target, relicData, "relicfail");
                 Debug.Log("遗物使用失败: " + relicData.id + ", 期望: " + relicName);
             }
         }

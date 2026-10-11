@@ -3,15 +3,20 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
+[System.Serializable]
+public class LocationInfo
+{
+    public string locationName;   //地点名称
+    public List<NPCData> npcList = new List<NPCData>();   //该地点的角色列表
+}
 
 //map中的可交互地点
-
 public class LocationEntry : MonoBehaviour, IPointerClickHandler
 {
     public CanvasGroup canvasGroup;   //地点的CanvasGroup，用于控制显示与交互
     public string locationName;   //地点名称
     public List<NPCData> npcList = new List<NPCData>();   //该地点的角色列表
-    public GameObject npcIconPanel;   //大地图上的地点图标
+    public GameObject npcIconPanel;   //地点角色展示容器
 
     void Start()
     {
@@ -53,6 +58,15 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
     public void OnPointerClick(PointerEventData eventData)
     {
         //Debug.Log("LocationEntry clicked: " + gameObject.name);
-        MapController.instance.SelectLocationEntry(this);
+        StoryPlayer.instance.currentLocation = locationName;
+
+        if (locationName == "出租屋")
+        {
+            //切换场景
+            UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
+        } else {
+            //切换场景
+            UnityEngine.SceneManagement.SceneManager.LoadScene("LocationScene");
+        }
     }
 }

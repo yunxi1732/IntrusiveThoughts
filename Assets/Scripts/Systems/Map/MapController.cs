@@ -23,7 +23,6 @@ public class MapController : MonoBehaviour
     }
     
     [Header("交互场景展示")]
-    private LocationEntry selectedLocationEntry;
     public List<LocationEntry> locationEntries = new List<LocationEntry>();   //对应场景内所有可交互点
 
     void Start()
@@ -31,20 +30,13 @@ public class MapController : MonoBehaviour
         InitMap();
     }
 
-
     public void InitMap()
     {
         //关闭背包功能
         Inventory.instance.DisableInventory();
-        foreach (var entry in locationEntries) entry.ShowNPCs();
-    }
 
-    public void SelectLocationEntry(LocationEntry entry)
-    {
-        //处理选中地图位置的逻辑
-        selectedLocationEntry = entry;
-        //加载对应场景和npc
-        TheaterController.instance.InitTheater(entry);
+        //刷新NPC显示
+        foreach (var entry in locationEntries) entry.ShowNPCs();
     }
 
 }

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a7f9315eca4397046be84ecad38da8c3
+guid: 7d7b84d8b5a606046bc0ba08deb030e2
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3002740266577848037
-    second: relic_0
+      213: -692078636420456154
+    second: Street_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: relic_0
+      name: Street_0
       rect:
         serializedVersion: 2
-        x: 28
-        y: 24
-        width: 559
-        height: 555
+        x: 0
+        y: 0
+        width: 1200
+        height: 675
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5e6622efc50eba920800000000000000
-      internalID: 3002740266577848037
+      spriteID: 621a58f952e3566f0800000000000000
+      internalID: -692078636420456154
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      relic_0: 3002740266577848037
+      Street_0: -692078636420456154
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

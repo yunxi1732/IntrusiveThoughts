@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: bb59192d205b5534faa32d3a437acce6
+guid: 208698253f8db12458e8213fa7a3a013
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 754159197147314342
-    second: Bedroom1_0
+      213: 2924650149336173889
+    second: wanrui_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +46,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bedroom1_0
+      name: wanrui_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 4
         y: 0
-        width: 736
-        height: 716
+        width: 508
+        height: 505
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6a83f0a4bcf477a00800000000000000
-      internalID: 754159197147314342
+      spriteID: 14dc97bb0d1769820800000000000000
+      internalID: 2924650149336173889
       vertices: []
       indices: 
       edges: []
@@ -151,7 +151,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Bedroom1_0: 754159197147314342
+      wanrui_0: 2924650149336173889
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

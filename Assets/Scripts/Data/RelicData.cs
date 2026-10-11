@@ -1,21 +1,17 @@
 using UnityEngine;
-using UnityEngine.Serialization;
 
-// CSV 中的遗物配置；具体物件身份由 BedroomRelicData 保存。
+// CSV 中的遗物配置；场景中的 RelicEntry 通过 id 绑定具体遗物。
 [System.Serializable]
 public class RelicData
 {
     public string id;
-    [FormerlySerializedAs("description")] public string desc;
+    public string desc;
     public string iconString;
     public string condition;
-    public int priority;
     // 资源加载后的缓存，不写入进度存档。
     [System.NonSerialized]
     public Sprite icon;
 
-    // 保留现有 UI 的访问方式，CSV 字段统一使用 desc。
-    public string description { get => desc; set => desc = value; }
 }
 
 // CsvToJson 将数字也输出为字符串，因此 CSV 行和运行时配置分开。
@@ -26,7 +22,6 @@ public class RelicCsvRow
     public string desc;
     public string iconString;
     public string condition;
-    public string priority;
 }
 
 [System.Serializable]

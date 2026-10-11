@@ -8,7 +8,7 @@ public class NPCData
     public string id;
     public string desc;
     public string iconString;
-    public string modelString;
+    public string modelString;    //多个不同表情图片，使用逗号分隔
     // 运行时情绪和属性，key 如 happy、regret、emotion.anxiety。
     public List<StateValueData> attributes = new List<StateValueData>();
     public List<string> tags = new List<string>();

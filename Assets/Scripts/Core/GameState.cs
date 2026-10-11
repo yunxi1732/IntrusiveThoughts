@@ -48,7 +48,6 @@ public class GameState : MonoBehaviour
         {
             instanceId = item.instanceId,
             relicId = item.relicId,
-            placementId = item.placementId,
             collected = item.collected,
         });
         Inventory.instance.RestoreBubbleRecords(data.inventoryBubbles ?? new List<BubbleData>());

@@ -101,7 +101,7 @@ public class Inventory_UI : MonoBehaviour
             }
             if (itemDescText != null)
             {
-                itemDescText.text = relic.description;
+                itemDescText.text = relic.desc;
             }
             if (itemIcon != null)
             {

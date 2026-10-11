@@ -75,15 +75,19 @@ public class StoryManager : MonoBehaviour
     }
 
     //选出当前场景下满足条件、优先级最高的对话
-    public DialogueSequence Select(string npc = null, string location = null, RelicData relicData = null)
+    public DialogueSequence Select(string npc = null, string location = null, RelicData relicData = null, string seqType = "normal")
     {
+        Debug.Log("Select param: " + npc + ", " + location + ", " + (relicData != null ? relicData.id : "null") + ", " + seqType);
         DialogueSequence best = null;
         foreach (var s in sequences)
         {
             if (s.once && played.Contains(s.id)) continue;
             if (!string.IsNullOrEmpty(s.location) && s.location != location) continue;
             if (!string.IsNullOrEmpty(s.npc) && s.npc != npc) continue;
-            if (!string.IsNullOrEmpty(s.relic) && s.relic != relicData?.id) continue;
+            if (!string.IsNullOrEmpty(s.seqType) && s.seqType != seqType) continue;   // 检查对话类型
+            if(s.id == "seq_tut_4_emg"){Debug.Log("Checking sequence: " + s.id);}
+            if (!s.CheckRelic(relicData?.id)) continue;
+            if(s.id == "seq_tut_4_emg"){Debug.Log("Checking MeetsConditions: " + s.id);}
             if (!MeetsConditions(s)) continue;
             if (best == null || s.priority > best.priority) best = s;
         }
@@ -93,18 +97,36 @@ public class StoryManager : MonoBehaviour
     private bool MeetsConditions(DialogueSequence s)
     {
         foreach (var c in s.conditions)
+        {
+            if(s.id == "seq_tut_4_emg"){
+                Debug.Log("Checking " + c.key + "--current:" + GameStateAccess.Get(c.key) + c.op + ", expected:" + c.value);
+            }
             if (!c.Check(GameStateAccess.Get(c.key))) return false;
+        }
         return true;
     }
 
     //选择并开始对话，没有可用对话返回 false
-    public bool TryStart(string npc = null, RelicData relicData = null)
+    public bool TryStart(string npc = null, RelicData relicData = null, string seqType = "normal")
     {
         //if (IsPlaying) return false;
-        string location = TheaterController.instance.currentLocation.locationName;
-        var seq = Select(npc, location, relicData);
+        string location = StoryPlayer.instance.currentLocation;
+        Debug.Log("Select param: " + npc + ", " + location + ", " + (relicData != null ? relicData.id : "null") + ", " + seqType);
+        var seq = Select(npc, location, relicData, seqType);
         Debug.Log("Selected dialogue sequence: " + (seq != null ? seq.id : "null"));
         if (seq == null || seq.lines.Count == 0) return false;
+        current = seq;
+        lineIndex = 0;
+        OnLine?.Invoke(current.lines[0]);
+        return true;
+    }
+
+    public bool StartSeqenceByID(string seqID)
+    {
+        var seq = sequences.Find(s => s.id == seqID);
+        if (seq == null || seq.lines.Count == 0) return false;
+        if (seq.once && played.Contains(seq.id)) return false;
+        Debug.Log("Selected dialogue sequence: " + seq.id);
         current = seq;
         lineIndex = 0;
         OnLine?.Invoke(current.lines[0]);
@@ -124,7 +146,25 @@ public class StoryManager : MonoBehaviour
         var finished = current;
         current = null;
         played.Add(finished.id);
-        foreach (var c in finished.onFinishSet) GameStateAccess.Set(c.key, c.value);
+        foreach (var c in finished.onFinishSet) 
+        {
+            Debug.Log("Setting " + c.key + " to " + c.value);
+            GameStateAccess.Set(c.key, c.value);
+        }
+        OnDialogueEnd?.Invoke(finished);
+    }
+
+    public void SkipDialogue()
+    {
+        if (current == null) return;
+        var finished = current;
+        current = null;
+        played.Add(finished.id);
+        foreach (var c in finished.onFinishSet) 
+        {
+            Debug.Log("Setting " + c.key + " to " + c.value);
+            GameStateAccess.Set(c.key, c.value);
+        }
         OnDialogueEnd?.Invoke(finished);
     }
 

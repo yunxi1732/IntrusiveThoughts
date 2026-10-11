@@ -8,10 +8,10 @@ public static class DialogueParse
     //CsvToJson 输出的值都是字符串，这里先按字符串读取再手动转换
     [Serializable] private class SequenceRow
     {
-        public string id, location, npc, relic, priority, once, conditions, onFinishSet;
+        public string id, location, npc, relic, seqType, priority, once, conditions, onFinishSet, action;
     }
     [Serializable] private class SequenceRows { public SequenceRow[] rows; }
-    [Serializable] private class LineRow { public string sequenceId, character, content, relic; }
+    [Serializable] private class LineRow { public string sequenceId, character, content, relics, tag, image, sfx, waitTime,action; }
     [Serializable] private class LineRows { public LineRow[] rows; }
 
     //格式: "a>=1;b==2"，结束设置项写 "a=1"（此时比较符只是占位，取 value）
@@ -41,8 +41,10 @@ public static class DialogueParse
                 location = r.location,
                 npc = r.npc,
                 relic = r.relic,
+                seqType = string.IsNullOrEmpty(r.seqType) ? "normal" : r.seqType,   //如果 seqType 为空，则默认为 normal
                 priority = priority,
                 once = !bool.TryParse(r.once, out bool once) || once,
+                action = r.action,
                 conditions = ParseConditions(r.conditions, r.id),
                 onFinishSet = ParseConditions(r.onFinishSet, r.id),
             };
@@ -58,9 +60,15 @@ public static class DialogueParse
                 continue;
             }
             var line = new DialogueLine {
+                    sequenceId = r.sequenceId,
                     character = r.character,
                     content = r.content.Replace("\\n", "\n"),
-                    relic = r.relic
+                    relics = r.relics,
+                    tag = r.tag,
+                    image = r.image,
+                    sfx = r.sfx,
+                    waitTime = float.TryParse(r.waitTime, out float wt) ? wt : 0f,
+                    action = r.action
                 };
             seq.lines.Add(line);
             allLines?.Add(line);

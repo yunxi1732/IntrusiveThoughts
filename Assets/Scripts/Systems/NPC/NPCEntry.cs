@@ -30,7 +30,12 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
             return;
         }
         //点击npc后触发剧情交互
-        TheaterController.instance.interactiveRelic = null; // 清空当前交互遗物
-        StoryManager.instance.TryStart(npcData.id); // 尝试开始与该NPC相关的剧情
+        StoryPlayer.instance.interactiveRelic = null; // 清空当前交互遗物
+        // 尝试开始与该NPC相关的剧情
+        if (!StoryManager.instance.TryStart(npcData.id))
+        {
+            // 如果未能成功开始剧情，可以在这里处理相应逻辑
+            StoryManager.instance.TryStart(npcData.id);
+        }
     }
 }
