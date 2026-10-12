@@ -118,6 +118,7 @@ public class StoryManager : MonoBehaviour
         current = seq;
         lineIndex = 0;
         OnLine?.Invoke(current.lines[0]);
+        BroadcastPlayingState();
         return true;
     }
 
@@ -130,6 +131,7 @@ public class StoryManager : MonoBehaviour
         current = seq;
         lineIndex = 0;
         OnLine?.Invoke(current.lines[0]);
+        BroadcastPlayingState();
         return true;
     }
 
@@ -152,6 +154,8 @@ public class StoryManager : MonoBehaviour
             GameStateAccess.Set(c.key, c.value);
         }
         OnDialogueEnd?.Invoke(finished);
+        BroadcastTutorialCompleted(finished);
+        BroadcastPlayingState();
     }
 
     public void SkipDialogue()
@@ -166,12 +170,27 @@ public class StoryManager : MonoBehaviour
             GameStateAccess.Set(c.key, c.value);
         }
         OnDialogueEnd?.Invoke(finished);
+        BroadcastTutorialCompleted(finished);
+        BroadcastPlayingState();
+    }
+
+    private void BroadcastTutorialCompleted(DialogueSequence finished)
+    {
+        if (finished.id == "seq_tut_5_emg")
+            EventManagerNP.TriggerEvent(GameEvents.TutorialCompleted);
     }
 
     public void ResetStory()
     {
         current = null;
         lineIndex = 0;
+        BroadcastPlayingState();
+    }
+
+    private void BroadcastPlayingState()
+    {
+        // 结束回调可能启动下一段对话，广播回调执行后的实际状态。
+        EventManager1P<bool>.TriggerEvent(GameEvents.DialoguePlayingChanged, IsPlaying);
     }
 
     public void RestoreProgress(GameData data)

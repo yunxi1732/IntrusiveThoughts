@@ -26,6 +26,7 @@ public class StoryPlayer : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject StoryPanel;   //剧情面板
+    public GameObject skipButton;
     public Image StoryImage;   //剧情图组件
     public Image CharacterImg;   //角色模型面板
     public Image CharacterShadowImg;   //角色阴影面板
@@ -38,6 +39,22 @@ public class StoryPlayer : MonoBehaviour
     public string currentCharacter;  //当前交互对象
     public bool canInteract = true;  //是否可以交互跳过
 
+    private void OnEnable()
+    {
+        EventManager1P<bool>.StartListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
+        SetSkipButtonVisible(StoryManager.instance != null && StoryManager.instance.IsPlaying);
+    }
+
+    private void OnDisable()
+    {
+        EventManager1P<bool>.StopListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
+    }
+
+    private void SetSkipButtonVisible(bool playing)
+    {
+        if (skipButton != null) skipButton.SetActive(playing);
+    }
+
     void Start()
     {
         StoryPanel.SetActive(false);
@@ -47,6 +64,7 @@ public class StoryPlayer : MonoBehaviour
         StoryManager.instance.OnLine += HandleDialogueLine;
         StoryManager.instance.OnDialogueEnd += HandleDialogueEnd;
         GameStateAccess.Changed += OnStateChange;
+        SetSkipButtonVisible(StoryManager.instance.IsPlaying);
     }
 
     private void OnDestroy()

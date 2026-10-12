@@ -30,13 +30,20 @@ public class BedroomController : MonoBehaviour
     private List<RelicEntry> relicEntries = new List<RelicEntry>();
     void Start()
     {
-        //如果是第0天，播放开场剧情
+        StoryPlayer.instance.currentLocation = "出租屋";
+        DateController.instance.BeginFirstDayOnBedroomEntry();
+        // 先按正确日期绑定遗物和面板，再播放剧情，避免覆盖剧情的 UI 动作。
+        InitBedroom();
+
         if (DateController.instance.currentDate == 0)
         {
             StoryManager.instance.TryStart();
         }
-
-        InitBedroom();
+        else if (DateController.instance.currentDate == 1)
+        {
+            // 用原 CSV 的地点、NPC、条件和 once 规则触发正式第一天开场。
+            StoryManager.instance.TryStart("麻雀");
+        }
     }
 
     public void CollectRelic()
@@ -83,8 +90,8 @@ public class BedroomController : MonoBehaviour
 
         //显示背包按钮
         Inventory.instance.EnableInventory();
-        //显示日期
-        DateController.instance.ShowDatePanel(true);
+        // 教程期间隐藏日期；教程结束后返回卧室才显示七天倒计时。
+        DateController.instance.ShowDatePanel(DateController.instance.currentDate > 0);
     }
 
 }

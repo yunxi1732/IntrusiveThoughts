@@ -26,7 +26,29 @@ public class DateController : MonoBehaviour
     [Header("UI Panels")]
     public GameObject datePanel;   //显示当前日期的面板
     public TextMeshProUGUI dateText;   //显示当前日期的文本
-    public int currentDate;   //当前日期
+    public int currentDate;   //0 为教程；教程结束后返回卧室才进入第 1 天
+
+    private void OnEnable()
+    {
+        EventManagerNP.StartListening(GameEvents.TutorialCompleted, OnTutorialCompleted);
+    }
+
+    private void OnDisable()
+    {
+        EventManagerNP.StopListening(GameEvents.TutorialCompleted, OnTutorialCompleted);
+    }
+
+    private void OnTutorialCompleted()
+    {
+        // 使用已有剧情标记，随存档保存和恢复；此时不推进日期。
+        StoryManager.instance.SetStoryState("story.tutorial.3", 1);
+    }
+
+    public void BeginFirstDayOnBedroomEntry()
+    {
+        if (currentDate == 0 && StoryManager.instance.GetStoryState("story.tutorial.3") == 1)
+            SetDate(1);
+    }
 
     void Start()
     {
@@ -36,11 +58,14 @@ public class DateController : MonoBehaviour
 
     public void ShowDatePanel(bool show)
     {
-        datePanel?.SetActive(show);
+        // 第 0 天只做教程；进入第 1 天后，由返回卧室的流程请求显示。
+        datePanel?.SetActive(show && currentDate > 0);
     }
 
     public void PassDay()
     {
+        // 第 0 天不能通过睡觉跳过正式游戏的卧室入口。
+        if (currentDate == 0) return;
         currentDate++;
         UpdateDateText();
     }
@@ -51,14 +76,17 @@ public class DateController : MonoBehaviour
         if (date < 0) throw new System.ArgumentOutOfRangeException(nameof(date));
         currentDate = date;
         UpdateDateText();
+        // 新游戏回到教程时，清除上一次游戏遗留的面板显示。
+        if (currentDate == 0) ShowDatePanel(false);
     }
 
     public void UpdateDateText()
     {
         if (dateText != null)
         {
-            dateText.text = (7 - currentDate).ToString();
-            if (currentDate >= 7)
+            // 正式第 1～7 天分别剩余 7～1 天，第 8 天结束。
+            dateText.text = currentDate == 0 ? string.Empty : (8 - currentDate).ToString();
+            if (currentDate > 7)
             {
                 dateText.text = "游戏结束";
             }

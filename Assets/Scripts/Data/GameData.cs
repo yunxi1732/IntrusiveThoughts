@@ -8,7 +8,7 @@ public class GameData
     public int version = 3;
     public int slotId;
     public string savedAtUtc;
-    // 与 DateController 一致：0 表示第一天。
+    // 与 DateController 一致：0 为教程，1～7 为正式游戏日期。
     public int currentDate;
     public PlayerData player = new PlayerData();
     // 只保存 story.* 标记；日期、玩家、NPC 各有独立字段。

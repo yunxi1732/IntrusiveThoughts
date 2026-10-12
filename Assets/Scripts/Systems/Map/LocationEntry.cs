@@ -42,7 +42,8 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
-        if (npcList.Count > 0)
+        // 教程结束后的地图仍处于第 0 天，必须保留返回卧室的入口。
+        if (locationName == "出租屋" || npcList.Count > 0)
         {
             canvasGroup.alpha = 1f;
             canvasGroup.interactable = true;
