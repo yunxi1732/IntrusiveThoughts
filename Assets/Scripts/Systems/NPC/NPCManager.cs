@@ -103,10 +103,11 @@ public class NPCManager : MonoBehaviour
 
         foreach(NPCData data in gameData.npcs) {
             Debug.Log("Adding NPC: " + data.id);
-            //初始化icon
-            data.icon = Resources.Load<Sprite>("Sprites/" + data.iconString);
-            //多个不同表情图片，使用逗号分隔解析 todo
-            data.model = Resources.Load<Sprite>("Sprites/" + data.modelString);
+            data.icons = LoadSprites(data.iconString, data.id, "iconString");
+            data.models = LoadSprites(data.modelString, data.id, "modelString");
+            // 保留现有单图接口，地图和地点默认使用第一张可用头像。
+            data.icon = data.icons.Find(sprite => sprite != null);
+            data.model = data.models.Find(sprite => sprite != null);
             // CSV 不含运行时字段；显式初始化，避免集合为空引用。
             data.attributes = new List<StateValueData>();
             data.tags = new List<string>();
@@ -118,10 +119,27 @@ public class NPCManager : MonoBehaviour
                 existing.modelString = data.modelString;
                 existing.icon = data.icon;
                 existing.model = data.model;
+                existing.icons = data.icons;
+                existing.models = data.models;
             }
             else
                 FullNPCList.Add(data);
         }
+    }
+
+    private static List<Sprite> LoadSprites(string names, string npcId, string field)
+    {
+        var sprites = new List<Sprite>();
+        if (string.IsNullOrWhiteSpace(names)) return sprites;
+        foreach (string part in names.Split(';'))
+        {
+            string resourceName = part.Trim();
+            var sprite = resourceName.Length == 0 ? null : Resources.Load<Sprite>("Sprites/" + resourceName);
+            sprites.Add(sprite);
+            if (sprite == null)
+                Debug.LogWarning($"NPC {npcId} 的 {field} 资源无法加载为 Sprite：Sprites/{resourceName}");
+        }
+        return sprites;
     }
 
     public void ParseNPCScheduleCSV()

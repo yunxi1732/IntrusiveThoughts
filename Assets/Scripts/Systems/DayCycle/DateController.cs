@@ -26,7 +26,7 @@ public class DateController : MonoBehaviour
     [Header("UI Panels")]
     public GameObject datePanel;   //显示当前日期的面板
     public TextMeshProUGUI dateText;   //显示当前日期的文本
-    public int currentDate;   //0 为教程；教程结束后返回卧室才进入第 1 天
+    public int currentDate;   //0 为教程；教程结束事件将日期推进到第 1 天
 
     private void OnEnable()
     {
@@ -40,14 +40,9 @@ public class DateController : MonoBehaviour
 
     private void OnTutorialCompleted()
     {
-        // 使用已有剧情标记，随存档保存和恢复；此时不推进日期。
+        // 先记录教程完成，再进入第一天，地图立即使用第一天的 NPC 日程。
         StoryManager.instance.SetStoryState("story.tutorial.3", 1);
-    }
-
-    public void BeginFirstDayOnBedroomEntry()
-    {
-        if (currentDate == 0 && StoryManager.instance.GetStoryState("story.tutorial.3") == 1)
-            SetDate(1);
+        if (currentDate == 0) SetDate(1);
     }
 
     void Start()

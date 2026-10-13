@@ -22,7 +22,13 @@ public class DialogueLine
             return NPCManager.instance.playerIcon;
         } else
         {
-            return NPCManager.instance.GetNPCDataByName(character).model;
+            var npc = NPCManager.instance.GetNPCDataByName(character);
+            if (npc == null)
+            {
+                Debug.LogWarning($"对白角色未配置：{character}");
+                return null;
+            }
+            return npc.GetModel(tag);
         }
     }
 }

@@ -2,8 +2,14 @@
 万蕊,楼道,0,day==0; story.tut.3 = 0
 麻雀,楼道,1,day==0; npc.麻雀.start = 0
 路过的外卖员,楼道,0,day==0; npc.路过的外卖员.finished = 0; npc.麻雀.start == 1
+麻雀,出租屋,,day==1; npc.麻雀.start == 1
 余宏志,商圈,,day==1
 可疑的人,商圈,,day==1
 可疑的人,楼道,1,day==2
-辰星Walker,出租屋,0,day==2;  story.seq_day2_chenxing2 =1
-麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 =1
+辰星Walker,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1
+麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1
+辰星Walker,出租屋,,day == 3; npc.辰星Walker.honest == 1
+麻雀,出租屋,,day == 3
+辰星Walker,街道,,day == 4; story.seq_day3_chenxing5 == 1
+麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1
+辰星Walker,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1

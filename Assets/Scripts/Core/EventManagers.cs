@@ -116,7 +116,7 @@ public enum GameEvents
     ShowLetter,
     // 对话播放状态变化（bool）；UI 根据此事件显示或隐藏跳过按钮。
     DialoguePlayingChanged,
-    // seq_tut_5_emg 完成后广播（无参数），记录教程完成，返回卧室再进入第一天。
+    // seq_tut_5_emg 完成后广播（无参数），记录教程完成并进入第一天。
     TutorialCompleted,
 }
 

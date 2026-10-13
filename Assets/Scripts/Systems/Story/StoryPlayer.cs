@@ -188,6 +188,7 @@ public class StoryPlayer : MonoBehaviour
                 //刷新npc，遍历获取本场景中的npc，如果新增则添加，否则删除
                 Debug.Log("update npc in theater action: " + action);
                 LocationController.instance?.UpdateNPCs();
+                BedroomController.instance?.UpdateNPCs();
                 break;
             //在这里添加特殊动作的处理逻辑，例如播放动画、触发事件等
             default:

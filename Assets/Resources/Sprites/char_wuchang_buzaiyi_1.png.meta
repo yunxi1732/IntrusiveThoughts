@@ -1,0 +1,507 @@
+fileFormatVersion: 2
+guid: 3593c6f761b7fe64ca37ce9a36553841
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 1484203843027039362
+    second: char_wuchang_buzaiyi_1_0
+  - first:
+      213: 4683360385296243975
+    second: char_wuchang_buzaiyi_1_1
+  - first:
+      213: 8182620403611361035
+    second: char_wuchang_buzaiyi_1_2
+  - first:
+      213: -940060892824572824
+    second: char_wuchang_buzaiyi_1_3
+  - first:
+      213: -495092245671487737
+    second: char_wuchang_buzaiyi_1_4
+  - first:
+      213: 4373591652921527179
+    second: char_wuchang_buzaiyi_1_5
+  - first:
+      213: -3148647584097912538
+    second: char_wuchang_buzaiyi_1_6
+  - first:
+      213: -1793048602992311993
+    second: char_wuchang_buzaiyi_1_7
+  - first:
+      213: -9199898311579074555
+    second: char_wuchang_buzaiyi_1_8
+  - first:
+      213: -2345557913233372509
+    second: char_wuchang_buzaiyi_1_9
+  - first:
+      213: 3572981800103921416
+    second: char_wuchang_buzaiyi_1_10
+  - first:
+      213: 6338157774393230105
+    second: char_wuchang_buzaiyi_1_11
+  - first:
+      213: 6580884928436972597
+    second: char_wuchang_buzaiyi_1_12
+  - first:
+      213: -3850977191226939949
+    second: char_wuchang_buzaiyi_1_13
+  - first:
+      213: 5389817672484569243
+    second: char_wuchang_buzaiyi_1_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_0
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 1056
+        width: 103
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 28475e51883f89410800000000000000
+      internalID: 1484203843027039362
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_1
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 1128
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70d18b8f473aef040800000000000000
+      internalID: 4683360385296243975
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_2
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 1122
+        width: 72
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b0f5e1957e18e8170800000000000000
+      internalID: 8182620403611361035
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_3
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 1070
+        width: 101
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 86c64ff399b34f2f0800000000000000
+      internalID: -940060892824572824
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_4
+      rect:
+        serializedVersion: 2
+        x: 668
+        y: 1103
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 70753b5c9341129f0800000000000000
+      internalID: -495092245671487737
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_5
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 981
+        width: 54
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8b4001af6e12bc30800000000000000
+      internalID: 4373591652921527179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_6
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 1037
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 629b3fa54b1cd44d0800000000000000
+      internalID: -3148647584097912538
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_7
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 998
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 74102a9abcfcd17e0800000000000000
+      internalID: -1793048602992311993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_8
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 946
+        width: 55
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5000d909a35635080800000000000000
+      internalID: -9199898311579074555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_9
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 984
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3aa4e955187e27fd0800000000000000
+      internalID: -2345557913233372509
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_10
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 967
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 80741284408c59130800000000000000
+      internalID: 3572981800103921416
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_11
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 787
+        width: 94
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 913c6113ae8a5f750800000000000000
+      internalID: 6338157774393230105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_12
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 134
+        width: 817
+        height: 817
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 53c2533b9fff35b50800000000000000
+      internalID: 6580884928436972597
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_13
+      rect:
+        serializedVersion: 2
+        x: 911
+        y: 816
+        width: 81
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3d569ced5a49e8ac0800000000000000
+      internalID: -3850977191226939949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_buzaiyi_1_14
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 667
+        width: 61
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b90c09cdd9a7cca40800000000000000
+      internalID: 5389817672484569243
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      char_wuchang_buzaiyi_1_0: 1484203843027039362
+      char_wuchang_buzaiyi_1_1: 4683360385296243975
+      char_wuchang_buzaiyi_1_10: 3572981800103921416
+      char_wuchang_buzaiyi_1_11: 6338157774393230105
+      char_wuchang_buzaiyi_1_12: 6580884928436972597
+      char_wuchang_buzaiyi_1_13: -3850977191226939949
+      char_wuchang_buzaiyi_1_14: 5389817672484569243
+      char_wuchang_buzaiyi_1_2: 8182620403611361035
+      char_wuchang_buzaiyi_1_3: -940060892824572824
+      char_wuchang_buzaiyi_1_4: -495092245671487737
+      char_wuchang_buzaiyi_1_5: 4373591652921527179
+      char_wuchang_buzaiyi_1_6: -3148647584097912538
+      char_wuchang_buzaiyi_1_7: -1793048602992311993
+      char_wuchang_buzaiyi_1_8: -9199898311579074555
+      char_wuchang_buzaiyi_1_9: -2345557913233372509
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -28,21 +28,17 @@ public class BedroomController : MonoBehaviour
     //卧室状态
     public RelicEntry selectedRelic;
     private List<RelicEntry> relicEntries = new List<RelicEntry>();
+    [Header("卧室 NPC 容器（绑定场景中的 NPCModelPanel）")]
+    public RectTransform npcPanel;
     void Start()
     {
         StoryPlayer.instance.currentLocation = "出租屋";
-        DateController.instance.BeginFirstDayOnBedroomEntry();
         // 先按正确日期绑定遗物和面板，再播放剧情，避免覆盖剧情的 UI 动作。
         InitBedroom();
 
         if (DateController.instance.currentDate == 0)
         {
             StoryManager.instance.TryStart();
-        }
-        else if (DateController.instance.currentDate == 1)
-        {
-            // 用原 CSV 的地点、NPC、条件和 once 规则触发正式第一天开场。
-            StoryManager.instance.TryStart("麻雀");
         }
     }
 
@@ -92,6 +88,30 @@ public class BedroomController : MonoBehaviour
         Inventory.instance.EnableInventory();
         // 教程期间隐藏日期；教程结束后返回卧室才显示七天倒计时。
         DateController.instance.ShowDatePanel(DateController.instance.currentDate > 0);
+        UpdateNPCs();
+    }
+
+    // 与其他地点使用同一份日程和预制体，人物出现不直接启动对白。
+    public void UpdateNPCs()
+    {
+        if (npcPanel == null)
+        {
+            Debug.LogError("卧室 NPC 容器未绑定，请在 BedroomController 中绑定 NPCModelPanel。", this);
+            return;
+        }
+
+        foreach (Transform child in npcPanel)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
+        var npcs = NPCManager.instance.GetNPCsAtLocation("出租屋");
+        foreach (var npc in npcs)
+        {
+            var npcObject = Instantiate(NPCManager.instance.npcBodyPrefab, npcPanel);
+            npcObject.GetComponent<NPCEntry>().Initialize(npc);
+        }
+        npcPanel.gameObject.SetActive(npcs.Count > 0);
     }
 
 }

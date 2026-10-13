@@ -1,0 +1,507 @@
+fileFormatVersion: 2
+guid: c3cf2b2d0da3d374596b371fd6da44f7
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -4560727787848482236
+    second: char_wuchang_kunrao_2_0
+  - first:
+      213: -5783943161138526981
+    second: char_wuchang_kunrao_2_1
+  - first:
+      213: -635679328673861418
+    second: char_wuchang_kunrao_2_2
+  - first:
+      213: -4272047022221887484
+    second: char_wuchang_kunrao_2_3
+  - first:
+      213: 636378414219185779
+    second: char_wuchang_kunrao_2_4
+  - first:
+      213: -6545427731031880851
+    second: char_wuchang_kunrao_2_5
+  - first:
+      213: -3581163862831590013
+    second: char_wuchang_kunrao_2_6
+  - first:
+      213: 1843709342921370767
+    second: char_wuchang_kunrao_2_7
+  - first:
+      213: 1395057581013564011
+    second: char_wuchang_kunrao_2_8
+  - first:
+      213: -6109713518285709723
+    second: char_wuchang_kunrao_2_9
+  - first:
+      213: -1419629059398568678
+    second: char_wuchang_kunrao_2_10
+  - first:
+      213: -52697873534824199
+    second: char_wuchang_kunrao_2_11
+  - first:
+      213: 3152054196291855030
+    second: char_wuchang_kunrao_2_12
+  - first:
+      213: 1404321134798115574
+    second: char_wuchang_kunrao_2_13
+  - first:
+      213: 7653858933737225245
+    second: char_wuchang_kunrao_2_14
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_0
+      rect:
+        serializedVersion: 2
+        x: 459
+        y: 1056
+        width: 103
+        height: 84
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 442c900ad3a05b0c0800000000000000
+      internalID: -4560727787848482236
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_1
+      rect:
+        serializedVersion: 2
+        x: 478
+        y: 1128
+        width: 14
+        height: 12
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: bf4c94fe65e4bbfa0800000000000000
+      internalID: -5783943161138526981
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_2
+      rect:
+        serializedVersion: 2
+        x: 634
+        y: 1122
+        width: 72
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6d0f55fb40d9d27f0800000000000000
+      internalID: -635679328673861418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_3
+      rect:
+        serializedVersion: 2
+        x: 767
+        y: 1070
+        width: 101
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 408f2b81ed3a6b4c0800000000000000
+      internalID: -4272047022221887484
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_4
+      rect:
+        serializedVersion: 2
+        x: 668
+        y: 1103
+        width: 15
+        height: 16
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 37ec24acbced4d800800000000000000
+      internalID: 636378414219185779
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_5
+      rect:
+        serializedVersion: 2
+        x: 890
+        y: 981
+        width: 54
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d6b8ad46828f925a0800000000000000
+      internalID: -6545427731031880851
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_6
+      rect:
+        serializedVersion: 2
+        x: 948
+        y: 1037
+        width: 10
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3851579c0762d4ec0800000000000000
+      internalID: -3581163862831590013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_7
+      rect:
+        serializedVersion: 2
+        x: 373
+        y: 998
+        width: 9
+        height: 11
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f8ca5e501eb269910800000000000000
+      internalID: 1843709342921370767
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_8
+      rect:
+        serializedVersion: 2
+        x: 395
+        y: 946
+        width: 55
+        height: 82
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b6a77858a7d3c5310800000000000000
+      internalID: 1395057581013564011
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_9
+      rect:
+        serializedVersion: 2
+        x: 876
+        y: 984
+        width: 12
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 56e9d2ffcefe53ba0800000000000000
+      internalID: -6109713518285709723
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_10
+      rect:
+        serializedVersion: 2
+        x: 455
+        y: 967
+        width: 11
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a15f9b954e67c4ce0800000000000000
+      internalID: -1419629059398568678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_11
+      rect:
+        serializedVersion: 2
+        x: 346
+        y: 787
+        width: 94
+        height: 111
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9f0d98f2097c44ff0800000000000000
+      internalID: -52697873534824199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_12
+      rect:
+        serializedVersion: 2
+        x: 431
+        y: 134
+        width: 817
+        height: 817
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b261ca57985ebb20800000000000000
+      internalID: 3152054196291855030
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_13
+      rect:
+        serializedVersion: 2
+        x: 911
+        y: 816
+        width: 81
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6f21736b1a62d7310800000000000000
+      internalID: 1404321134798115574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: char_wuchang_kunrao_2_14
+      rect:
+        serializedVersion: 2
+        x: 406
+        y: 667
+        width: 61
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: d1c7b5af528f73a60800000000000000
+      internalID: 7653858933737225245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      char_wuchang_kunrao_2_0: -4560727787848482236
+      char_wuchang_kunrao_2_1: -5783943161138526981
+      char_wuchang_kunrao_2_10: -1419629059398568678
+      char_wuchang_kunrao_2_11: -52697873534824199
+      char_wuchang_kunrao_2_12: 3152054196291855030
+      char_wuchang_kunrao_2_13: 1404321134798115574
+      char_wuchang_kunrao_2_14: 7653858933737225245
+      char_wuchang_kunrao_2_2: -635679328673861418
+      char_wuchang_kunrao_2_3: -4272047022221887484
+      char_wuchang_kunrao_2_4: 636378414219185779
+      char_wuchang_kunrao_2_5: -6545427731031880851
+      char_wuchang_kunrao_2_6: -3581163862831590013
+      char_wuchang_kunrao_2_7: 1843709342921370767
+      char_wuchang_kunrao_2_8: 1395057581013564011
+      char_wuchang_kunrao_2_9: -6109713518285709723
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
