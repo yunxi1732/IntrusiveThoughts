@@ -36,6 +36,8 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
             var image = icon.GetComponent<Image>();
             if (image != null) image.sprite = npc.icon;
         }
+        // 头像条只在当前地点有人时显示；出租屋入口本身仍可随时点击。
+        npcIconPanel.SetActive(npcList.Count > 0);
 
         if (canvasGroup == null)
         {

@@ -1,127 +1,204 @@
 using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
-using System.Collections;
-using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
-public enum SoundType
-{
-    Button,     // UI音效
-    Bubblem,    // 泡泡音效
-}
+/// <summary>常驻播放器：场景/地点换曲，卧室按日期选曲。</summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager instance { get; private set; }
 
-    [Header("音频源")]
-    public AudioSource musicSource;      // 播放背景音乐
-    public AudioSource sfxSource;        // 播放音效
-    [Header("音量设置")]
+    public AudioSource musicSource;
+    public AudioSource sfxSource;
+    [Header("场景 / 剧情音乐")]
+    [SerializeField] private AudioClip bgm_bedroom1;
+    [SerializeField] private AudioClip bgm_bedroom2;
+    [SerializeField] private AudioClip bgm_sunset;
+    [SerializeField] private AudioClip bgm_park;
+    [SerializeField] private AudioClip bgm_meteor;
+    [SerializeField] private AudioClip sound_hallway;
+    [Header("场景音效")]
+    [SerializeField] private AudioClip sound_mall;
+    [SerializeField] private AudioClip sound_traffic;
+    [SerializeField] private AudioClip sound_truck;
+    [Header("交互音效")]
+    [SerializeField] private AudioClip effect_bubble_select;
+    [SerializeField] private AudioClip effect_bubble_cancel;
+    [SerializeField] private AudioClip effect_emergence;
     [Range(0f, 1f)] public float masterVolume = 0.5f;
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
+    private float musicMultiplier = 20f;
+    private float sfxMultiplier = 20f;
 
-    [Header("music")]
-    public AudioClip mainTheme;
-
-    [Header("sfx")]
-    private Dictionary<AudioClip, int> playingCount = new Dictionary<AudioClip, int>();
-    [SerializeField] private int maxPerClip = 5;
-    public AudioClip buttonClip;
-
-
-    private AudioClip myClip;
     private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-            //DontDestroyOnLoad(gameObject);
-        }
-        else
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
+            return;
+        }
+        instance = this;
+        transform.SetParent(null);
+        DontDestroyOnLoad(gameObject);
+        if (musicSource == null) musicSource = gameObject.AddComponent<AudioSource>();
+        if (sfxSource == null || sfxSource == musicSource) sfxSource = gameObject.AddComponent<AudioSource>();
+        musicSource.playOnAwake = false;
+        musicSource.loop = true;
+        sfxSource.playOnAwake = false;
+        sfxSource.loop = false;
+        ApplyVolumes();
+    }
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        EventManager1P<string>.StartListening(GameEvents.AudioLocationChanged, PlayLocationMusic);
+        EventManager1P<int>.StartListening(GameEvents.DayChanged, OnDayChanged);
+    }
+
+    private void Start()
+    {
+        if (SaveManager.instance != null)
+        {
+            SetVolume("bgm", SaveManager.instance.GetVolumePreference("bgm"));
+            SetVolume("sfx", SaveManager.instance.GetVolumePreference("sfx"));
+        }
+        PlaySceneMusic();
+    }
+
+    private void OnDisable()
+    {
+        if (instance != this) return;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        EventManager1P<string>.StopListening(GameEvents.AudioLocationChanged, PlayLocationMusic);
+        EventManager1P<int>.StopListening(GameEvents.DayChanged, OnDayChanged);
+        StopMusic();
+        StopSFX();
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (mode != LoadSceneMode.Single) return;
+        StopMusic();
+        StopSFX();
+        PlaySceneMusic();
+    }
+
+    private void PlaySceneMusic()
+    {
+        switch (SceneManager.GetActiveScene().name)
+        {
+            case "BedRoomScene":
+                int day = DateController.instance != null ? DateController.instance.currentDate : 0;
+                PlayMusic(day >= 5 ? bgm_bedroom2 : bgm_bedroom1);
+                break;
+            case "MapScene": PlayMusic(bgm_sunset); break;
+            case "LocationScene":
+                PlayLocationMusic(StoryPlayer.instance != null ? StoryPlayer.instance.currentLocation : null);
+                break;
+            default: StopMusic(); break;
         }
     }
 
-    // 播放背景音乐（如果传入新音乐会自动切换）
-    public void PlayMusic(AudioClip musicClip)
+    private void OnDayChanged(int day)
     {
-        AudioClip clip = musicClip;
-        if (clip == null)
+        if (SceneManager.GetActiveScene().name == "BedRoomScene") PlaySceneMusic();
+    }
+
+    public void PlayLocationMusic(string location)
+    {
+        if (SceneManager.GetActiveScene().name != "LocationScene") return;
+        AudioClip clip = location == "公园" ? bgm_park : location == "街道" ? bgm_meteor : null;
+        // 相同地点的初始化通知不重启当前曲目；换地点时 PlayMusic 会停止旧曲。
+        PlayMusic(clip);
+    }
+
+    public void PlayBGM(string id)
+    {
+        switch (id)
         {
-            clip = mainTheme;
+            case "bgm_bedroom1": PlayMusic(bgm_bedroom1); break;
+            case "bgm_bedroom2": PlayMusic(bgm_bedroom2); break;
+            case "bgm_sunset": PlayMusic(bgm_sunset); break;
+            case "bgm_park": PlayMusic(bgm_park); break;
+            case "bgm_meteor": PlayMusic(bgm_meteor); break;
+            case "sound_hallway": PlayMusic(sound_hallway); break;
+            default: Debug.LogWarning($"未配置的音乐 ID：{id}", this); break;
         }
-        
-        if (musicSource.clip == clip && musicSource.isPlaying)
-            return; // 同一首曲子正在播放则不重复播放
-        if (!musicSource.enabled)
-        {
-            musicSource.enabled = true;
-        }
+    }
+
+    public void PlayMusic(AudioClip clip)
+    {
+        if (clip != null && musicSource.clip == clip && musicSource.isPlaying) return;
+        StopMusic();
+        if (clip == null) return;
         musicSource.clip = clip;
         musicSource.Play();
     }
 
-    // 停止背景音乐
     public void StopMusic()
     {
+        if (musicSource == null) return;
         musicSource.Stop();
+        musicSource.clip = null;
     }
 
-    private AudioClip GetClipByType(SoundType soundType)
+    public void PlaySFX(AudioClip clip)
     {
-        AudioClip clip = null;
-        switch (soundType)
+        if (clip != null) sfxSource.PlayOneShot(clip);
+    }
+
+    public void PlaySFX(string id)
+    {
+        switch (id)
         {
-            case SoundType.Button:
-                clip = buttonClip;
-                break;
-            default:
-                Debug.LogWarning($"未找到类型为 {soundType} 的音效！");
-                break;
+            case "sound_mall": PlaySFX(sound_mall); break;
+            case "sound_traffic": PlaySFX(sound_traffic); break;
+            case "sound_truck": PlaySFX(sound_truck); break;
+            case "effect_bubble_select": PlaySFX(effect_bubble_select); break;
+            case "effect_bubble_cancel": PlaySFX(effect_bubble_cancel); break;
+            case "effect_emergence": PlaySFX(effect_emergence); break;
+            default: Debug.LogWarning($"未配置的音效 ID：{id}", this); break;
         }
-        return clip;
-    }
-
-    //多个sfx可同时播放
-    public void PlaySFX(SoundType soundType)
-    {
-        myClip = GetClipByType(soundType);
-        if (myClip != null)
-        {
-            PlayWithCap(myClip);
-        }
-    }
-
-    //限制同时播放的音效数量，放置声音过大
-    public void PlayWithCap(AudioClip clip, float volume = 1f)
-    {
-        playingCount.TryGetValue(clip, out int current);
-        
-        if (current >= maxPerClip) return; // 同类音效播放太多，忽略本次
-        
-        playingCount[clip] = current + 1;
-        //sfxSource.PlayOneShot(clip, volume);
-
-        //根据同时播放数缩小当前音量
-        sfxSource.PlayOneShot(clip, volume*Mathf.Pow(0.7f, playingCount[clip]));
-        
-        StartCoroutine(DecrementCount(clip, clip.length));
-    }
-    
-    private IEnumerator DecrementCount(AudioClip clip, float delay)
-    {
-        //不受timescale影响
-        yield return new WaitForSecondsRealtime(delay);
-        playingCount[clip]--;
     }
 
     public void StopSFX()
     {
-       // 停止语音播放
-        if (sfxSource.isPlaying)
-            sfxSource.Stop();
+        if (sfxSource != null) sfxSource.Stop();
     }
 
+    // 保留已有滑条同步：滑条数值转分贝，再转 AudioSource 的线性增益。
+    public static float VolumeToDecibels(float value, float multiplier = 20f)
+    {
+        value = Mathf.Clamp01(value);
+        return value <= 0f ? -80f : Mathf.Max(-80f, Mathf.Log10(value) * multiplier);
+    }
+
+    private float SourceVolume(float value, float multiplier)
+    {
+        return value <= 0f ? 0f : Mathf.Clamp01(masterVolume) * Mathf.Pow(10f, VolumeToDecibels(value, multiplier) / 20f);
+    }
+
+    public void ApplyVolumes()
+    {
+        musicSource.volume = SourceVolume(musicVolume, musicMultiplier);
+        sfxSource.volume = SourceVolume(sfxVolume, sfxMultiplier);
+    }
+
+    public bool SetVolume(string channel, float value, float multiplier = 20f)
+    {
+        value = Mathf.Clamp01(value);
+        multiplier = multiplier > 0f ? multiplier : 20f;
+        if (channel == "bgm") { musicVolume = value; musicMultiplier = multiplier; }
+        else if (channel == "sfx") { sfxVolume = value; sfxMultiplier = multiplier; }
+        else return false;
+        ApplyVolumes();
+        EventManager2P<string, float>.TriggerEvent(GameEvents.AudioVolumeChanged, channel, value);
+        return true;
+    }
 }

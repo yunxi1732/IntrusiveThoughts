@@ -36,7 +36,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 300}
+  m_SizeDelta: {x: 500, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3495243919533292566
 CanvasRenderer:
@@ -92,6 +92,6 @@ MonoBehaviour:
     id: char2
     desc: 
     iconString: 
-    state: 
-    stateValue: 0
-    icon: {fileID: 0}
+    modelString: 
+    attributes: []
+    tags: []

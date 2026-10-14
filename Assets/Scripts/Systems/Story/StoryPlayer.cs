@@ -187,8 +187,11 @@ public class StoryPlayer : MonoBehaviour
             case "updatenpc":
                 //刷新npc，遍历获取本场景中的npc，如果新增则添加，否则删除
                 Debug.Log("update npc in theater action: " + action);
-                LocationController.instance?.UpdateNPCs();
-                BedroomController.instance?.UpdateNPCs();
+                // Unity 已销毁对象不能用 ?. 判空；只刷新当前场景的控制器。
+                if (SceneManager.GetActiveScene().name == "LocationScene" && LocationController.instance != null)
+                    LocationController.instance.UpdateNPCs();
+                else if (SceneManager.GetActiveScene().name == "BedRoomScene" && BedroomController.instance != null)
+                    BedroomController.instance.UpdateNPCs();
                 break;
             //在这里添加特殊动作的处理逻辑，例如播放动画、触发事件等
             default:

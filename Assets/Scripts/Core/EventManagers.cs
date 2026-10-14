@@ -118,6 +118,14 @@ public enum GameEvents
     DialoguePlayingChanged,
     // seq_tut_5_emg 完成后广播（无参数），记录教程完成并进入第一天。
     TutorialCompleted,
+    // 音频请求：string 参数为 BGM ID 或地点名称。
+    PlayBGM,
+    AudioLocationChanged,
+    StopBGM,
+    // 日期初始化/变化（int）：0 为教程，1～7 为正式游戏。
+    DayChanged,
+    // 音量同步（string 通道 bgm/sfx，float 为 0～1 的滑条值）。
+    AudioVolumeChanged,
 }
 
 public class ErrorSuppress

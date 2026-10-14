@@ -44,6 +44,7 @@ public class LocationController : MonoBehaviour
 
 
         currentLocation = StoryPlayer.instance.currentLocation;
+        EventManager1P<string>.TriggerEvent(GameEvents.AudioLocationChanged, currentLocation);
         //获取该场景下npc
         Location_UI.instance.ShowBackGround();
         //设置背景图

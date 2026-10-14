@@ -33,9 +33,45 @@ public class Bedroom_UI : MonoBehaviour
     public Image relicIcon;
     public TextMeshProUGUI relicDescription;
 
+    private Image bedroomBackground;
+    private readonly Sprite[] dailyBackgrounds = new Sprite[7];
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        EventManager1P<int>.StartListening(GameEvents.DayChanged, RefreshDailyBackground);
+        RefreshDailyBackground(DateController.instance != null ? DateController.instance.currentDate : 0);
+    }
+
+    private void OnDisable()
+    {
+        if (instance != this) return;
+        EventManager1P<int>.StopListening(GameEvents.DayChanged, RefreshDailyBackground);
+    }
+
+    public void RefreshDailyBackground(int day)
+    {
+        if (bedroomBackground == null && BedroomPanel != null)
+            bedroomBackground = BedroomPanel.GetComponent<Image>();
+        if (bedroomBackground == null) return;
+
+        // 教程沿用第一天；结束后保留最后一天的房间。
+        int index = Mathf.Clamp(day, 1, 7) - 1;
+        if (dailyBackgrounds[index] == null)
+            dailyBackgrounds[index] = Resources.Load<Sprite>($"UI/bg_bedroom{index + 1}");
+        if (dailyBackgrounds[index] == null)
+        {
+            Debug.LogWarning($"卧室背景缺失：Resources/UI/bg_bedroom{index + 1}", this);
+            return;
+        }
+        bedroomBackground.sprite = dailyBackgrounds[index];
+        bedroomBackground.type = Image.Type.Simple;
+        bedroomBackground.preserveAspect = false;
+    }
+
     void Start()
     {
-        //RelicInfoPanel.SetActive(false);
+        RefreshDailyBackground(DateController.instance != null ? DateController.instance.currentDate : 0);
     }
 
     public void CloseRelicInfo()

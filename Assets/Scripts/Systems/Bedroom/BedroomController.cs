@@ -14,7 +14,7 @@ public class BedroomController : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        if (instance == null || instance == this)
         {
             instance = this;
             //DontDestroyOnLoad(gameObject);
@@ -22,7 +22,13 @@ public class BedroomController : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
     }
 
     //卧室状态
@@ -62,6 +68,7 @@ public class BedroomController : MonoBehaviour
 
     public void InitBedroom()
     {
+        Bedroom_UI.instance.RefreshDailyBackground(DateController.instance.currentDate);
         Bedroom_UI.instance.CloseRelicInfo();
         bool createRecords = !GameState.instance.bedroomInitialized;
         bool initializedSuccessfully = true;
