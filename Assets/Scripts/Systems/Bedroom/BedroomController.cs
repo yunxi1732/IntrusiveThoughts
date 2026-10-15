@@ -39,6 +39,8 @@ public class BedroomController : MonoBehaviour
     void Start()
     {
         StoryPlayer.instance.currentLocation = "出租屋";
+        // 教程从卧室开始；正式游戏进家先到客厅。
+        Bedroom_UI.instance.ShowRoom(DateController.instance.currentDate == 0);
         // 先按正确日期绑定遗物和面板，再播放剧情，避免覆盖剧情的 UI 动作。
         InitBedroom();
 
@@ -76,7 +78,12 @@ public class BedroomController : MonoBehaviour
         bool initializedSuccessfully = true;
         selectedRelic = null;
         relicEntries.Clear();
-        foreach (var entry in FindObjectsByType<RelicEntry>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        // 包括隐藏房间里的遗物，不扫描场景中遗留的其他遗物对象。
+        var homeUI = Bedroom_UI.instance;
+        var homeRelics = new List<RelicEntry>();
+        homeRelics.AddRange(homeUI.BedroomPanel.GetComponentsInChildren<RelicEntry>(true));
+        homeRelics.AddRange(homeUI.LivingRoomPanel.GetComponentsInChildren<RelicEntry>(true));
+        foreach (var entry in homeRelics)
         {
             // if (!entry.InitializeRecord(createRecords))
             // {

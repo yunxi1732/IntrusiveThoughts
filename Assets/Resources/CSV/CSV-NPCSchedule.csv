@@ -13,3 +13,6 @@
 辰星Walker,街道,,day == 4; story.seq_day3_chenxing5 == 1
 麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1
 辰星Walker,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1
+万蕊,父母家,,day ==2; day >=6 
+万蕊,公园,,day<=5;day>=2
+麻雀,楼道,,day<=4;day>=3

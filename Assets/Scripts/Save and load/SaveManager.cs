@@ -135,7 +135,7 @@ public class SaveManager : MonoBehaviour
         catch (Exception error)
         {
             entering = false;
-            Debug.LogError($"进入槽位 {slotId} 失败：{error.Message}");
+            Debug.LogError($"进入槽位 {slotId} 失败：{error}");
             return false;
         }
     }

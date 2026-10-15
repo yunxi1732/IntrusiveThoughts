@@ -24,6 +24,7 @@ public class Bedroom_UI : MonoBehaviour
     [Header("UI Panels")]
     public Canvas canvas;  // UI 所在的 Canvas
     public GameObject BedroomPanel;   //卧室主面板
+    public GameObject LivingRoomPanel;
     public GameObject RelicInfoPanel;   //遗物说明窗口
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
@@ -34,7 +35,9 @@ public class Bedroom_UI : MonoBehaviour
     public TextMeshProUGUI relicDescription;
 
     private Image bedroomBackground;
+    private Image livingRoomBackground;
     private readonly Sprite[] dailyBackgrounds = new Sprite[7];
+    private readonly Sprite[] dailyLivingRoomBackgrounds = new Sprite[7];
 
     private void OnEnable()
     {
@@ -53,20 +56,45 @@ public class Bedroom_UI : MonoBehaviour
     {
         if (bedroomBackground == null && BedroomPanel != null)
             bedroomBackground = BedroomPanel.GetComponent<Image>();
-        if (bedroomBackground == null) return;
+        if (livingRoomBackground == null && LivingRoomPanel != null)
+            livingRoomBackground = LivingRoomPanel.GetComponent<Image>();
 
         // 教程沿用第一天；结束后保留最后一天的房间。
         int index = Mathf.Clamp(day, 1, 7) - 1;
-        if (dailyBackgrounds[index] == null)
-            dailyBackgrounds[index] = Resources.Load<Sprite>($"UI/bg_bedroom{index + 1}");
-        if (dailyBackgrounds[index] == null)
+        ApplyDailyBackground(bedroomBackground, dailyBackgrounds, "bg_bedroom", index);
+        ApplyDailyBackground(livingRoomBackground, dailyLivingRoomBackgrounds, "bg_livingroom", index);
+    }
+
+    private void ApplyDailyBackground(Image background, Sprite[] sprites, string prefix, int index)
+    {
+        if (background == null) return;
+        if (sprites[index] == null)
+            sprites[index] = Resources.Load<Sprite>($"UI/{prefix}{index + 1}");
+        if (sprites[index] == null)
         {
-            Debug.LogWarning($"卧室背景缺失：Resources/UI/bg_bedroom{index + 1}", this);
+            Debug.LogWarning($"房间背景缺失：Resources/UI/{prefix}{index + 1}", this);
             return;
         }
-        bedroomBackground.sprite = dailyBackgrounds[index];
-        bedroomBackground.type = Image.Type.Simple;
-        bedroomBackground.preserveAspect = false;
+        background.sprite = sprites[index];
+        background.type = Image.Type.Simple;
+        background.preserveAspect = false;
+    }
+
+    public void OnGoToLivingRoomClicked() => SwitchRoom(false);
+    public void OnReturnToBedroomClicked() => SwitchRoom(true);
+
+    private void SwitchRoom(bool bedroom)
+    {
+        if (StoryManager.instance != null && StoryManager.instance.IsPlaying) return;
+        ShowRoom(bedroom);
+    }
+
+    public void ShowRoom(bool bedroom)
+    {
+        CloseRelicInfo();
+        if (BedroomController.instance != null) BedroomController.instance.selectedRelic = null;
+        BedroomPanel.SetActive(bedroom);
+        LivingRoomPanel.SetActive(!bedroom);
     }
 
     void Start()
