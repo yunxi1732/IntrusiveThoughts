@@ -60,8 +60,12 @@ public class Menu_UI : MonoBehaviour
     //退出按钮点击事件
     public void OnQuitClicked()
     {
-        //处理退出按钮点击事件
+        // 编辑器中停止运行；打包后退出游戏进程。
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
         Application.Quit();
+#endif
     }
 
     //从DataChoosePanel存档页面返回

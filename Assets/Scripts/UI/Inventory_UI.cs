@@ -106,6 +106,7 @@ public class Inventory_UI : MonoBehaviour
             if (itemIcon != null)
             {
                 itemIcon.sprite = relic.icon;
+                itemIcon.preserveAspect = true;
             }
         }
     }

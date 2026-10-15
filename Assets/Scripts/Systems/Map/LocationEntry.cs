@@ -33,8 +33,18 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
         {
             npcList.Add(npc);
             GameObject icon = Instantiate(iconPrefab, npcIconPanel.transform);
-            var image = icon.GetComponent<Image>();
-            if (image != null) image.sprite = npc.icon;
+            // 尺寸和缩放沿用 NPCIcon 预制件；头像放在 Mask 内参与裁剪。
+            var portrait = icon.transform.Find("Mask/NPCImage");
+            var image = portrait != null ? portrait.GetComponent<Image>() : null;
+            if (image != null)
+            {
+                image.sprite = npc.icon;
+                image.enabled = npc.icon != null;
+            }
+            else
+            {
+                Debug.LogError("NPCIcon 缺少带 Image 组件的 Mask/NPCImage 子物体。", icon);
+            }
         }
         // 头像条只在当前地点有人时显示；出租屋入口本身仍可随时点击。
         npcIconPanel.SetActive(npcList.Count > 0);

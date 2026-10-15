@@ -18,6 +18,15 @@ public class RelicEntry : MonoBehaviour
 
     public bool IsConfigured => !string.IsNullOrWhiteSpace(relicId);
 
+    // 场景里绑定的遗物美术作为说明、背包和气泡的共同图片来源。
+    public void SynchronizeIcon()
+    {
+        if (relicData == null) return;
+        var image = GetComponent<Image>();
+        if (image != null && image.sprite != null)
+            relicData.icon = image.sprite;
+    }
+
     public bool InitializeRecord(bool createIfMissing)
     {
         if (GameState.instance == null || RelicManager.instance == null) return false;
@@ -48,6 +57,8 @@ public class RelicEntry : MonoBehaviour
         Debug.Log($"找到卧室记录对应的遗物：{relicId}", this);
         
         relicData = RelicManager.instance.GetRelicDataByName(relicId);
+        // 包括已收集/隐藏的遗物，读档后也要更新其共享图标。
+        SynchronizeIcon();
         if (relicData == null)
             Debug.LogError($"卧室记录引用了不存在的遗物：{record.relicId}", this);
         bool visible = relicData != null

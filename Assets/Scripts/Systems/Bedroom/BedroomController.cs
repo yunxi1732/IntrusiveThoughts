@@ -52,6 +52,7 @@ public class BedroomController : MonoBehaviour
     {
         if (selectedRelic == null || selectedRelic.record == null || selectedRelic.record.collected) return;
         var record = selectedRelic.record;
+        selectedRelic.SynchronizeIcon();
         if (!Inventory.instance.AddBubbleItem(selectedRelic.relicData, record.instanceId)) return;
         record.collected = true;
         Bedroom_UI.instance.CloseRelicInfo();
@@ -62,6 +63,7 @@ public class BedroomController : MonoBehaviour
     public void SelectRelicEntry(RelicEntry entry)
     {
         if (entry.record == null || entry.record.collected) return;
+        entry.SynchronizeIcon();
         selectedRelic = entry;
         Bedroom_UI.instance.ShowRelicInfo(entry, entry.transform.position);
     }

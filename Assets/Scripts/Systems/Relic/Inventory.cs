@@ -72,6 +72,14 @@ public class Inventory : MonoBehaviour
     public void ShowBubblePanel()
     {
         BubblePanel.SetActive(true);
+        // 读档先创建背包项、卧室随后绑定美术；重新显示时同步已有列表图标。
+        foreach (var entry in inventoryItems)
+        {
+            var itemIcon = entry.item != null ? entry.item.transform.Find("Icon")?.GetComponent<Image>() : null;
+            if (itemIcon == null) continue;
+            itemIcon.sprite = entry.relicData.icon;
+            itemIcon.preserveAspect = true;
+        }
         //根据背包内的遗物渲染泡泡
         for (int i = 0; i < bubbleEntries.Count; i++)
         {
@@ -105,6 +113,7 @@ public class Inventory : MonoBehaviour
             if (icon != null)
             {
                 icon.sprite = relic.icon;
+                icon.preserveAspect = true;
             }
             //注册点击事件
             Button itemButton = item.GetComponent<Button>();

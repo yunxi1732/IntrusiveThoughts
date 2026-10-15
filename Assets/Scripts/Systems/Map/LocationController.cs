@@ -24,9 +24,6 @@ public class LocationController : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject npcmodelPanel;   //角色模型面板
-    public GameObject DialoguePanel;   //对白窗口
-    public TextMeshProUGUI DialogueCharacter;   //对白角色名
-    public TextMeshProUGUI DialogueText;   //对白文本
     public Image StoryImage;   //剧情图组件
 
     public string currentLocation;
@@ -62,8 +59,6 @@ public class LocationController : MonoBehaviour
         }
 
         
-        //关闭对话框
-        DialoguePanel.SetActive(false);
         StoryImage.gameObject.SetActive(false);
     }
 

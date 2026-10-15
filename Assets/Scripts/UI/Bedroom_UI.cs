@@ -142,6 +142,7 @@ public class Bedroom_UI : MonoBehaviour
         RelicInfoPanel.SetActive(true);
         //MoveToWorldPosition(canvas, RelicInfoPanel.GetComponent<RectTransform>(), worldPosition);
         relicIcon.sprite = entry.relicData.icon;
+        relicIcon.preserveAspect = true;
         relicDescription.text = entry.relicData.desc;
     }
 

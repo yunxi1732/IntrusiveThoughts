@@ -32,6 +32,7 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         if (icon != null && relicData != null)
         {
             icon.sprite = relicData.icon;
+            icon.preserveAspect = true;
         }
     }
 
