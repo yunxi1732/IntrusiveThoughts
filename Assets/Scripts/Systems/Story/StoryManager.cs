@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -21,6 +22,10 @@ public class StoryManager : MonoBehaviour
 
     private DialogueSequence current;
     private int lineIndex;
+    private Coroutine leaveRoutine;
+    private bool processingLeave;
+    private readonly List<NPCDepartureData> departures = new List<NPCDepartureData>();
+    public bool IsProcessingLeave => processingLeave;
 
     public bool IsPlaying => current != null;
 
@@ -78,6 +83,11 @@ public class StoryManager : MonoBehaviour
     public DialogueSequence Select(string npc = null, string location = null, RelicData relicData = null, string seqType = "normal")
     {
         Debug.Log("Select param: " + npc + ", " + location + ", " + (relicData != null ? relicData.id : "null") + ", " + seqType);
+        return SelectAvailable(npc, location, relicData, seqType);
+    }
+
+    private DialogueSequence SelectAvailable(string npc, string location, RelicData relicData, string seqType)
+    {
         DialogueSequence best = null;
         foreach (var s in sequences)
         {
@@ -85,22 +95,55 @@ public class StoryManager : MonoBehaviour
             if (!string.IsNullOrEmpty(s.location) && s.location != location) continue;
             if (!string.IsNullOrEmpty(s.npc) && s.npc != npc) continue;
             if (!string.IsNullOrEmpty(s.seqType) && s.seqType != seqType) continue;   // 检查对话类型
-            if(s.id == "seq_tut_4_emg"){Debug.Log("Checking sequence: " + s.id);}
             if (!s.CheckRelic(relicData?.id)) continue;
-            if(s.id == "seq_tut_4_emg"){Debug.Log("Checking MeetsConditions: " + s.id);}
-            if (!MeetsConditions(s)) continue;
+            try
+            {
+                if (!MeetsConditions(s)) continue;
+            }
+            catch (ArgumentException error)
+            {
+                Debug.LogWarning($"对白 {s.id} 的条件无效，跳过：{error.Message}");
+                continue;
+            }
             if (best == null || s.priority > best.priority) best = s;
         }
         return best;
+    }
+
+    // 扩展非对白交互时可订阅此查询；只有实际可完成且尚未完成时返回 true。
+    public event Func<string, string, bool> HasAdditionalNpcInteraction;
+
+    public bool HasNewNpcInteraction(string npc, string location)
+    {
+        if (IsNewNpcSequence(SelectAvailable(npc, location, null, "normal"), npc)) return true;
+        if (Inventory.instance != null)
+        {
+            foreach (var item in Inventory.instance.inventoryItems)
+            {
+                if (item == null || item.relicData == null) continue;
+                // 与 Bubble 的实际操作相同：先匹配遗物对白，再匹配失败反馈。
+                var sequence = SelectAvailable(npc, location, item.relicData, "normal");
+                if (sequence == null || sequence.lines.Count == 0)
+                    sequence = SelectAvailable(npc, location, item.relicData, "relicfail");
+                if (IsNewNpcSequence(sequence, npc)) return true;
+            }
+        }
+        if (HasAdditionalNpcInteraction != null)
+            foreach (Func<string, string, bool> query in HasAdditionalNpcInteraction.GetInvocationList())
+                if (query(npc, location)) return true;
+        return false;
+    }
+
+    private bool IsNewNpcSequence(DialogueSequence sequence, string npc)
+    {
+        // played 同样记录 once=false 的对白；通用场景对白不提示到每个 NPC 头上。
+        return sequence != null && sequence.npc == npc && sequence.lines.Count > 0 && !played.Contains(sequence.id);
     }
 
     private bool MeetsConditions(DialogueSequence s)
     {
         foreach (var c in s.conditions)
         {
-            if(s.id == "seq_tut_4_emg"){
-                Debug.Log("Checking " + c.key + "--current:" + GameStateAccess.Get(c.key) + c.op + ", expected:" + c.value);
-            }
             if (!c.Check(GameStateAccess.Get(c.key))) return false;
         }
         return true;
@@ -109,6 +152,7 @@ public class StoryManager : MonoBehaviour
     //选择并开始对话，没有可用对话返回 false
     public bool TryStart(string npc = null, RelicData relicData = null, string seqType = "normal")
     {
+        if (processingLeave) return false;
         //if (IsPlaying) return false;
         string location = StoryPlayer.instance.currentLocation;
         Debug.Log("Select param: " + npc + ", " + location + ", " + (relicData != null ? relicData.id : "null") + ", " + seqType);
@@ -124,6 +168,7 @@ public class StoryManager : MonoBehaviour
 
     public bool StartSeqenceByID(string seqID)
     {
+        if (processingLeave) return false;
         var seq = sequences.Find(s => s.id == seqID);
         if (seq == null || seq.lines.Count == 0) return false;
         if (seq.once && played.Contains(seq.id)) return false;
@@ -138,6 +183,28 @@ public class StoryManager : MonoBehaviour
     //推进到下一句，结束时触发 OnDialogueEnd
     public void NextDialogue()
     {
+        if (current == null || processingLeave) return;
+        var ids = ParseLeaveIds(current.lines[lineIndex].leave);
+        if (ids.Count > 0)
+        {
+            processingLeave = true;
+            leaveRoutine = StartCoroutine(LeaveAndAdvance(ids));
+            return;
+        }
+        AdvanceLine();
+    }
+
+    private IEnumerator LeaveAndAdvance(HashSet<string> ids)
+    {
+        RegisterDepartures(ids);
+        yield return StoryPlayer.instance.FadeNpcBodies(ids);
+        processingLeave = false;
+        leaveRoutine = null;
+        AdvanceLine();
+    }
+
+    private void AdvanceLine()
+    {
         if (current == null) return;
         lineIndex++;
         if (lineIndex < current.lines.Count)
@@ -151,8 +218,9 @@ public class StoryManager : MonoBehaviour
         foreach (var c in finished.onFinishSet) 
         {
             Debug.Log("Setting " + c.key + " to " + c.value);
-            GameStateAccess.Set(c.key, c.value);
+            c.Apply();
         }
+        FinalizeDepartures(finished.id);
         OnDialogueEnd?.Invoke(finished);
         BroadcastTutorialCompleted(finished);
         BroadcastPlayingState();
@@ -161,14 +229,23 @@ public class StoryManager : MonoBehaviour
     public void SkipDialogue()
     {
         if (current == null) return;
+        CancelLeaveAnimation();
+        // 跳过不等待动画，但当前句和剩余台词的离开结果仍需执行。
+        for (int i = lineIndex; i < current.lines.Count; i++)
+        {
+            var ids = ParseLeaveIds(current.lines[i].leave);
+            RegisterDepartures(ids);
+            StoryPlayer.instance.HideNpcBodies(ids);
+        }
         var finished = current;
         current = null;
         played.Add(finished.id);
         foreach (var c in finished.onFinishSet) 
         {
             Debug.Log("Setting " + c.key + " to " + c.value);
-            GameStateAccess.Set(c.key, c.value);
+            c.Apply();
         }
+        FinalizeDepartures(finished.id);
         OnDialogueEnd?.Invoke(finished);
         BroadcastTutorialCompleted(finished);
         BroadcastPlayingState();
@@ -182,6 +259,7 @@ public class StoryManager : MonoBehaviour
 
     public void ResetStory()
     {
+        CancelLeaveAnimation();
         current = null;
         lineIndex = 0;
         BroadcastPlayingState();
@@ -198,9 +276,12 @@ public class StoryManager : MonoBehaviour
         ResetStory();
         states.Clear();
         played.Clear();
+        departures.Clear();
         if (data == null) return;
         foreach (var entry in data.storyStates ?? new List<StateValueData>()) SetStoryState(entry.key, entry.value);
         foreach (var id in data.completedSequenceIds ?? new List<string>()) played.Add(id);
+        foreach (var departure in data.npcDepartures ?? new List<NPCDepartureData>())
+            if (departure != null) departures.Add(CloneDeparture(departure));
     }
 
     public void CaptureProgress(GameData data)
@@ -209,5 +290,93 @@ public class StoryManager : MonoBehaviour
         foreach (var entry in states)
             data.storyStates.Add(new StateValueData { key = entry.Key, value = entry.Value });
         data.completedSequenceIds = new List<string>(played);
+        data.npcDepartures = departures.ConvertAll(CloneDeparture);
+    }
+
+    private static HashSet<string> ParseLeaveIds(string text)
+    {
+        var ids = new HashSet<string>();
+        if (string.IsNullOrWhiteSpace(text)) return ids;
+        foreach (string part in text.Split(';', '；'))
+            if (!string.IsNullOrWhiteSpace(part)) ids.Add(part.Trim());
+        return ids;
+    }
+
+    private void RegisterDepartures(HashSet<string> ids)
+    {
+        foreach (string id in ids)
+        {
+            if (NPCManager.instance.GetNPCDataByName(id) == null)
+            {
+                Debug.LogWarning($"leave 引用了不存在的 NPC：{id}");
+                continue;
+            }
+            string location = StoryPlayer.instance.currentLocation;
+            departures.RemoveAll(item => item.npcId == id && item.location == location);
+            var record = new NPCDepartureData { npcId = id, location = location, sequenceId = current.id };
+            SnapshotAvailable(record);
+            departures.Add(record);
+        }
+    }
+
+    private bool IsAvailableForReturn(DialogueSequence sequence, NPCDepartureData record)
+    {
+        // 新剧情提示/返回资格不要求当前已经选中遗物。
+        bool candidate = sequence.npc == record.npcId && sequence.location == record.location
+            && sequence.seqType == "normal" && sequence.lines.Count > 0
+            && sequence.id != record.sequenceId && !played.Contains(sequence.id);
+        if (!candidate) return false;
+        try { return MeetsConditions(sequence); }
+        catch (ArgumentException error)
+        {
+            Debug.LogWarning($"对白 {sequence.id} 的返回条件无效：{error.Message}");
+            return false;
+        }
+    }
+
+    private void SnapshotAvailable(NPCDepartureData record)
+    {
+        foreach (var sequence in sequences)
+            if (IsAvailableForReturn(sequence, record) && !record.availableSequenceIds.Contains(sequence.id))
+                record.availableSequenceIds.Add(sequence.id);
+    }
+
+    private void FinalizeDepartures(string sequenceId)
+    {
+        // 结束状态写完后再记录基线，防止 updatenpc 立刻重生刚离开的人物。
+        foreach (var record in departures)
+            if (record.sequenceId == sequenceId) SnapshotAvailable(record);
+    }
+
+    public bool IsNpcAbsent(string npcId, string location)
+    {
+        var record = departures.Find(item => item.npcId == npcId && item.location == location);
+        if (record == null) return false;
+        if (current != null && current.id == record.sequenceId) return true;
+        foreach (var sequence in sequences)
+        {
+            if (record.availableSequenceIds.Contains(sequence.id) || !IsAvailableForReturn(sequence, record)) continue;
+            departures.Remove(record);
+            return false;
+        }
+        return true;
+    }
+
+    private static NPCDepartureData CloneDeparture(NPCDepartureData record)
+    {
+        return new NPCDepartureData
+        {
+            npcId = record.npcId, location = record.location, sequenceId = record.sequenceId,
+            availableSequenceIds = new List<string>(record.availableSequenceIds ?? new List<string>()),
+        };
+    }
+
+    private void CancelLeaveAnimation()
+    {
+        if (processingLeave && current != null && StoryPlayer.instance != null)
+            StoryPlayer.instance.HideNpcBodies(ParseLeaveIds(current.lines[lineIndex].leave));
+        if (leaveRoutine != null) StopCoroutine(leaveRoutine);
+        leaveRoutine = null;
+        processingLeave = false;
     }
 }

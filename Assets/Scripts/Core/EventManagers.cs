@@ -126,6 +126,7 @@ public enum GameEvents
     DayChanged,
     // 音量同步（string 通道 bgm/sfx，float 为 0～1 的滑条值）。
     AudioVolumeChanged,
+    InventoryChanged,
 }
 
 public class ErrorSuppress

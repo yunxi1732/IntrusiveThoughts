@@ -186,7 +186,10 @@ public class NPCManager : MonoBehaviour
             if (best == null || s.priority > best.priority) best = s;
         }
         Debug.Log("Best location for NPC " + npcId + ": " + (best?.location ?? "None"));
-        return best?.location;
+        string location = best?.location;
+        if (location != null && StoryManager.instance != null && StoryManager.instance.IsNpcAbsent(npcId, location))
+            return null;
+        return location;
     }
 
     public List<NPCData> GetNPCsAtLocation(string location)

@@ -1,6 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Collections.Generic;
+
+[System.Serializable]
+public class LocationViewSettings
+{
+    public string locationName;
+    public GameObject background;
+    public GameObject npcPanel;
+}
 
 //设置游戏
 //管理游戏设置，音量，语言等
@@ -23,6 +32,10 @@ public class Location_UI : MonoBehaviour
 
     public GameObject LocationPanel;   //地点主界面
     public Image BackgroundImage;   //背景图片组件
+    [Header("各地点的背景对象与 NPC 容器（位置直接在场景中编辑）")]
+    public List<LocationViewSettings> locations = new List<LocationViewSettings>();
+
+    public LocationViewSettings CurrentView => locations.Find(item => item.locationName == StoryPlayer.instance.currentLocation);
 
     void Start()
     {
@@ -32,6 +45,7 @@ public class Location_UI : MonoBehaviour
 
     public void OnExitLocationClicked()
     {
+        if (StoryManager.instance.IsProcessingLeave) return;
 
         //如果教程3没有完成，无法睡觉
         if (StoryManager.instance.GetState("story.tutorial.3") != 1)
@@ -52,7 +66,10 @@ public class Location_UI : MonoBehaviour
     public void ShowBackGround()
     {
         LocationPanel.SetActive(true);
-        //设置背景图片
-        //BackgroundImage.sprite = Resources.Load<Sprite>("Sprites/" + StoryPlayer.instance.currentLocation);
+        var view = CurrentView;
+        foreach (var settings in locations)
+            if (settings.background != null) settings.background.SetActive(settings == view);
+        if (view != null && view.background != null)
+            BackgroundImage = view.background.GetComponent<Image>();
     }
 }

@@ -106,9 +106,11 @@ public class Inventory : MonoBehaviour
         if (relic != null)
         {
             //创建背包项预制体
-            GameObject item = Instantiate(inventoryItemPrefab, InventoryContent.transform);
+            // 新背包在打开时创建 BubbleInfo；仅兼容仍绑定了旧列表的界面。
+            GameObject item = inventoryItemPrefab != null && InventoryContent != null
+                ? Instantiate(inventoryItemPrefab, InventoryContent.transform) : null;
             //找到名字为Icon的子物体渲染图标
-            GameObject iconObject = item.transform.Find("Icon")?.gameObject;
+            GameObject iconObject = item != null ? item.transform.Find("Icon")?.gameObject : null;
             Image icon = iconObject?.GetComponent<Image>();
             if (icon != null)
             {
@@ -116,7 +118,7 @@ public class Inventory : MonoBehaviour
                 icon.preserveAspect = true;
             }
             //注册点击事件
-            Button itemButton = item.GetComponent<Button>();
+            Button itemButton = item != null ? item.GetComponent<Button>() : null;
             if (itemButton != null)
             {
                 itemButton.onClick.AddListener(() => Inventory_UI.instance.RenderBubbleInfo(relic));
@@ -131,13 +133,14 @@ public class Inventory : MonoBehaviour
 
             //触发收集遗物的相关剧情
             Debug.Log("bedroomInitialized: " + GameState.instance.bedroomInitialized + ", inventoryItems.Count: " + inventoryItems.Count + ", bubbleEntries.Count: " + bubbleEntries.Count);
-            if(GameState.instance.bedroomInitialized && inventoryItems.Count == bubbleEntries.Count )
+            if (GameState.instance.bedroomInitialized && inventoryItems.Count > 1)
             {
                 StoryManager.instance.SetState("story.tutorial.1", 1);
             }
 
             //刷新bubble显示
             ShowBubblePanel();
+            EventManagerNP.TriggerEvent(GameEvents.InventoryChanged);
         }
         return true;
     }
@@ -148,6 +151,7 @@ public class Inventory : MonoBehaviour
         if (index < 0) return false;
         Destroy(inventoryItems[index].item);
         inventoryItems.RemoveAt(index);
+        EventManagerNP.TriggerEvent(GameEvents.InventoryChanged);
         //刷新bubble显示
         ShowBubblePanel();
         return true;
@@ -199,6 +203,7 @@ public class Inventory : MonoBehaviour
             Destroy(entry.item);
         }
         inventoryItems.Clear();
+        EventManagerNP.TriggerEvent(GameEvents.InventoryChanged);
 
         //刷新bubble显示
         ShowBubblePanel();

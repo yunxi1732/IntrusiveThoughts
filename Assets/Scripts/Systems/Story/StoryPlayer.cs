@@ -38,6 +38,8 @@ public class StoryPlayer : MonoBehaviour
     public string interactiveRelic;  //可交互气泡
     public string currentCharacter;  //当前交互对象
     public bool canInteract = true;  //是否可以交互跳过
+    [Header("场景小人离开动画")]
+    [Min(0f)] public float npcLeaveDuration = 0.4f;
 
     private void OnEnable()
     {
@@ -148,7 +150,7 @@ public class StoryPlayer : MonoBehaviour
         if (string.IsNullOrEmpty(interactiveRelic)) return false;
         if (interactiveRelic == "any") return true;
 
-        var relics = interactiveRelic.Split(';');
+        var relics = interactiveRelic.Split(';', '；');
         foreach (var relic in relics)
         {
             if (relic.Trim() == relicId) return true;
@@ -216,10 +218,57 @@ public class StoryPlayer : MonoBehaviour
 
     public void OnDialogueClicked()
     {
-        if (canInteract)
+        if (canInteract && !StoryManager.instance.IsProcessingLeave)
         {
             StoryManager.instance.NextDialogue();
         }
+    }
+
+    // 只淡出场景小人及其子节点（包括阴影），不修改对白或半身立绘。
+    public IEnumerator FadeNpcBodies(HashSet<string> ids)
+    {
+        var bodies = FindNpcBodies(ids);
+        var groups = new List<CanvasGroup>();
+        var alphas = new List<float>();
+        foreach (var body in bodies)
+        {
+            var group = body.BodyCanvasGroup;
+            groups.Add(group);
+            alphas.Add(group.alpha);
+        }
+        float duration = Mathf.Max(0f, npcLeaveDuration);
+        float elapsed = 0f;
+        while (elapsed < duration && groups.Count > 0)
+        {
+            elapsed += Time.unscaledDeltaTime;
+            for (int i = 0; i < groups.Count; i++)
+                if (groups[i] != null) groups[i].alpha = Mathf.Lerp(alphas[i], 0f, Mathf.Clamp01(elapsed / duration));
+            yield return null;
+        }
+        foreach (var body in bodies)
+            if (body != null)
+            {
+                body.BodyCanvasGroup.alpha = 0f;
+                body.gameObject.SetActive(false);
+            }
+    }
+
+    public void HideNpcBodies(HashSet<string> ids)
+    {
+        foreach (var body in FindNpcBodies(ids))
+        {
+            body.BodyCanvasGroup.alpha = 0f;
+            body.gameObject.SetActive(false);
+        }
+    }
+
+    private static List<NPCEntry> FindNpcBodies(HashSet<string> ids)
+    {
+        var result = new List<NPCEntry>();
+        foreach (var body in FindObjectsByType<NPCEntry>(FindObjectsSortMode.None))
+            if (body.gameObject.scene == SceneManager.GetActiveScene() && body.npcData != null && ids.Contains(body.npcData.id))
+                result.Add(body);
+        return result;
     }
 
     void HandleDialogueEnd(DialogueSequence sequence)

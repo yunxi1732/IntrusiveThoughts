@@ -110,6 +110,7 @@ public class BedroomController : MonoBehaviour
     // 与其他地点使用同一份日程和预制体，人物出现不直接启动对白。
     public void UpdateNPCs()
     {
+        if (StoryManager.instance.IsProcessingLeave) return;
         if (npcPanel == null)
         {
             Debug.LogError("卧室 NPC 容器未绑定，请在 BedroomController 中绑定 NPCModelPanel。", this);

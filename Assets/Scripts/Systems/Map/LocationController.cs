@@ -44,12 +44,22 @@ public class LocationController : MonoBehaviour
         EventManager1P<string>.TriggerEvent(GameEvents.AudioLocationChanged, currentLocation);
         //获取该场景下npc
         Location_UI.instance.ShowBackGround();
-        //设置背景图
+        var view = Location_UI.instance.CurrentView;
+        if (view == null || view.npcPanel == null)
+        {
+            Debug.LogError($"地点 {currentLocation} 未配置 NPC 容器。", this);
+            return;
+        }
+        npcmodelPanel = view.npcPanel;
 
         //生成角色并放置位置
         GameObject npcPrefab = NPCManager.instance.npcBodyPrefab;
         //清空残留角色
-        foreach (Transform child in npcmodelPanel.transform) Destroy(child.gameObject);
+        foreach (Transform child in npcmodelPanel.transform)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
         //生成场景内角色
         foreach (var npc in NPCManager.instance.GetNPCsAtLocation(currentLocation))
         {
@@ -64,6 +74,7 @@ public class LocationController : MonoBehaviour
 
     public void UpdateNPCs()
     {
+        if (StoryManager.instance.IsProcessingLeave) return;
         if (string.IsNullOrEmpty(currentLocation)) return; 
         //重新获取该场景下的npc
         List<NPCData> currentNpcs = NPCManager.instance.GetNPCsAtLocation(currentLocation);
@@ -77,6 +88,11 @@ public class LocationController : MonoBehaviour
                 NPCEntry npcEntry = child.GetComponent<NPCEntry>();
                 if (npcEntry != null && npcEntry.npcData.id == npc.id)
                 {
+                    if (!child.gameObject.activeSelf)
+                    {
+                        npcEntry.Initialize(npc);
+                        child.gameObject.SetActive(true);
+                    }
                     exists = true;
                     break;
                 }
@@ -94,6 +110,7 @@ public class LocationController : MonoBehaviour
             NPCEntry npcEntry = child.GetComponent<NPCEntry>();
             if (npcEntry != null && !currentNpcs.Contains(npcEntry.npcData))
             {
+                child.gameObject.SetActive(false);
                 Destroy(child.gameObject);
             }
         }

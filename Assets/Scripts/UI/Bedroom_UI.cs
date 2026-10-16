@@ -33,6 +33,7 @@ public class Bedroom_UI : MonoBehaviour
     [Header("遗物信息展示")]
     public Image relicIcon;
     public TextMeshProUGUI relicDescription;
+    [SerializeField] private ScrollRect relicDescriptionScroll;
 
     private Image bedroomBackground;
     private Image livingRoomBackground;
@@ -172,6 +173,13 @@ public class Bedroom_UI : MonoBehaviour
         relicIcon.sprite = entry.relicData.icon;
         relicIcon.preserveAspect = true;
         relicDescription.text = entry.relicData.desc;
+        if (relicDescriptionScroll != null)
+        {
+            Canvas.ForceUpdateCanvases();
+            LayoutRebuilder.ForceRebuildLayoutImmediate(relicDescription.rectTransform);
+            relicDescriptionScroll.StopMovement();
+            relicDescriptionScroll.verticalNormalizedPosition = 1f;
+        }
     }
 
     public void MoveToWorldPosition(Canvas canvas, RectTransform uiElement, Vector3 worldPos)

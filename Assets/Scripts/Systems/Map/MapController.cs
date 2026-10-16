@@ -24,6 +24,46 @@ public class MapController : MonoBehaviour
     
     [Header("交互场景展示")]
     public List<LocationEntry> locationEntries = new List<LocationEntry>();   //对应场景内所有可交互点
+    private bool marksDirty;
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        GameStateAccess.Changed += RequestMarkRefresh;
+        EventManagerNP.StartListening(GameEvents.InventoryChanged, RequestMarkRefresh);
+        EventManager1P<int>.StartListening(GameEvents.DayChanged, OnDayChanged);
+        EventManager1P<bool>.StartListening(GameEvents.DialoguePlayingChanged, OnDialoguePlayingChanged);
+        marksDirty = true;
+    }
+
+    private void OnDisable()
+    {
+        if (instance != this) return;
+        GameStateAccess.Changed -= RequestMarkRefresh;
+        EventManagerNP.StopListening(GameEvents.InventoryChanged, RequestMarkRefresh);
+        EventManager1P<int>.StopListening(GameEvents.DayChanged, OnDayChanged);
+        EventManager1P<bool>.StopListening(GameEvents.DialoguePlayingChanged, OnDialoguePlayingChanged);
+    }
+
+    private void OnDestroy()
+    {
+        if (instance == this) instance = null;
+    }
+
+    private void RequestMarkRefresh() => marksDirty = true;
+    private void OnDayChanged(int day) => RequestMarkRefresh();
+    private void OnDialoguePlayingChanged(bool playing)
+    {
+        if (!playing) RequestMarkRefresh();
+    }
+
+    private void LateUpdate()
+    {
+        if (!marksDirty) return;
+        marksDirty = false;
+        foreach (var entry in locationEntries)
+            if (entry != null) entry.RefreshDialogueMarks();
+    }
 
     void Start()
     {

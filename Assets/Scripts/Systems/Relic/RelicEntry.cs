@@ -18,12 +18,15 @@ public class RelicEntry : MonoBehaviour
 
     public bool IsConfigured => !string.IsNullOrWhiteSpace(relicId);
 
-    // 场景里绑定的遗物美术作为说明、背包和气泡的共同图片来源。
+    // 优先使用配置图片，让场景、说明、背包和气泡共享同一资源。
     public void SynchronizeIcon()
     {
         if (relicData == null) return;
         var image = GetComponent<Image>();
-        if (image != null && image.sprite != null)
+        if (image == null) return;
+        if (relicData.icon != null)
+            image.sprite = relicData.icon;
+        else if (image.sprite != null)
             relicData.icon = image.sprite;
     }
 

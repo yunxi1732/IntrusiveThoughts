@@ -8,17 +8,21 @@ using UnityEngine.EventSystems;
 
 public class NPCEntry : MonoBehaviour, IPointerClickHandler
 {
+    public CanvasGroup BodyCanvasGroup => GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
     //public LocData locData;
     public NPCData npcData;   //NPC数据
-    private Image iconImage;
+    [SerializeField] private Image iconImage;
 
     public void Initialize(NPCData data)
     {
         npcData = data;
-        iconImage = GetComponent<Image>();
+        BodyCanvasGroup.alpha = 1f;
+        BodyCanvasGroup.blocksRaycasts = true;
+        if (iconImage == null) iconImage = GetComponentInChildren<Image>(true);
         if (iconImage != null && npcData != null)
         {
             iconImage.sprite = npcData.icon;
+            iconImage.preserveAspect = true;
         }
     }
 

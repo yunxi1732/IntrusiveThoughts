@@ -1,27 +1,27 @@
-using System.IO;
+using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 public static class CsvToJson
 {
     public static string Convert(string csvText)
     {
-        var lines = csvText.Split('\n');
-        if (lines.Length < 2) return "[]";
+        if (string.IsNullOrEmpty(csvText)) return "[]";
+        var rows = ReadRows(csvText);
+        if (rows.Count < 2) return "[]";
 
         // 解析表头
-        var headers = SplitCsvLine(lines[0].Trim());
+        var headers = rows[0];
+        for (int i = 0; i < headers.Length; i++)
+            headers[i] = headers[i].Trim().TrimStart('\uFEFF');
 
         var sb = new StringBuilder();
         sb.Append("[");
 
         int rowCount = 0;
-        for (int i = 1; i < lines.Length; i++)
+        for (int i = 1; i < rows.Count; i++)
         {
-            var line = lines[i].Trim();
-            if (string.IsNullOrEmpty(line)) continue;
-
-            var values = SplitCsvLine(line);
+            var values = rows[i];
+            if (System.Array.TrueForAll(values, string.IsNullOrWhiteSpace)) continue;
             if (rowCount > 0) sb.Append(",");
             sb.Append("{");
 
@@ -40,27 +40,68 @@ public static class CsvToJson
         return sb.ToString();
     }
 
-    // 处理带引号的 CSV 字段（含逗号的情况）
-    private static string[] SplitCsvLine(string line)
+    // 只有引号外的换行才结束一条记录；引号内的逗号、换行和双引号属于字段内容。
+    private static List<string[]> ReadRows(string text)
     {
-        var result = new System.Collections.Generic.List<string>();
+        var rows = new List<string[]>();
+        var fields = new List<string>();
         bool inQuotes = false;
         var cur = new StringBuilder();
 
-        foreach (char c in line)
+        for (int i = 0; i < text.Length; i++)
         {
-            if (c == '"') inQuotes = !inQuotes;
+            char c = text[i];
+            if (c == '"')
+            {
+                if (inQuotes && i + 1 < text.Length && text[i + 1] == '"')
+                {
+                    cur.Append('"');
+                    i++;
+                }
+                else inQuotes = !inQuotes;
+            }
             else if (c == ',' && !inQuotes)
             {
-                result.Add(cur.ToString());
+                fields.Add(cur.ToString());
                 cur.Clear();
+            }
+            else if ((c == '\r' || c == '\n') && !inQuotes)
+            {
+                fields.Add(cur.ToString());
+                rows.Add(fields.ToArray());
+                fields.Clear();
+                cur.Clear();
+                if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n') i++;
             }
             else cur.Append(c);
         }
-        result.Add(cur.ToString());
-        return result.ToArray();
+        if (inQuotes) throw new System.FormatException("CSV 字段的双引号未闭合。");
+        if (cur.Length > 0 || fields.Count > 0)
+        {
+            fields.Add(cur.ToString());
+            rows.Add(fields.ToArray());
+        }
+        return rows;
     }
 
-    private static string Escape(string s) =>
-        s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+    private static string Escape(string s)
+    {
+        var result = new StringBuilder();
+        foreach (char c in s)
+        {
+            switch (c)
+            {
+                case '\\': result.Append("\\\\"); break;
+                case '"': result.Append("\\\""); break;
+                case '\r': result.Append("\\r"); break;
+                case '\n': result.Append("\\n"); break;
+                case '\t': result.Append("\\t"); break;
+                default:
+                    if (c < 0x20) result.Append("\\u").Append(((int)c).ToString("x4"));
+                    else result.Append(c);
+                    break;
+            }
+        }
+        return result.ToString();
+    }
 }

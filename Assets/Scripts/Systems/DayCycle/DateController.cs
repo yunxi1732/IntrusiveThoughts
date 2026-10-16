@@ -99,9 +99,6 @@ public class DateController : MonoBehaviour
             dailyDateSprites[index] = Resources.Load<Sprite>($"UI/day{currentDate}");
         dateImage.sprite = dailyDateSprites[index];
         dateImage.enabled = dateImage.sprite != null;
-        dateImage.type = Image.Type.Simple;
-        dateImage.preserveAspect = true;
-        dateImage.raycastTarget = false;
         if (dateImage.sprite == null)
             Debug.LogWarning($"日期图片缺失：Resources/UI/day{currentDate}", this);
     }

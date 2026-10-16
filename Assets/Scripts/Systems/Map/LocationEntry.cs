@@ -17,6 +17,7 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
     public string locationName;   //地点名称
     public List<NPCData> npcList = new List<NPCData>();   //该地点的角色列表
     public GameObject npcIconPanel;   //地点角色展示容器
+    private readonly Dictionary<string, GameObject> dialogueMarks = new Dictionary<string, GameObject>();
 
     void Start()
     {
@@ -29,10 +30,13 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
         GameObject iconPrefab = NPCManager.instance.npcIconPrefab;
         foreach (Transform child in npcIconPanel.transform) Destroy(child.gameObject);
         npcList.Clear();
+        dialogueMarks.Clear();
         foreach (var npc in NPCManager.instance.GetNPCsAtLocation(locationName))
         {
             npcList.Add(npc);
             GameObject icon = Instantiate(iconPrefab, npcIconPanel.transform);
+            var mark = icon.transform.Find("NewDiaMark") ?? icon.transform.Find("NewDIaMark");
+            if (mark != null) dialogueMarks[npc.id] = mark.gameObject;
             // 尺寸和缩放沿用 NPCIcon 预制件；头像放在 Mask 内参与裁剪。
             var portrait = icon.transform.Find("Mask/NPCImage");
             var image = portrait != null ? portrait.GetComponent<Image>() : null;
@@ -48,6 +52,8 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
         }
         // 头像条只在当前地点有人时显示；出租屋入口本身仍可随时点击。
         npcIconPanel.SetActive(npcList.Count > 0);
+        RefreshLocationArtwork(npcList.Count > 0);
+        RefreshDialogueMarks();
 
         if (canvasGroup == null)
         {
@@ -66,6 +72,29 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
             canvasGroup.alpha = 0f;
             canvasGroup.interactable = false;
             canvasGroup.blocksRaycasts = false;
+        }
+    }
+
+    private void RefreshLocationArtwork(bool hasNpc)
+    {
+        // 六个地点共用的结构：按钮、地点美术和头像容器同属一个地点根节点。
+        // 仅控制美术 Image 的显示，不改动 Transform，也不隐藏出租屋返回按钮。
+        if (transform.parent == null) return;
+        foreach (Transform sibling in transform.parent)
+        {
+            if (sibling == transform || sibling.gameObject == npcIconPanel) continue;
+            var artwork = sibling.GetComponent<Image>();
+            if (artwork != null) artwork.enabled = hasNpc;
+        }
+    }
+
+    public void RefreshDialogueMarks()
+    {
+        if (StoryManager.instance == null) return;
+        foreach (var pair in dialogueMarks)
+        {
+            if (pair.Value == null) continue;
+            pair.Value.SetActive(StoryManager.instance.HasNewNpcInteraction(pair.Key, locationName));
         }
     }
     public void OnPointerClick(PointerEventData eventData)

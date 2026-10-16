@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 
 //把 DialogueSequence.csv 和 DialogueLine.csv 解析为对话数据
@@ -11,10 +12,10 @@ public static class DialogueParse
         public string id, location, npc, relic, seqType, priority, once, conditions, onFinishSet, action;
     }
     [Serializable] private class SequenceRows { public SequenceRow[] rows; }
-    [Serializable] private class LineRow { public string sequenceId, character, content, relics, tag, image, sfx, waitTime,action; }
+    [Serializable] private class LineRow { public string sequenceId, character, content, relics, tag, image, sfx, waitTime, action, leave; }
     [Serializable] private class LineRows { public LineRow[] rows; }
 
-    //格式: "a>=1;b==2"，结束设置项写 "a=1"（此时比较符只是占位，取 value）
+    // 条件与结束时的赋值/累加分开解析。
     private static readonly (string token, CompareOp op)[] Operators =
     {
         (">=", CompareOp.GreaterEqual), ("<=", CompareOp.LessEqual),
@@ -46,7 +47,7 @@ public static class DialogueParse
                 once = !bool.TryParse(r.once, out bool once) || once,
                 action = r.action,
                 conditions = ParseConditions(r.conditions, r.id),
-                onFinishSet = ParseConditions(r.onFinishSet, r.id),
+                onFinishSet = ParseStateChanges(r.onFinishSet, r.id),
             };
             byId[r.id] = seq;
             result.Add(seq);
@@ -68,7 +69,8 @@ public static class DialogueParse
                     image = r.image,
                     sfx = r.sfx,
                     waitTime = float.TryParse(r.waitTime, out float wt) ? wt : 0f,
-                    action = r.action
+                    action = r.action,
+                    leave = r.leave,
                 };
             seq.lines.Add(line);
             allLines?.Add(line);
@@ -81,9 +83,14 @@ public static class DialogueParse
         var list = new List<DialogueCondition>();
         if (string.IsNullOrWhiteSpace(text)) return list;
 
-        foreach (var part in text.Split(';'))
+        foreach (var part in text.Split(';', '；'))
         {
             if (string.IsNullOrWhiteSpace(part)) continue;
+            if (part.Contains("+="))
+            {
+                Debug.LogWarning($"对话 {seqId} 的条件不能使用累加操作：{part}");
+                continue;
+            }
             bool parsed = false;
             foreach (var (token, op) in Operators)
             {
@@ -97,6 +104,30 @@ public static class DialogueParse
                 break;
             }
             if (!parsed) Debug.LogWarning($"对话 {seqId} 的条件无法解析: {part}");
+        }
+        return list;
+    }
+
+    public static List<DialogueStateChange> ParseStateChanges(string text, string seqId)
+    {
+        var list = new List<DialogueStateChange>();
+        if (string.IsNullOrWhiteSpace(text)) return list;
+        foreach (var part in text.Split(';', '；'))
+        {
+            if (string.IsNullOrWhiteSpace(part)) continue;
+            // == 保留为旧配置的赋值兼容语法；+= 使用执行时的当前值。
+            var match = Regex.Match(part.Trim(), @"^([^=+<>!]+?)\s*(\+=|==|=)\s*([+-]?\d+)\s*$");
+            if (!match.Success || !int.TryParse(match.Groups[3].Value, out int value))
+            {
+                Debug.LogWarning($"对话 {seqId} 的结束设置无法解析：{part}");
+                continue;
+            }
+            list.Add(new DialogueStateChange
+            {
+                key = match.Groups[1].Value.Trim(),
+                op = match.Groups[2].Value == "+=" ? StateChangeOp.Add : StateChangeOp.Set,
+                value = value,
+            });
         }
         return list;
     }

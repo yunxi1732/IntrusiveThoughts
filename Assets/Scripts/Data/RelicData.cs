@@ -6,6 +6,7 @@ public class RelicData
 {
     public string id;
     public string desc;
+    public string tag;
     public string iconString;
     public string condition;
     // 资源加载后的缓存，不写入进度存档。
@@ -20,6 +21,7 @@ public class RelicCsvRow
 {
     public string id;
     public string desc;
+    public string tag;
     public string iconString;
     public string condition;
 }

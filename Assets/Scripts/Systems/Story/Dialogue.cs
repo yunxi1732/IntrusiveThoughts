@@ -14,6 +14,7 @@ public class DialogueLine
     public string sfx;  //关联的音效资源名称
     public float waitTime;  //等待时长，单位为秒
     public string action;  //关联的特殊动作
+    public string leave;   //本句读完后离开的 NPC ID，使用分号分隔
 
     public Sprite GetCharacterSprite() {
         if (character =="余予")
@@ -40,6 +41,22 @@ public class DialogueLineJsons
 }
 
 public enum CompareOp { Equal, NotEqual, Greater, GreaterEqual, Less, LessEqual }
+
+public enum StateChangeOp { Set, Add }
+
+[Serializable]
+public class DialogueStateChange
+{
+    public string key;
+    public StateChangeOp op;
+    public int value;
+
+    public void Apply()
+    {
+        int result = op == StateChangeOp.Add ? checked(GameStateAccess.Get(key) + value) : value;
+        GameStateAccess.Set(key, result);
+    }
+}
 
 //条件：读取状态值（key）并与 value 比较。玩家状态用 "player.xxx"，NPC 状态用 "npc.<名字>.xxx"
 [Serializable]
@@ -77,18 +94,17 @@ public class DialogueSequence
     public string action;           //关联的特殊动作
     public List<DialogueCondition> conditions = new List<DialogueCondition>();
     public List<DialogueLine> lines = new List<DialogueLine>();
-    public List<DialogueCondition> onFinishSet = new List<DialogueCondition>();  //结束后设置状态（key = value）
+    public List<DialogueStateChange> onFinishSet = new List<DialogueStateChange>();
 
     public bool CheckRelic(string targetRelic)
     {
-        //relic为空不过滤
-        //if (string.IsNullOrEmpty(relic)) return true;
-        //都为空匹配
-        if (string.IsNullOrEmpty(relic) && string.IsNullOrEmpty(targetRelic)) return true;
-
-        //relic为any可以匹配任意互动遗物
-        if (relic == "any" && !string.IsNullOrEmpty(targetRelic)) return true;
-        //否则必须精确匹配互动遗物
-        return relic == targetRelic;
+        if (string.IsNullOrWhiteSpace(relic)) return string.IsNullOrWhiteSpace(targetRelic);
+        if (string.IsNullOrWhiteSpace(targetRelic)) return false;
+        foreach (var item in relic.Split(';', '；'))
+        {
+            string id = item.Trim();
+            if (id == "any" || id == targetRelic.Trim()) return true;
+        }
+        return false;
     }
 }

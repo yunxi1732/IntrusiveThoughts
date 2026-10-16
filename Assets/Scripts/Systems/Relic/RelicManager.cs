@@ -71,14 +71,33 @@ public class RelicManager : MonoBehaviour
         data = new RelicData
         {
             id = row.id.Trim(),
-            desc = row.desc,
+            desc = (row.desc ?? "").Replace("<br>", "\n").Replace("<br/>", "\n").Replace("<br />", "\n"),
+            tag = row.tag ?? "",
             iconString = row.iconString,
             condition = row.condition,
-            icon = string.IsNullOrWhiteSpace(row.iconString)
-                ? null
-                : Resources.Load<Sprite>(row.iconString),
+            icon = LoadRelicIcon(row.iconString, row.id),
         };
         return true;
+    }
+
+    private static Sprite LoadRelicIcon(string iconString, string relicId)
+    {
+        if (string.IsNullOrWhiteSpace(iconString)) return null;
+        string path = iconString.Trim().Replace('\\', '/');
+        int resourcesIndex = path.IndexOf("Resources/", StringComparison.OrdinalIgnoreCase);
+        if (resourcesIndex >= 0)
+            path = path.Substring(resourcesIndex + "Resources/".Length);
+        while (path.StartsWith("./", StringComparison.Ordinal)) path = path.Substring(2);
+        path = path.TrimStart('/');
+        string extension = System.IO.Path.GetExtension(path);
+        if (!string.IsNullOrEmpty(extension)) path = path.Substring(0, path.Length - extension.Length);
+
+        // 仅填资源名时默认在 UI 下查找；同时兼容已有 Resources 相对路径。
+        Sprite icon = Resources.Load<Sprite>(path.StartsWith("UI/", StringComparison.OrdinalIgnoreCase)
+            ? path : "UI/" + path);
+        if (icon == null) icon = Resources.Load<Sprite>(path);
+        if (icon == null) Debug.LogWarning($"遗物 {relicId} 的图片未找到：{iconString}");
+        return icon;
     }
 
     public bool IsEligible(RelicData relic)

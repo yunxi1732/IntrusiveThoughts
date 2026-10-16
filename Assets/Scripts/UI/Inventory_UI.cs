@@ -35,10 +35,32 @@ public class Inventory_UI : MonoBehaviour
     public TextMeshProUGUI itemDescText;
     public Image itemIcon;
 
+    [Header("气泡详情列表")]
+    public GameObject bubbleInfoPrefab;
+    public RectTransform bubbleInfoPanel;
+    public GameObject detailedPanel;
+    public Image relicBG;
+    public TextMeshProUGUI relicDesc;
+    public ScrollRect relicDescScroll;
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        EventManagerNP.StartListening(GameEvents.InventoryChanged, RefreshOpenInventory);
+    }
+
+    private void OnDisable()
+    {
+        if (instance != this) return;
+        EventManagerNP.StopListening(GameEvents.InventoryChanged, RefreshOpenInventory);
+    }
+
     void Start()
     {
         InventoryGroup.SetActive(false);
         InventoryPanel.SetActive(false);
+        CloseDetailedPanel();
+        ClearBubbleInfo();
         inventoryButton.gameObject.SetActive(true);
     }
 
@@ -46,19 +68,21 @@ public class Inventory_UI : MonoBehaviour
     public void OnOpenClicked()
     {
         InventoryPanel.SetActive(true);
-        HideInventoryButton();
+        CloseDetailedPanel();
+        RefreshBubbleInfo();
     }
 
     //点击关闭按钮 - 关闭背包
     public void OnCloseClicked()
     {
+        CloseDetailedPanel();
         InventoryPanel.SetActive(false);
-        ShowInventoryButton();
     }
 
     //启用背包功能，显示按钮并渲染气泡
     public void EnableInventory()
     {
+        CloseDetailedPanel();
         InventoryGroup.SetActive(true);
         InventoryPanel.SetActive(false);
         // 显示按钮，并渲染气泡
@@ -68,6 +92,7 @@ public class Inventory_UI : MonoBehaviour
     //禁用背包功能
     public void DisableInventory()
     {
+        CloseDetailedPanel();
         InventoryGroup.SetActive(false);
     }
 
@@ -76,13 +101,6 @@ public class Inventory_UI : MonoBehaviour
     {
         inventoryButton.gameObject.SetActive(true);
         BubblePanel.SetActive(true);
-    }
-
-    //隐藏背包按钮并隐藏气泡
-    public void HideInventoryButton()
-    {
-        inventoryButton.gameObject.SetActive(false);
-        HideBubblePanel();
     }
 
     //隐藏气泡面板
@@ -95,6 +113,7 @@ public class Inventory_UI : MonoBehaviour
     {
         if (relic != null)
         {
+            ShowDetailedPanel(relic);
             if (itemNameText != null)
             {
                 itemNameText.text = relic.id;
@@ -109,6 +128,80 @@ public class Inventory_UI : MonoBehaviour
                 itemIcon.preserveAspect = true;
             }
         }
+    }
+
+    private void RefreshOpenInventory()
+    {
+        if (InventoryPanel != null && InventoryPanel.activeInHierarchy)
+        {
+            CloseDetailedPanel();
+            RefreshBubbleInfo();
+        }
+    }
+
+    private void ClearBubbleInfo()
+    {
+        if (bubbleInfoPanel == null) return;
+        // 容器仅用于运行时条目，同时清理场景中预览用的 BubbleInfo。
+        foreach (Transform child in bubbleInfoPanel)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
+    }
+
+    public void RefreshBubbleInfo()
+    {
+        ClearBubbleInfo();
+        if (bubbleInfoPanel == null || bubbleInfoPrefab == null || Inventory.instance == null) return;
+        // 与 bubble1、bubble2、bubble3 使用同一个背包顺序；空槽不创建详情。
+        var items = Inventory.instance.inventoryItems;
+        for (int i = 0; i < items.Count; i++)
+        {
+            RelicData relic = items[i].relicData;
+            var view = Instantiate(bubbleInfoPrefab, bubbleInfoPanel);
+            view.name = "BubbleInfo" + (i + 1);
+            var image = view.transform.Find("BubbleImage").GetComponent<Image>();
+            image.sprite = relic.icon;
+            image.preserveAspect = true;
+            view.transform.Find("BubbleTag").GetComponent<TextMeshProUGUI>().text = relic.tag;
+            view.transform.Find("DetailButton").GetComponent<Button>().onClick
+                .AddListener(() => ShowDetailedPanel(relic));
+        }
+    }
+
+    public void ShowDetailedPanel(RelicData relic)
+    {
+        if (relic == null || detailedPanel == null) return;
+        detailedPanel.SetActive(true);
+        detailedPanel.transform.SetAsLastSibling();
+        if (relicBG != null)
+        {
+            relicBG.sprite = relic.icon;
+            relicBG.preserveAspect = true;
+            Color color = relicBG.color;
+            color.a = 1f;
+            relicBG.color = color;
+        }
+        if (relicDesc != null) relicDesc.text = relic.desc;
+        if (relicDescScroll != null)
+        {
+            relicDescScroll.horizontal = false;
+            relicDescScroll.vertical = true;
+            relicDescScroll.scrollSensitivity = 0f;
+            relicDescScroll.inertia = false;
+            Canvas.ForceUpdateCanvases();
+            if (relicDescScroll.content != null)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(relicDescScroll.content);
+            relicDescScroll.StopMovement();
+            relicDescScroll.verticalNormalizedPosition = 1f;
+        }
+    }
+
+    // 在 Inspector 中绑定到 DetailCloseButton 的 OnClick。
+    public void CloseDetailedPanel()
+    {
+        if (detailedPanel != null) detailedPanel.SetActive(false);
     }
 
 }
