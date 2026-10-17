@@ -140,6 +140,7 @@ public class Bedroom_UI : MonoBehaviour
     //睡觉按钮 - 结束一天
     public void OnEndDayClicked()
     {
+        if (ScreenTransition.Instance.IsTransitioning) return;
 
         //如果对话在进行中，防止打断对话
         if (StoryManager.instance.IsPlaying)
@@ -155,15 +156,17 @@ public class Bedroom_UI : MonoBehaviour
             return;
         }
 
-        //结算当天数据，保存状态，更新游戏时间
-        DateController.instance.PassDay();
+        if (DateController.instance.currentDate == 7)
+        {
+            ScreenTransition.Instance.LoadScene("EndScene");
+            return;
+        }
+        // 全黑时推进日期并刷新房间，让场景变化完全被遮罩挡住。
         ScreenTransition.Instance.Play(onMidPoint: () =>
             {
-                // 全黑时执行的转场逻辑
+                DateController.instance.PassDay();
                 BedroomController.instance.InitBedroom();
-            }, null);
-        //加载卧室场景（通过转场控制器处理）
-        // BedroomController.instance.InitBedroom();
+            }, onComplete: () => StoryPlayer.instance.RequestAutoCheck());
     }
 
     public void ShowRelicInfo(RelicEntry entry, Vector3 worldPosition)

@@ -5,13 +5,16 @@ using System.Collections.Generic;
 [Serializable]
 public class GameData
 {
-    public int version = 3;
+    public int version = 4;
     public int slotId;
     public string savedAtUtc;
+    public bool endingCompleted;
+    public List<string> achievedEndingIds = new List<string>();
     // 与 DateController 一致：0 为教程，1～7 为正式游戏日期。
     public int currentDate;
-    public PlayerData player = new PlayerData();
-    // 只保存 story.* 标记；日期、玩家、NPC 各有独立字段。
+    // 仅用于读取旧存档；主角属性现保存在 npcs 的余予记录中。
+    public PlayerData player;
+    // 只保存 story.* 标记；日期和人物属性由各自字段保存。
     public List<StateValueData> storyStates = new List<StateValueData>();
     // 仅用于读取第一版存档并迁移；新存档不在这里记录数据。
     public List<StateValueData> states = new List<StateValueData>();

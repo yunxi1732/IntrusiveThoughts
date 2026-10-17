@@ -58,7 +58,7 @@ public class DialogueStateChange
     }
 }
 
-//条件：读取状态值（key）并与 value 比较。玩家状态用 "player.xxx"，NPC 状态用 "npc.<名字>.xxx"
+//条件：读取状态值（key）并与 value 比较。人物统一用 "npc.<名字>.xxx"，player.xxx 兼容映射到主角。
 [Serializable]
 public class DialogueCondition
 {

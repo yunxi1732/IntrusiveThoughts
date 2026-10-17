@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 public class NPCManager : MonoBehaviour
 {
+    public const string PlayerId = "余予";
     //单例模式
     public static NPCManager instance { get; private set; }
 
@@ -79,6 +80,9 @@ public class NPCManager : MonoBehaviour
         // 初始化NPC管理器
         //初始化全量NPC信息：将csv转化为json，并从json文件中读取全量NPC信息
         ParseNPCCSV();
+        // 主角与其他人物共用属性和存档；CSV 尚未配置主角时补建记录。
+        if (GetNPCDataByName(PlayerId) == null)
+            FullNPCList.Add(new NPCData { id = PlayerId });
         ParseNPCScheduleCSV();
     }
 

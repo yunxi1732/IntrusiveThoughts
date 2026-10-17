@@ -1,21 +1,33 @@
-﻿npcid,location,priority,conditions
-万蕊,楼道,0,day==0; story.tut.3 = 0
-麻雀,楼道,1,day==0; npc.麻雀.start = 0
-路过的外卖员,楼道,0,day==0; npc.路过的外卖员.finished = 0; npc.麻雀.start == 1
-万蕊,公园,,day == 1; story.seq_day1_start == 1
-万蕊,父母家,,day >= 2; day <= 4; story.seq_day2_wanrui1 != 1
-万蕊,公园,,day>=2; day<=5
-麻雀,出租屋,,day==1; npc.麻雀.start == 1
-可疑的人,商圈,,day == 1; story.seq_day1_start == 1
-余宏志,商圈,,day == 1; story.seq_day1_start == 1
-可疑的人,楼道,1,day==2
-辰星Walker,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1
-麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1
-辰星Walker,出租屋,,day == 3; npc.辰星Walker.honest == 1
-辰星Walker,街道,,day == 4; story.seq_day3_chenxing5 == 1
-麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1
-辰星Walker,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1
-麻雀,楼道,,day == 3
-麻雀,出租屋,,day == 5
-万蕊,父母家,,day >=6; day <= 7
-？？？,出租屋,,day >=6; day <= 7
+﻿npcid,location,priority,conditions,,,,,,
+万蕊,楼道,0,day==0; story.tut.3 = 0,,,,,,
+麻雀,楼道,1,day==0; npc.麻雀.start = 0,,,,,,
+路过的外卖员,楼道,0,day==0; npc.路过的外卖员.finished = 0; npc.麻雀.start == 1,,,,,,
+万蕊,公园,,day == 1; story.seq_day1_start == 1,,,,,,
+万蕊,父母家,,day >= 2; day <= 4; story.seq_day2_wanrui1 != 1,,,,,,
+万蕊,公园,,day>=2; day<=5,,,,,,
+麻雀,出租屋,,day==1; npc.麻雀.start == 1,,,,,,
+可疑的人,商圈,,day == 1; story.seq_day1_start == 1,,,,,,
+余宏志,商圈,,day == 1; story.seq_day1_start == 1,,,,,,
+可疑的人,楼道,1,day==2,,,,,,
+辰星,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1,,,,,,
+麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1,,,,,,
+辰星,出租屋,,day == 3; npc.辰星.honest == 1,,,,,,
+辰星,街道,,day == 4; story.seq_day3_chenxing5 == 1,,,,,,
+麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1,,,,,,
+麻雀,出租屋,1,day == 4; story.seq_day4_chenxing6 == 1,,,,,,
+辰星,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1,,,,,,
+辰星,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1,,,,,,
+麻雀,楼道,,day == 3,,,,,,
+麻雀,出租屋,,day == 5;story.seq_day5_sparrow2_onclick!=1,,,,,,
+万蕊,父母家,,day >=6; day <= 7,,,,,,
+？？？,出租屋,,day >=6; day <= 7,,,,,,
+无常,商圈,,day>0,,,,,,
+王嘉豪,商圈,,day>=2; npc.王嘉豪.embarrassed != 1;npc.王嘉豪.fear != 1,,,,,,
+遗像,父母家,,day>0; npc.王嘉豪.fear == 1,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,
+,,,,,,,,,

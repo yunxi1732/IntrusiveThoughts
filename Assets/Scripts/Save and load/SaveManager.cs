@@ -17,6 +17,8 @@ public class SaveManager : MonoBehaviour
     private bool entering;
     private GlobalProgressData globalProgress = new GlobalProgressData();
     private bool globalLoaded;
+    private bool endingCompleted;
+    private List<string> achievedEndingIds = new List<string>();
     private string GlobalPath => Path.Combine(Application.persistentDataPath, "Saves", "global_progress.json");
 
     private void Start()
@@ -40,6 +42,7 @@ public class SaveManager : MonoBehaviour
                 : new GlobalProgressData();
             if (data == null || data.version != 1) throw new InvalidDataException("全局数据格式无效。");
             data.volumeSettings = data.volumeSettings ?? new List<VolumePreferenceData>();
+            data.unlockedEndingIds = data.unlockedEndingIds ?? new List<string>();
             var parameters = new HashSet<string>();
             foreach (var entry in data.volumeSettings)
                 if (entry == null || string.IsNullOrWhiteSpace(entry.parameter) || !parameters.Add(entry.parameter)
@@ -99,7 +102,7 @@ public class SaveManager : MonoBehaviour
             if (File.Exists(path))
             {
                 data = JsonUtility.FromJson<GameData>(File.ReadAllText(path));
-                if (data == null || (data.version != 1 && data.version != 2 && data.version != 3) || data.slotId != slotId || !data.bedroomInitialized)
+                if (data == null || data.version < 1 || data.version > 4 || data.slotId != slotId || !data.bedroomInitialized)
                     throw new InvalidDataException("存档格式或槽位不正确。");
                 MigrateProgress(data);
                 ValidateProgress(data);
@@ -122,11 +125,12 @@ public class SaveManager : MonoBehaviour
                     npc.tags = progress.tags ?? new List<string>();
                 }
                 GameState.instance.RestoreBedroomProgress(data);
-                GameState.instance.player = data.player;
             }
             StoryManager.instance.RestoreProgress(data);
             if (LoadGlobalProgress()) ApplyVolumePreferences();
             CurrentSlotId = slotId;
+            endingCompleted = data != null && data.endingCompleted;
+            achievedEndingIds = new List<string>(data?.achievedEndingIds ?? new List<string>());
             entering = true;
             SceneManager.LoadScene("BedRoomScene");
             entering = false;
@@ -168,9 +172,6 @@ public class SaveManager : MonoBehaviour
         foreach (var state in data.storyStates ?? new List<StateValueData>())
             if (state == null || string.IsNullOrWhiteSpace(state.key) || !state.key.StartsWith("story."))
                 throw new InvalidDataException("剧情记录只能保存 story.* 状态。");
-        foreach (var state in data.player.attributes)
-            if (state == null || string.IsNullOrWhiteSpace(state.key))
-                throw new InvalidDataException("玩家属性记录无效。");
     }
 
     // 第一版的混合状态表拆分到对应数据，不修改原文件。
@@ -194,8 +195,28 @@ public class SaveManager : MonoBehaviour
                     throw new InvalidDataException($"旧存档含不支持的状态：{state.key}");
             }
         }
+        data.npcs = data.npcs ?? new List<NPCProgressData>();
+        if (data.version < 4)
+        {
+            var playerNpc = data.npcs.Find(npc => npc != null && npc.npcId == NPCManager.PlayerId);
+            if (playerNpc == null)
+            {
+                playerNpc = new NPCProgressData { npcId = NPCManager.PlayerId };
+                data.npcs.Add(playerNpc);
+            }
+            playerNpc.attributes = playerNpc.attributes ?? new List<StateValueData>();
+            foreach (var state in data.player.attributes)
+            {
+                if (state == null || string.IsNullOrWhiteSpace(state.key))
+                    throw new InvalidDataException("旧存档玩家属性记录无效。");
+                // 已有统一人物记录时以该记录为准，避免覆盖较新的值。
+                if (!playerNpc.attributes.Exists(entry => entry != null && entry.key == state.key))
+                    playerNpc.attributes.Add(new StateValueData { key = state.key, value = state.value });
+            }
+        }
+        data.player = null;
         data.states = new List<StateValueData>();
-        data.version = 3;
+        data.version = 4;
     }
 
     private void Awake()
@@ -216,14 +237,40 @@ public class SaveManager : MonoBehaviour
     {
         if (CurrentSlotId == 0 || SceneManager.GetActiveScene().name != "BedRoomScene"
             || StoryManager.instance.IsPlaying || !GameState.instance.bedroomInitialized) return;
+        SaveProgress();
+    }
+
+    // 只有制作名单退出时提交通关结果；保存成功后才能清理当前游戏。
+    public bool CompleteEnding(List<string> endingIds)
+    {
+        if (SceneManager.GetActiveScene().name != "EndScene" || CurrentSlotId == 0
+            || endingIds == null || endingIds.Count == 0 || !GameState.instance.bedroomInitialized)
+        {
+            Debug.LogError("无法保存结局：缺少有效槽位、结局或游戏状态。");
+            return false;
+        }
+        if (!globalLoaded && !LoadGlobalProgress()) return false;
+        foreach (string id in endingIds)
+        {
+            if (string.IsNullOrWhiteSpace(id)) continue;
+            if (!achievedEndingIds.Contains(id)) achievedEndingIds.Add(id);
+            if (!globalProgress.unlockedEndingIds.Contains(id)) globalProgress.unlockedEndingIds.Add(id);
+        }
+        endingCompleted = true;
+        return SaveProgress();
+    }
+
+    private bool SaveProgress()
+    {
         try
         {
             var data = new GameData
             {
                 slotId = CurrentSlotId,
                 savedAtUtc = DateTime.UtcNow.ToString("O"),
+                endingCompleted = endingCompleted,
+                achievedEndingIds = new List<string>(achievedEndingIds),
                 currentDate = DateController.instance.currentDate,
-                player = GameState.instance.player,
                 bedroomInitialized = true,
                 bedroomRelics = GameState.instance.bedroomRelics,
                 inventoryBubbles = Inventory.instance.GetBubbleRecords(),
@@ -238,8 +285,9 @@ public class SaveManager : MonoBehaviour
             if (File.Exists(path)) File.Replace(temporary, path, null);
             else File.Move(temporary, path);
             SaveGlobalProgress();
+            return true;
         }
-        catch (Exception error) { Debug.LogError($"存档失败：{error.Message}"); }
+        catch (Exception error) { Debug.LogError($"存档失败：{error.Message}"); return false; }
     }
 
     //载入之前游戏进度

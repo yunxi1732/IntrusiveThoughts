@@ -48,6 +48,7 @@ public class BedroomController : MonoBehaviour
         {
             StoryManager.instance.TryStart();
         }
+        StoryPlayer.instance.RequestAutoCheck();
     }
 
     public void CollectRelic()
@@ -105,6 +106,27 @@ public class BedroomController : MonoBehaviour
         // 教程期间隐藏日期；教程结束后返回卧室才显示七天倒计时。
         DateController.instance.ShowDatePanel(DateController.instance.currentDate > 0);
         UpdateNPCs();
+    }
+
+    // 对话结束更新条件后，只刷新遗物，不重置房间、背包或 NPC。
+    public void UpdateRelics()
+    {
+        var homeUI = Bedroom_UI.instance;
+        var entries = new List<RelicEntry>();
+        entries.AddRange(homeUI.BedroomPanel.GetComponentsInChildren<RelicEntry>(true));
+        entries.AddRange(homeUI.LivingRoomPanel.GetComponentsInChildren<RelicEntry>(true));
+        relicEntries.Clear();
+        foreach (var entry in entries)
+        {
+            // 复用既有收集记录，已收集遗物不会重新出现，也不补建存档记录。
+            entry.InitializeRecord(false);
+            relicEntries.Add(entry);
+        }
+        if (selectedRelic != null && !selectedRelic.gameObject.activeInHierarchy)
+        {
+            selectedRelic = null;
+            homeUI.CloseRelicInfo();
+        }
     }
 
     // 与其他地点使用同一份日程和预制体，人物出现不直接启动对白。

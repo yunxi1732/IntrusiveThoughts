@@ -17,7 +17,7 @@ public static class GameStateAccess
         ValidateKey(key);
         if (key == "day") return DateController.instance.currentDate;
         if (key.StartsWith("player.", StringComparison.Ordinal))
-            return GameState.instance.player.GetValue(Attribute(key, "player."));
+            return NPCManager.instance.GetNpcState(NPCManager.PlayerId, Attribute(key, "player."));
         if (key.StartsWith("npc.", StringComparison.Ordinal))
         {
             SplitNpc(key, out string id, out string attribute);
@@ -37,7 +37,7 @@ public static class GameStateAccess
         ValidateKey(key);
         if (key == "day") DateController.instance.SetDate(value);
         else if (key.StartsWith("player.", StringComparison.Ordinal))
-            GameState.instance.player.SetValue(Attribute(key, "player."), value);
+            NPCManager.instance.SetNpcState(NPCManager.PlayerId, Attribute(key, "player."), value);
         else if (key.StartsWith("npc.", StringComparison.Ordinal))
         {
             SplitNpc(key, out string id, out string attribute);

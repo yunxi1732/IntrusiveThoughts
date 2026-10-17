@@ -20,6 +20,12 @@ public class StayCanvas : MonoBehaviour
 
     public Canvas canvas;
 
+    private void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (instance == this) instance = null;
+    }
+
     private void Start()
     {
         canvas = GetComponent<Canvas>();

@@ -28,7 +28,11 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
     {
         //刷新大地图NPC显示位置
         GameObject iconPrefab = NPCManager.instance.npcIconPrefab;
-        foreach (Transform child in npcIconPanel.transform) Destroy(child.gameObject);
+        foreach (Transform child in npcIconPanel.transform)
+        {
+            child.gameObject.SetActive(false);
+            Destroy(child.gameObject);
+        }
         npcList.Clear();
         dialogueMarks.Clear();
         foreach (var npc in NPCManager.instance.GetNPCsAtLocation(locationName))
@@ -50,9 +54,13 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
                 Debug.LogError("NPCIcon 缺少带 Image 组件的 Mask/NPCImage 子物体。", icon);
             }
         }
-        // 头像条只在当前地点有人时显示；出租屋入口本身仍可随时点击。
+        // 头像条与按钮现在是同级，展示元素不能挡住按钮的射线。
+        foreach (var graphic in npcIconPanel.GetComponentsInChildren<Graphic>(true))
+            graphic.raycastTarget = false;
+        // 地点美术与点击区域使用同一个开放条件；出租屋始终可以返回。
+        bool open = locationName == "出租屋" || npcList.Count > 0;
         npcIconPanel.SetActive(npcList.Count > 0);
-        RefreshLocationArtwork(npcList.Count > 0);
+        RefreshLocationArtwork(open);
         RefreshDialogueMarks();
 
         if (canvasGroup == null)
@@ -60,31 +68,25 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
-        // 教程结束后的地图仍处于第 0 天，必须保留返回卧室的入口。
-        if (locationName == "出租屋" || npcList.Count > 0)
-        {
-            canvasGroup.alpha = 1f;
-            canvasGroup.interactable = true;
-            canvasGroup.blocksRaycasts = true;
-        }
-        else
-        {
-            canvasGroup.alpha = 0f;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
-        }
+        canvasGroup.alpha = open ? 1f : 0f;
+        canvasGroup.interactable = open;
+        canvasGroup.blocksRaycasts = open;
     }
 
-    private void RefreshLocationArtwork(bool hasNpc)
+    private void RefreshLocationArtwork(bool open)
     {
         // 六个地点共用的结构：按钮、地点美术和头像容器同属一个地点根节点。
-        // 仅控制美术 Image 的显示，不改动 Transform，也不隐藏出租屋返回按钮。
+        // 美术不接收点击，由同级的透明按钮统一处理地点交互。
         if (transform.parent == null) return;
         foreach (Transform sibling in transform.parent)
         {
             if (sibling == transform || sibling.gameObject == npcIconPanel) continue;
             var artwork = sibling.GetComponent<Image>();
-            if (artwork != null) artwork.enabled = hasNpc;
+            if (artwork != null)
+            {
+                artwork.enabled = open;
+                artwork.raycastTarget = false;
+            }
         }
     }
 

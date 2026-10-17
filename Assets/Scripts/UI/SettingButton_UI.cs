@@ -33,7 +33,8 @@ public class SettingButton_UI : MonoBehaviour
 
     private void UpdateVisibility(Scene scene)
     {
-        bool show = scene.name != "MainScene";
+        bool show = scene.name != "MainScene" && scene.name != "EndScene";
+        if (scene.name == "EndScene" && settingsPanel != null) settingsPanel.SetActive(false);
         // 不停用自身，常驻按钮才能继续接收场景变化事件。
         visibility.alpha = show ? 1f : 0f;
         visibility.interactable = show;
@@ -42,7 +43,7 @@ public class SettingButton_UI : MonoBehaviour
 
     public void OnSettingsClicked()
     {
-        if (SceneManager.GetActiveScene().name == "MainScene") 
+        if (SceneManager.GetActiveScene().name == "MainScene" || SceneManager.GetActiveScene().name == "EndScene")
             return;
 
         settingsPanel.SetActive(true);

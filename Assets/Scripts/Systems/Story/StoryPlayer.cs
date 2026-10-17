@@ -38,6 +38,7 @@ public class StoryPlayer : MonoBehaviour
     public string interactiveRelic;  //可交互气泡
     public string currentCharacter;  //当前交互对象
     public bool canInteract = true;  //是否可以交互跳过
+    private bool autoCheckPending;
     [Header("场景小人离开动画")]
     [Min(0f)] public float npcLeaveDuration = 0.4f;
 
@@ -82,8 +83,20 @@ public class StoryPlayer : MonoBehaviour
 
     void OnStateChange()
     {
-        Debug.Log("Game state changed.");
-        //触发满足条件时可以自动播放的对话 （例如收集满3个遗物时触发，完成教程目标时自动触发等）
+        RequestAutoCheck();
+    }
+
+    // 合并同一帧的多次状态变化，等场景初始化、对话和转场完成后检查。
+    public void RequestAutoCheck() => autoCheckPending = true;
+
+    private void LateUpdate()
+    {
+        if (!autoCheckPending || StoryManager.instance == null) return;
+        string scene = SceneManager.GetActiveScene().name;
+        if (scene != "BedRoomScene" && scene != "LocationScene") return;
+        if (StoryManager.instance.IsPlaying || StoryManager.instance.IsProcessingLeave) return;
+        if (ScreenTransition.Instance != null && ScreenTransition.Instance.IsTransitioning) return;
+        autoCheckPending = false;
         StoryManager.instance.TryStart(null, null, "auto");
     }
 
@@ -185,6 +198,10 @@ public class StoryPlayer : MonoBehaviour
             case "showInventory":
                 //显示背包
                 Inventory.instance.EnableInventory();
+                break;
+            case "updaterelic":
+                if (SceneManager.GetActiveScene().name == "BedRoomScene" && BedroomController.instance != null)
+                    BedroomController.instance.UpdateRelics();
                 break;
             case "updatenpc":
                 //刷新npc，遍历获取本场景中的npc，如果新增则添加，否则删除

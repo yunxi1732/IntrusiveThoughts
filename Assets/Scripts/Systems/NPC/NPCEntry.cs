@@ -8,7 +8,15 @@ using UnityEngine.EventSystems;
 
 public class NPCEntry : MonoBehaviour, IPointerClickHandler
 {
-    public CanvasGroup BodyCanvasGroup => GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
+    public CanvasGroup BodyCanvasGroup
+    {
+        get
+        {
+            var group = GetComponent<CanvasGroup>();
+            if (group == null) group = gameObject.AddComponent<CanvasGroup>();
+            return group;
+        }
+    }
     //public LocData locData;
     public NPCData npcData;   //NPC数据
     [SerializeField] private Image iconImage;

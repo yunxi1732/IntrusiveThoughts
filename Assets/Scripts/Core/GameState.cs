@@ -8,7 +8,6 @@ public class GameState : MonoBehaviour
     //单例模式，跨场景不销毁
     public static GameState instance { get; private set; }
     public bool bedroomInitialized;
-    public PlayerData player = new PlayerData();
     public List<BedroomRelicData> bedroomRelics = new List<BedroomRelicData>();
 
     private void Awake()
@@ -28,7 +27,6 @@ public class GameState : MonoBehaviour
     {
         // 仅供空槽开始新游戏调用；读档和返回卧室不得调用。
         Inventory.instance.InitInventory();
-        player = new PlayerData();
         DateController.instance.SetDate(0);
         bedroomInitialized = false;
         bedroomRelics.Clear();

@@ -18,6 +18,27 @@ public class RelicEntry : MonoBehaviour
 
     public bool IsConfigured => !string.IsNullOrWhiteSpace(relicId);
 
+    private Animator[] blinkAnimators;
+    private SpriteRenderer[] blinkRenderers;
+
+    private void Awake()
+    {
+        blinkAnimators = GetComponentsInChildren<Animator>(true);
+        blinkRenderers = GetComponentsInChildren<SpriteRenderer>(true);
+    }
+
+    private void LateUpdate()
+    {
+        // SpriteRenderer 不受 UI 面板遮挡；详情打开期间隐藏所有遗物闪光。
+        var homeUI = Bedroom_UI.instance;
+        bool show = (record == null || !record.collected)
+            && (homeUI == null || homeUI.RelicInfoPanel == null || !homeUI.RelicInfoPanel.activeInHierarchy);
+        foreach (var animator in blinkAnimators)
+            if (animator != null && animator.enabled != show) animator.enabled = show;
+        foreach (var renderer in blinkRenderers)
+            if (renderer != null && renderer.enabled != show) renderer.enabled = show;
+    }
+
     // 优先使用配置图片，让场景、说明、背包和气泡共享同一资源。
     public void SynchronizeIcon()
     {

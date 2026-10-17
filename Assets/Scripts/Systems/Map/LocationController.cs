@@ -70,6 +70,7 @@ public class LocationController : MonoBehaviour
 
         
         StoryImage.gameObject.SetActive(false);
+        StoryPlayer.instance.RequestAutoCheck();
     }
 
     public void UpdateNPCs()

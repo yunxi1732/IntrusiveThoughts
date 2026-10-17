@@ -1,6 +1,6 @@
 using System;
 
-// 玩家自己的运行时数据；属性名不带 player. 前缀。
+// 旧存档的玩家属性格式，仅供 SaveManager 迁移；运行时统一使用 NPCData。
 [Serializable]
 public class PlayerData
 {
