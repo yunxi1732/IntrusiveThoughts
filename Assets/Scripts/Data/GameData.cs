@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 
-// 单个槽位的纯进度数据。四个槽位各保存一份，读档固定回卧室。
+// 单个槽位的纯进度数据。
 [Serializable]
 public class GameData
 {
-    public int version = 4;
+    public int version = 5;
+    public string sceneName = "BedRoomScene";
+    public string locationName = "出租屋";
+    public bool showingBedroom;
     public int slotId;
     public string savedAtUtc;
     public bool endingCompleted;

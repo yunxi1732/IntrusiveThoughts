@@ -25,7 +25,7 @@ public class GameState : MonoBehaviour
 
     public void InitializeGameState()
     {
-        // 仅供空槽开始新游戏调用；读档和返回卧室不得调用。
+        // 仅供开始新游戏调用；读档和返回卧室不得调用。
         Inventory.instance.InitInventory();
         DateController.instance.SetDate(0);
         bedroomInitialized = false;
@@ -46,8 +46,16 @@ public class GameState : MonoBehaviour
         {
             instanceId = item.instanceId,
             relicId = item.relicId,
+            fallbackIconResource = item.fallbackIconResource,
             collected = item.collected,
         });
+        // 先恢复图片回退，再创建背包；读档地点不一定是出租屋。
+        foreach (var record in restoredRecords)
+        {
+            var relic = RelicManager.instance.GetRelicDataByName(record.relicId);
+            if (relic != null && relic.icon == null && !string.IsNullOrWhiteSpace(record.fallbackIconResource))
+                relic.icon = Resources.Load<Sprite>(record.fallbackIconResource);
+        }
         Inventory.instance.RestoreBubbleRecords(data.inventoryBubbles ?? new List<BubbleData>());
         bedroomRelics = restoredRecords;
         bedroomInitialized = true;

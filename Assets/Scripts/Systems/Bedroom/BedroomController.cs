@@ -40,7 +40,8 @@ public class BedroomController : MonoBehaviour
     {
         StoryPlayer.instance.currentLocation = "出租屋";
         // 教程从卧室开始；正式游戏进家先到客厅。
-        Bedroom_UI.instance.ShowRoom(DateController.instance.currentDate == 0);
+        bool? restoredView = SaveManager.instance != null ? SaveManager.instance.ConsumeRestoredBedroomView() : null;
+        Bedroom_UI.instance.ShowRoom(restoredView ?? DateController.instance.currentDate == 0);
         // 先按正确日期绑定遗物和面板，再播放剧情，避免覆盖剧情的 UI 动作。
         InitBedroom();
 

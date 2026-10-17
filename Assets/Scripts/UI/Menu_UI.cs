@@ -24,10 +24,11 @@ public class Menu_UI : MonoBehaviour
     public GameObject DataChoosePanel;
     public GameObject DataEnterPanel;
     public GameObject SettingsPanel;
+    [Header("开始新游戏 / 继续游戏选择")]
+    public GameObject GameModePanel;
     public Button startGameButton;
     public Button settingsButton;
     public Button quitButton;
-    public Button returnButton;
     [SerializeField] private int selectedSlotId;
     public int SelectedSlotId => selectedSlotId;
 
@@ -35,20 +36,33 @@ public class Menu_UI : MonoBehaviour
     {
         MainPanel.SetActive(true);
         SettingsPanel.SetActive(false);
-        DataChoosePanel.SetActive(false); 
-        DataEnterPanel.SetActive(false);
+        if (DataChoosePanel != null) DataChoosePanel.SetActive(false);
+        if (DataEnterPanel != null) DataEnterPanel.SetActive(false);
+        if (GameModePanel != null) GameModePanel.SetActive(false);
     }
 
 
     public void OnStartGameClicked()
     {
+        if (!SaveManager.instance.HasAnyValidSave()) { OnNewGameClicked(); return; }
+        ShowGameMode();
+    }
+
+    public void OnNewGameClicked() => SaveManager.instance.StartNewGame();
+
+    public void OnContinueGameClicked()
+    {
+        if (SaveSlot_UI.instance == null) { Debug.LogError("请先配置常驻 SaveSlot_UI。", this); return; }
+        if (!SaveSlot_UI.instance.OpenLoad(ShowGameMode)) return;
         MainPanel.SetActive(false);
-        DataChoosePanel.SetActive(true);
-        //清空存档
-        //根据当前状态初始化游戏数据
-        //GameState.instance.InitializeGameState();
-        //加载卧室场景
-        //UnityEngine.SceneManagement.SceneManager.LoadScene("BedRoomScene");
+        if (GameModePanel != null) GameModePanel.SetActive(false);
+    }
+
+    private void ShowGameMode()
+    {
+        if (GameModePanel == null) { Debug.LogError("请绑定开始新游戏/继续游戏选择面板 GameModePanel。", this); return; }
+        MainPanel.SetActive(false);
+        GameModePanel.SetActive(true);
     }
 
     //设置按钮点击事件
@@ -71,24 +85,30 @@ public class Menu_UI : MonoBehaviour
     //从DataChoosePanel存档页面返回
     public void OnReturnButtonClicked()
     {
+        // 兼容尚未更换的旧绑定；游戏中的槽位返回只关闭弹窗。
+        if (SaveSlot_UI.instance != null && SaveSlot_UI.instance.IsOpen)
+        {
+            SaveSlot_UI.instance.OnBackClicked();
+            return;
+        }
+        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "MainScene") return;
         OnCloseClicked();
-        DataChoosePanel.SetActive(false);
-        MainPanel.SetActive(true);
+        if (DataChoosePanel != null) DataChoosePanel.SetActive(false);
+        if (GameModePanel != null) GameModePanel.SetActive(false);
+        if (MainPanel != null) MainPanel.SetActive(true);
     }
 
     //点击槽位
     public void OnDataChooseClicked(int slotId)
     {
-        if (slotId < 1 || slotId > 4) return;
         selectedSlotId = slotId;
-        DataEnterPanel.SetActive(true);
+        if (SaveSlot_UI.instance != null) SaveSlot_UI.instance.OnSlotClicked(slotId);
     }
 
     //加载存档开始游戏
     public void OnEnterDataClicked()
     {
-        if (selectedSlotId < 1 || selectedSlotId > 4) return;
-        if (SaveManager.instance.EnterSlot(selectedSlotId)) OnCloseClicked();
+        if (SaveSlot_UI.instance != null) SaveSlot_UI.instance.OnConfirmClicked();
     }
 
     //清除存档按钮点击事件
@@ -101,7 +121,8 @@ public class Menu_UI : MonoBehaviour
     //关闭DataEnterPanel读档确认页面
     public void OnCloseClicked()
     {
-        DataEnterPanel.SetActive(false);
+        if (DataEnterPanel != null) DataEnterPanel.SetActive(false);
+        if (SaveSlot_UI.instance != null && SaveSlot_UI.instance.IsOpen) SaveSlot_UI.instance.OnCancelConfirmClicked();
         selectedSlotId = 0;
     }
 }

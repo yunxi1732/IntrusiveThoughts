@@ -26,6 +26,7 @@ public class Bedroom_UI : MonoBehaviour
     public GameObject BedroomPanel;   //卧室主面板
     public GameObject LivingRoomPanel;
     public GameObject RelicInfoPanel;   //遗物说明窗口
+    public GameObject SleepPanel;      //结束当天的确认窗口
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
     public Button outdoorButton;          //离开卧室按钮
@@ -100,6 +101,7 @@ public class Bedroom_UI : MonoBehaviour
 
     void Start()
     {
+        if (SleepPanel != null) SleepPanel.SetActive(false);
         RefreshDailyBackground(DateController.instance != null ? DateController.instance.currentDate : 0);
     }
 
@@ -137,24 +139,45 @@ public class Bedroom_UI : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("MapScene");
     }
 
-    //睡觉按钮 - 结束一天
+    // NextDayButton：先询问，不直接推进日期。
     public void OnEndDayClicked()
     {
-        if (ScreenTransition.Instance.IsTransitioning) return;
+        if (!CanSleep()) return;
+        if (SleepPanel == null) { Debug.LogError("请绑定 Bedroom_UI 的 SleepPanel。", this); return; }
+        SleepPanel.SetActive(true);
+    }
+
+    public void OnCancelSleepClicked()
+    {
+        if (SleepPanel != null) SleepPanel.SetActive(false);
+    }
+
+    private bool CanSleep()
+    {
+        if (ScreenTransition.Instance.IsTransitioning || StoryManager.instance.IsProcessingLeave) return false;
 
         //如果对话在进行中，防止打断对话
         if (StoryManager.instance.IsPlaying)
         {
             //播放交互失败音效
-            return;
+            return false;
         }
         //如果教程2没有完成，无法睡觉
         if (StoryManager.instance.GetState("story.tutorial.3") != 1)
         {
             //触发警告对话
             StoryManager.instance.TryStart(null, null, "tutorial2");
-            return;
+            return false;
         }
+        return true;
+    }
+
+    // SleepPanel 确认：复查交互状态后执行原有睡觉/结局转场。
+    public void OnConfirmSleepClicked()
+    {
+        if (SleepPanel == null || !SleepPanel.activeInHierarchy) return;
+        SleepPanel.SetActive(false);
+        if (!CanSleep()) return;
 
         if (DateController.instance.currentDate == 7)
         {

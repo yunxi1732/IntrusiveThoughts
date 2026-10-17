@@ -43,12 +43,17 @@ public class EndingController : MonoBehaviour
         if (ScreenTransition.Instance != null && ScreenTransition.Instance.IsTransitioning) return;
         if (currentPriority >= 4)
         {
-            if (!configurationFailed && (SaveManager.instance == null || !SaveManager.instance.CompleteEnding(achievedEndingIds)))
+            if (configurationFailed)
             {
-                nextButtonText.text = "保存失败，重试";
+                ScreenTransition.Instance.ReturnToMainMenu();
                 return;
             }
-            ScreenTransition.Instance.ReturnToMainMenu();
+            if (SaveSlot_UI.instance == null)
+            {
+                Debug.LogError("请在常驻 Canvas 上配置 SaveSlot_UI，通关后需要手动选择槽位保存。", this);
+                return;
+            }
+            SaveSlot_UI.instance.OpenCompletedSave(achievedEndingIds, () => ScreenTransition.Instance.ReturnToMainMenu());
             return;
         }
         try { ShowNext(); }

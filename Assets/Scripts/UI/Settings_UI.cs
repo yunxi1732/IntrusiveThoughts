@@ -23,40 +23,48 @@ public class Settings_UI : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject SettingsPanel;
+    [SerializeField] private GameObject quitConfirmPanel;
+    [SerializeField] private TMPro.TMP_Text quitConfirmText;
 
     void Start()
     {
         SettingsPanel.SetActive(false);
+        if (quitConfirmPanel != null) quitConfirmPanel.SetActive(false);
     }
 
-    // 设置界面的存档按钮入口；槽位由进入游戏时的选择决定。
+    // 保存始终先选槽位，未保存过的新游戏也可使用。
     public void OnSaveButtonClicked()
     {
-        if (SaveManager.instance == null)
-        {
-            Debug.LogError("存档管理器尚未初始化。", this);
-            return;
-        }
-        if (SaveManager.instance.CurrentSlotId == 0)
-        {
-            Debug.LogWarning("尚未选择游戏槽位，无法保存。", this);
-            return;
-        }
-        if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name != "BedRoomScene")
-        {
-            Debug.LogWarning("只能在卧室保存游戏。", this);
-            return;
-        }
-        if (StoryManager.instance == null || StoryManager.instance.IsPlaying)
-        {
-            Debug.LogWarning("剧情尚未就绪或正在播放，无法保存。", this);
-            return;
-        }
-        SaveManager.instance.SaveGame();
+        if (SaveManager.instance != null) SaveManager.instance.SaveGame();
+    }
+
+    public void OnQuitButtonClicked()
+    {
+        if (ScreenTransition.Instance != null && ScreenTransition.Instance.IsTransitioning) return;
+        if (quitConfirmPanel == null) { Debug.LogError("请绑定退出确认面板。", this); return; }
+        if (quitConfirmText != null) quitConfirmText.text = "是否确认退出游戏？未保存的游戏进度将会丢失。";
+        quitConfirmPanel.SetActive(true);
+    }
+
+    public void OnCancelQuitClicked()
+    {
+        if (quitConfirmPanel != null) quitConfirmPanel.SetActive(false);
+    }
+
+    public void OnConfirmQuitClicked()
+    {
+        if (quitConfirmPanel == null || !quitConfirmPanel.activeInHierarchy) return;
+        if (SaveManager.instance != null) SaveManager.instance.SavePreferences();
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     public void OnReturnButtonClicked()
     {
+        if (SaveManager.instance != null) SaveManager.instance.SavePreferences();
         SettingsPanel.SetActive(false);
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainScene"
             && Menu_UI.instance != null)

@@ -18,8 +18,11 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
         rect = GetComponent<RectTransform>();
         canvas = GetComponentInParent<Canvas>();
         canvasGroup = GetComponent<CanvasGroup>();
-        //获取名称为icon的子物体
-        icon = transform.Find("Icon")?.GetComponent<Image>();
+        // 图标新增 Mask 父节点，兼容旧的直属 Icon 层级。
+        var iconTransform = transform.Find("Mask/Icon");
+        if (iconTransform == null) iconTransform = transform.Find("Icon");
+        icon = iconTransform != null ? iconTransform.GetComponent<Image>() : null;
+        if (icon == null) Debug.LogError($"气泡 {name} 缺少 Mask/Icon 或 Icon 图片组件。", this);
         // 记录原始位置
         originalPosition = rect.anchoredPosition;
         originalParent = rect.parent;

@@ -29,26 +29,33 @@ public class RelicEntry : MonoBehaviour
 
     private void LateUpdate()
     {
-        // SpriteRenderer 不受 UI 面板遮挡；详情打开期间隐藏所有遗物闪光。
-        var homeUI = Bedroom_UI.instance;
-        bool show = (record == null || !record.collected)
-            && (homeUI == null || homeUI.RelicInfoPanel == null || !homeUI.RelicInfoPanel.activeInHierarchy);
+        // 详情 Canvas 的 UI / 1 排序在闪光 UI / 0 之上，无需暂停动画。
+        bool show = record == null || !record.collected;
         foreach (var animator in blinkAnimators)
             if (animator != null && animator.enabled != show) animator.enabled = show;
         foreach (var renderer in blinkRenderers)
             if (renderer != null && renderer.enabled != show) renderer.enabled = show;
     }
 
-    // 优先使用配置图片，让场景、说明、背包和气泡共享同一资源。
+    // 场景图片由 Inspector 指定；只把它注册为详情/背包的缺图回退，不反向覆盖场景。
     public void SynchronizeIcon()
     {
         if (relicData == null) return;
         var image = GetComponent<Image>();
         if (image == null) return;
-        if (relicData.icon != null)
-            image.sprite = relicData.icon;
-        else if (image.sprite != null)
-            relicData.icon = image.sprite;
+        if (image.sprite == null) return;
+        if (relicData.icon == null) relicData.icon = image.sprite;
+        if (record != null)
+        {
+            // 当前遗物图片在 Resources/UI 中；同时兼容 Resources 根目录或 Sprites。
+            foreach (string folder in new[] { "UI/", "Sprites/", "" })
+            {
+                string path = folder + image.sprite.name;
+                if (Resources.Load<Sprite>(path) != image.sprite) continue;
+                record.fallbackIconResource = path;
+                break;
+            }
+        }
     }
 
     public bool InitializeRecord(bool createIfMissing)

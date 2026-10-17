@@ -92,6 +92,7 @@ public class StoryPlayer : MonoBehaviour
     private void LateUpdate()
     {
         if (!autoCheckPending || StoryManager.instance == null) return;
+        if (SaveSlot_UI.instance != null && SaveSlot_UI.instance.IsOpen) return;
         string scene = SceneManager.GetActiveScene().name;
         if (scene != "BedRoomScene" && scene != "LocationScene") return;
         if (StoryManager.instance.IsPlaying || StoryManager.instance.IsProcessingLeave) return;
