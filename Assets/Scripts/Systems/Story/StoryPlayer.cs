@@ -42,6 +42,12 @@ public class StoryPlayer : MonoBehaviour
     public bool canInteract = true;  //是否可以交互跳过
     private bool autoCheckPending;
     private bool openingTruckFinished;
+    [Header("开场 CG 抖动")]
+    [Min(0f)] public float truckShakeDelay = 3.5f;
+    [Min(0f)] public float truckShakeMagnitude = 50f;
+    private Coroutine truckShakeRoutine;
+    private RectTransform truckShakeTarget;
+    private Vector2 truckImageOriginalPosition;
     [Header("场景小人离开动画")]
     [Min(0f)] public float npcLeaveDuration = 0.4f;
 
@@ -54,6 +60,7 @@ public class StoryPlayer : MonoBehaviour
 
     private void OnDisable()
     {
+        StopTruckImageShake();
         EventManager1P<bool>.StopListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
         EventManager1P<bool>.StopListening(GameEvents.SkipAvailabilityChanged, OnSkipAvailabilityChanged);
     }
@@ -197,9 +204,46 @@ public class StoryPlayer : MonoBehaviour
     {
         // 先让本帧的第二张 CG 完成显示，再开始播放卡车声。
         yield return null;
-        if (AudioManager.instance != null) yield return AudioManager.instance.PlayOpeningTruck();
+        if (AudioManager.instance != null)
+            yield return AudioManager.instance.PlayOpeningTruck(source =>
+            {
+                StopTruckImageShake();
+                truckShakeTarget = StoryImage.rectTransform;
+                truckImageOriginalPosition = truckShakeTarget.anchoredPosition;
+                truckShakeRoutine = StartCoroutine(ShakeTruckImage(source));
+            });
+        StopTruckImageShake();
         openingTruckFinished = true;
         canInteract = true;
+    }
+
+    private IEnumerator ShakeTruckImage(AudioSource source)
+    {
+        AudioClip clip = source.clip;
+        while (source != null && source.isPlaying && source.clip == clip)
+        {
+            float elapsed = source.time - truckShakeDelay;
+            if (elapsed >= 0f && truckShakeTarget != null)
+            {
+                // 与涌现震动一样随机偏移、逐渐衰减；时间跟随音频实际进度。
+                float shakeDuration = Mathf.Max(0.001f, clip.length - truckShakeDelay);
+                float damper = Mathf.Clamp01(1f - elapsed / shakeDuration);
+                truckShakeTarget.anchoredPosition = truckImageOriginalPosition + new Vector2(
+                    UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f))
+                    * truckShakeMagnitude * damper;
+            }
+            yield return null;
+        }
+        if (truckShakeTarget != null) truckShakeTarget.anchoredPosition = truckImageOriginalPosition;
+        truckShakeRoutine = null;
+    }
+
+    private void StopTruckImageShake()
+    {
+        if (truckShakeRoutine != null) StopCoroutine(truckShakeRoutine);
+        truckShakeRoutine = null;
+        if (truckShakeTarget != null) truckShakeTarget.anchoredPosition = truckImageOriginalPosition;
+        truckShakeTarget = null;
     }
 
     public bool IsMatchRelic(string relicId)

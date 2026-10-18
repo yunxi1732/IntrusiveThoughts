@@ -78,6 +78,7 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
                 if (StoryManager.instance.TryStart(target, relicData))
                 {
                     AudioManager.instance.PlayEmergenceSFX();
+                    StoryPlayer.instance.emergenceEffect.PlayParticles();
                     Inventory.instance.RemoveRelic(instanceId);
                 }
             } else

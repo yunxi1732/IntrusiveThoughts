@@ -9,7 +9,7 @@ public class DialogueLine
     public string character;
     [UnityEngine.TextArea] public string content;
     public string relics;  //关联的遗物名称，不为空时表示可以互动
-    public string tag;   //关联角色图片序号
+    public string tag;   //Resources/Sprites 下的立绘图片名；FIFA 表示不显示立绘
     public string image;  //关联的图片资源名称
     public string sfx;  //关联的音效资源名称
     public float waitTime;  //等待时长，单位为秒
@@ -17,22 +17,19 @@ public class DialogueLine
     public string leave;   //本句读完后离开的 NPC ID，使用分号分隔
 
     public Sprite GetCharacterSprite() {
-        // FIFA 表示本句不显示立绘，主角也遵守此标记。
-        if (string.Equals(tag?.Trim(), "FIFA", StringComparison.OrdinalIgnoreCase)) return null;
-        if (character =="余予")
+        string imageName = tag?.Trim();
+        if (string.Equals(imageName, "FIFA", StringComparison.OrdinalIgnoreCase)) return null;
+        if (!string.IsNullOrEmpty(imageName))
         {
-            //sprite for 余予
-            return NPCManager.instance.playerIcon;
-        } else
-        {
-            var npc = NPCManager.instance.GetNPCDataByName(character);
-            if (npc == null)
-            {
-                Debug.LogWarning($"对白角色未配置：{character}");
-                return null;
-            }
-            return npc.GetModel(tag);
+            Sprite sprite = Resources.Load<Sprite>("Sprites/" + imageName);
+            if (sprite == null)
+                Debug.LogWarning($"台词 {sequenceId} 的立绘不存在：Sprites/{imageName}（角色：{character}）");
+            return sprite;
         }
+
+        // tag 留空时保留默认立绘；所有角色（包括余予）使用 NPC 配置。
+        var npc = NPCManager.instance.GetNPCDataByName(character);
+        return npc != null ? npc.model : null;
     }
 }
 

@@ -13,7 +13,17 @@ public class EmergenceEffect : MonoBehaviour
 
     public RectTransform rectTransform;
     public Image backgroundImage;
+    [Header("涌现气泡粒子")]
+    public ParticleSystem emergenceParticles;
     private Vector2 originalPos;
+
+    public void PlayParticles()
+    {
+        if (emergenceParticles == null) return;
+        emergenceParticles.gameObject.SetActive(true);
+        emergenceParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        emergenceParticles.Play(true);
+    }
 
     void Awake()
     {
@@ -23,8 +33,10 @@ public class EmergenceEffect : MonoBehaviour
     /// <summary>
     /// 触发涌现特效
     /// </summary>
+    [ContextMenu("测试涌现震动（Play Mode）")]
     public void PlayEmergenceShake()
     {
+        if (!Application.isPlaying) return;
         StopAllCoroutines();
         if (rectTransform == null) return;
         rectTransform.anchoredPosition = originalPos;

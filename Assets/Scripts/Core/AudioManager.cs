@@ -33,6 +33,7 @@ public class AudioManager : MonoBehaviour
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
     [Header("输出增益（1 为原始音量）")]
+    public bool enableOutputGain = false;
     [Range(1f, 4f)] public float outputGain = 2f;
     [Header("编辑器音频诊断")]
     public bool logAudioPlayback = false;
@@ -115,8 +116,19 @@ public class AudioManager : MonoBehaviour
         AudioListener listener = FindFirstObjectByType<AudioListener>();
         if (listener == null) return;
         AudioOutputGain gain = listener.GetComponent<AudioOutputGain>();
+        if (!enableOutputGain)
+        {
+            if (gain != null) gain.enabled = false;
+            return;
+        }
         if (gain == null) gain = listener.gameObject.AddComponent<AudioOutputGain>();
+        gain.enabled = true;
         gain.Gain = outputGain;
+    }
+
+    private void OnValidate()
+    {
+        if (Application.isPlaying && instance == this) ConfigureOutputGain();
     }
 
     private void PlaySceneMusic()
@@ -210,7 +222,7 @@ public class AudioManager : MonoBehaviour
             + new System.Diagnostics.StackTrace(1, true), this);
     }
 
-    public System.Collections.IEnumerator PlayOpeningTruck()
+    public System.Collections.IEnumerator PlayOpeningTruck(System.Action<AudioSource> onStarted = null)
     {
         if (sound_truck == null)
         {
@@ -222,6 +234,7 @@ public class AudioManager : MonoBehaviour
         sfxSource.clip = sound_truck;
         TracePlayback("开场音效", sound_truck, sfxSource);
         sfxSource.Play();
+        onStarted?.Invoke(sfxSource);
         while (sfxSource.isPlaying) yield return null;
         sfxSource.clip = null;
     }

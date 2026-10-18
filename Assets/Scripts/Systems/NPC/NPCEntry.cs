@@ -53,7 +53,7 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
         if (StoryManager.instance.TryStart(npcData.id)
             && StoryPlayer.instance.DialoguePanel.activeInHierarchy)
         {
-            AudioManager.instance.PlaySFX(4);
+            AudioManager.instance.PlaySFX(2);
         }
     }
 }

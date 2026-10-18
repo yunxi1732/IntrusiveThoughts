@@ -1,28 +1,28 @@
-﻿npcid,location,priority,conditions
-万蕊,楼道,0,day==0; story.tut.3 = 0
-麻雀,楼道,1,day==0; npc.麻雀.start = 0
-路过的外卖员,楼道,0,day==0; npc.路过的外卖员.finished = 0; npc.麻雀.start == 1
-万蕊,公园,,day == 1; story.seq_day1_start == 1
-万蕊,父母家,,day >= 2; day <= 4; story.seq_day2_wanrui1 != 1
-万蕊,公园,,day>=2; day<=5
-麻雀,出租屋,,day==1; npc.麻雀.start == 1
-可疑的人,商圈,,day == 1; story.seq_day1_start == 1; story.seq_day1_chenxing1_emg != 1
-余宏志,商圈,,day == 1; story.seq_day1_start == 1
-可疑的人,楼道,1,day==2; story.seq_day2_chenxing2 != 1
-辰星,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1
-麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1
-辰星,出租屋,,day == 3; npc.辰星.honest == 1
-辰星,街道,,day == 4; story.seq_day3_chenxing5 == 1
-麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1; story.seq_day4_chenxing6 != 1
-麻雀,出租屋,1,day == 4; story.seq_day4_chenxing6 == 1
-辰星,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1; npc.辰星.doom != 1
-麻雀,楼道,,day == 3
-麻雀,出租屋,,day == 5;story.seq_day5_sparrow2_onclick!=1
-万蕊,父母家,,day >=6; day <= 7
-？？？,出租屋,,day >=6; day <= 7
-无常,商圈,,day>0
-王嘉豪,商圈,,day>=2;story.seq_day2_jiahao1_postemg != 1
-遗像,父母家,,day>0; npc.王嘉豪.fear == 1
-麻雀,街道,,day ==7; story.seq_day5_sparrow2_onclick ==1; story.seq_day7_sparrow3_street_fail != 1
-陌生男人,街道,,day>0; npc.陌生男人.fear !=1
-卷饼阿姨,街道,,day>0; npc.卷饼阿姨.fear !=1
+﻿npcid,location,priority,conditions,
+万蕊,楼道,0,day==0; story.tut.3 = 0,
+麻雀,楼道,1,day==0; npc.麻雀.start = 0,
+外卖员,楼道,0,day==0; npc.外卖员.finished = 0; npc.麻雀.start == 1,
+万蕊,公园,,day == 1; story.seq_day1_start == 1,
+万蕊,父母家,,day >= 2; day <= 4; story.seq_day2_wanrui1 != 1,
+万蕊,公园,,day>=2; day<=5,
+麻雀,出租屋,,day==1; npc.麻雀.start == 1,
+可疑的人,商圈,,day == 1; story.seq_day1_start == 1; story.seq_day1_chenxing1_emg != 1,
+余宏志,商圈,,day == 1; story.seq_day1_start == 1,
+可疑的人,楼道,1,day==2; story.seq_day2_chenxing2 != 1,
+辰星,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1,
+麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1,
+辰星,出租屋,,day == 3; npc.辰星.honest == 1,
+辰星,街道,,day == 4; story.seq_day3_chenxing5 == 1,
+麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1; story.seq_day4_chenxing6 != 1,
+麻雀,出租屋,1,day == 4; story.seq_day4_chenxing6 == 1,
+辰星,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1; npc.辰星.doom != 1,替换小人char_chenxing2_xiaorenteshu
+麻雀,楼道,,day == 3,
+麻雀,出租屋,,day == 5;story.seq_day5_sparrow2_onclick!=1,
+万蕊,父母家,,day >=6; day <= 7,
+？？？,出租屋,,day >=6; day <= 7,
+无常,商圈,,day>0,
+王嘉豪,商圈,,day>=2;story.seq_day2_jiahao1_postemg != 1,
+遗像,父母家,,day>0; npc.王嘉豪.fear == 1; story.seq_day2_jiahao4 != 1,
+麻雀,街道,,day ==7; story.seq_day5_sparrow2_onclick ==1; story.seq_day7_sparrow3_street_fail != 1,
+陌生男人,街道,,day>0; npc.陌生男人.fear !=1,
+卷饼阿姨,街道,,day>0; npc.卷饼阿姨.fear !=1,
