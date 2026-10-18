@@ -23,6 +23,9 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip effect_bubble_select;
     [SerializeField] private AudioClip effect_bubble_cancel;
     [SerializeField] private AudioClip effect_emergence;
+    [SerializeField] private AudioClip effect_button;
+    [SerializeField] private AudioClip effect_error;
+    [SerializeField] private AudioClip effect_interact;
     [Range(0f, 1f)] public float masterVolume = 0.5f;
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
@@ -155,6 +158,7 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(string id)
     {
+        Debug.Log($"Playing SFX with ID: {id}", this);
         switch (id)
         {
             case "sound_mall": PlaySFX(sound_mall); break;
@@ -163,6 +167,9 @@ public class AudioManager : MonoBehaviour
             case "effect_bubble_select": PlaySFX(effect_bubble_select); break;
             case "effect_bubble_cancel": PlaySFX(effect_bubble_cancel); break;
             case "effect_emergence": PlaySFX(effect_emergence); break;
+            case "effect_button": PlaySFX(effect_button); break;
+            case "effect_error": PlaySFX(effect_error); break;
+            case "effect_interact": PlaySFX(effect_interact); break;
             default: Debug.LogWarning($"未配置的音效 ID：{id}", this); break;
         }
     }

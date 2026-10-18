@@ -45,15 +45,21 @@ public class Menu_UI : MonoBehaviour
     public void OnStartGameClicked()
     {
         if (!SaveManager.instance.HasAnyValidSave()) { OnNewGameClicked(); return; }
+        AudioManager.instance.PlaySFX("effect_button");
         ShowGameMode();
     }
 
-    public void OnNewGameClicked() => SaveManager.instance.StartNewGame();
+    public void OnNewGameClicked()
+    {
+        AudioManager.instance.PlaySFX("effect_button");
+        SaveManager.instance.StartNewGame();
+    }
 
     public void OnContinueGameClicked()
     {
         if (SaveSlot_UI.instance == null) { Debug.LogError("请先配置常驻 SaveSlot_UI。", this); return; }
         if (!SaveSlot_UI.instance.OpenLoad(ShowGameMode)) return;
+        AudioManager.instance.PlaySFX("effect_button");
         MainPanel.SetActive(false);
         if (GameModePanel != null) GameModePanel.SetActive(false);
     }
@@ -68,6 +74,7 @@ public class Menu_UI : MonoBehaviour
     //设置按钮点击事件
     public void OnSettingsClicked()
     {
+        AudioManager.instance.PlaySFX("effect_button");
         SettingsPanel.SetActive(true);
     }
 
@@ -101,6 +108,7 @@ public class Menu_UI : MonoBehaviour
     //点击槽位
     public void OnDataChooseClicked(int slotId)
     {
+        AudioManager.instance.PlaySFX("effect_button");
         selectedSlotId = slotId;
         if (SaveSlot_UI.instance != null) SaveSlot_UI.instance.OnSlotClicked(slotId);
     }
@@ -108,6 +116,7 @@ public class Menu_UI : MonoBehaviour
     //加载存档开始游戏
     public void OnEnterDataClicked()
     {
+        AudioManager.instance.PlaySFX("effect_button");
         if (SaveSlot_UI.instance != null) SaveSlot_UI.instance.OnConfirmClicked();
     }
 
@@ -115,12 +124,14 @@ public class Menu_UI : MonoBehaviour
     public void OnClearDataClicked()
     {
         if (selectedSlotId < 1 || selectedSlotId > 4) return;
+        AudioManager.instance.PlaySFX("effect_button");
         if (SaveManager.instance.ClearSave(selectedSlotId)) OnCloseClicked();
     }
 
     //关闭DataEnterPanel读档确认页面
     public void OnCloseClicked()
     {
+        AudioManager.instance.PlaySFX("effect_button");
         if (DataEnterPanel != null) DataEnterPanel.SetActive(false);
         if (SaveSlot_UI.instance != null && SaveSlot_UI.instance.IsOpen) SaveSlot_UI.instance.OnCancelConfirmClicked();
         selectedSlotId = 0;

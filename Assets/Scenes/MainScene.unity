@@ -720,6 +720,81 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 62997353}
   m_CullTransparentMesh: 1
+--- !u!1 &63081876
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 63081877}
+  - component: {fileID: 63081879}
+  - component: {fileID: 63081878}
+  m_Layer: 5
+  m_Name: ButtonsShad
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &63081877
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63081876}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1454751455}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -12, y: -15}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &63081878
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63081876}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+  m_Material: {fileID: 0}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.6666667}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_Sprite: {fileID: 21300000, guid: 702aa624607d215449bc20d48d26864e, type: 3}
+  m_Type: 0
+  m_PreserveAspect: 0
+  m_FillCenter: 1
+  m_FillMethod: 4
+  m_FillAmount: 1
+  m_FillClockwise: 1
+  m_FillOrigin: 0
+  m_UseSpriteMesh: 0
+  m_PixelsPerUnitMultiplier: 1
+--- !u!222 &63081879
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 63081876}
+  m_CullTransparentMesh: 1
 --- !u!1 &74969594
 GameObject:
   m_ObjectHideFlags: 0
@@ -2755,6 +2830,7 @@ GameObject:
   - component: {fileID: 462677614}
   - component: {fileID: 462677615}
   - component: {fileID: 462677616}
+  - component: {fileID: 462677617}
   m_Layer: 0
   m_Name: StoryManager
   m_TagString: Untagged
@@ -2811,11 +2887,28 @@ MonoBehaviour:
   DialoguePanel: {fileID: 1099520661}
   DialogueCharacter: {fileID: 1686615053}
   DialogueText: {fileID: 788917837}
+  emergenceEffect: {fileID: 462677617}
   currentLocation: "\u51FA\u79DF\u5C4B"
   interactiveRelic: 
   currentCharacter: 
   canInteract: 1
   npcLeaveDuration: 0.4
+--- !u!114 &462677617
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 462677613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1bc890161b4fd624d99fa2e3bb697081, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EmergenceEffect
+  duration: 0.3
+  magnitude: 8
+  rectTransform: {fileID: 1613465456}
+  backgroundImage: {fileID: 1607328086}
 --- !u!1 &483478727
 GameObject:
   m_ObjectHideFlags: 0
@@ -9024,6 +9117,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 63081877}
   - {fileID: 1797459867}
   m_Father: {fileID: 404662820}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -9339,7 +9433,10 @@ MonoBehaviour:
   sound_truck: {fileID: 0}
   effect_bubble_select: {fileID: 0}
   effect_bubble_cancel: {fileID: 0}
-  effect_emergence: {fileID: 0}
+  effect_emergence: {fileID: 8300000, guid: 8acc3f87158633b4aafc0a2c42e55807, type: 3}
+  effect_button: {fileID: 8300000, guid: 586b6dc09c57ab9478dc07f39a2cc35e, type: 3}
+  effect_error: {fileID: 8300000, guid: 7a4254dccc37d694eb9bb5a8e94ef47c, type: 3}
+  effect_interact: {fileID: 8300000, guid: 0ff5c947a8006264ab979b7741ac1f05, type: 3}
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1
@@ -9911,7 +10008,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 840, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1579530862
 MonoBehaviour:
@@ -10146,6 +10243,7 @@ GameObject:
   - component: {fileID: 1613465456}
   - component: {fileID: 1613465458}
   - component: {fileID: 1613465457}
+  - component: {fileID: 1613465459}
   m_Layer: 5
   m_Name: CharacterShadow
   m_TagString: Untagged
@@ -10211,6 +10309,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1613465455}
   m_CullTransparentMesh: 1
+--- !u!225 &1613465459
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1613465455}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 0
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1660712362
 GameObject:
   m_ObjectHideFlags: 0

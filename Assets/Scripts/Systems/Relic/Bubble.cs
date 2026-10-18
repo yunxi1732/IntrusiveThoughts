@@ -72,6 +72,7 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
             if (!string.IsNullOrEmpty(relicName) && StoryPlayer.instance.IsMatchRelic(relicData.id))
             {
                 Debug.Log("遗物使用成功: " + relicData.id + ", 期望: " + relicName);
+                AudioManager.instance.PlaySFX("effect_emergence");
                 //开始涌现剧情
                 // 缓存 ID，刷新气泡槽位后本组件可能绑定到另一件物品。
                 string instanceId = bubbleData.sourceInstanceId;
@@ -79,6 +80,7 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
                     Inventory.instance.RemoveRelic(instanceId);
             } else
             {
+                AudioManager.instance.PlaySFX("effect_error");
                 //获取使用对象
                 StoryManager.instance.TryStart(target, relicData, "relicfail");
                 Debug.Log("遗物使用失败: " + relicData.id + ", 期望: " + relicName);

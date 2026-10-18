@@ -28,6 +28,7 @@ public class StoryManager : MonoBehaviour
     public bool IsProcessingLeave => processingLeave;
 
     public bool IsPlaying => current != null;
+    public bool IsEmergence => current != null && !string.IsNullOrEmpty(current.relic) && lineIndex == 0;
 
     //UI 订阅这些事件来显示对话
     public event Action<DialogueLine> OnLine;

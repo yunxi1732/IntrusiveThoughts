@@ -34,6 +34,8 @@ public class StoryPlayer : MonoBehaviour
     public TextMeshProUGUI DialogueCharacter;   //对白角色名
     public TextMeshProUGUI DialogueText;   //对白文本
 
+    public EmergenceEffect emergenceEffect;
+
     public string currentLocation;
     public string interactiveRelic;  //可交互气泡
     public string currentCharacter;  //当前交互对象
@@ -143,8 +145,21 @@ public class StoryPlayer : MonoBehaviour
             //处理对白逻辑
             DialogueCharacter.text = line.character;
             DialogueText.text = line.content;
-            CharacterImg.sprite = line.GetCharacterSprite();
-            CharacterShadowImg.sprite = line.GetCharacterSprite();
+            Sprite sprite = line.GetCharacterSprite();
+            if (sprite != null)
+            {
+                CharacterImg.sprite = sprite;
+                CharacterShadowImg.sprite = sprite;
+                CharacterShadowImg.GetComponent<CanvasGroup>().alpha = 1;
+            } else
+            {
+                CharacterShadowImg.GetComponent<CanvasGroup>().alpha = 0;
+            }
+            if(StoryManager.instance != null && StoryManager.instance.IsEmergence)
+            {
+                emergenceEffect?.PlayEmergenceShake();
+            }
+
         } else 
         {
             DialoguePanel?.SetActive(false);

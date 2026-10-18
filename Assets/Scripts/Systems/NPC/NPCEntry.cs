@@ -36,6 +36,7 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        AudioManager.instance.PlaySFX("effect_interact");
         //如果当前在播放剧情，禁止交互
         if (StoryManager.instance.IsPlaying)
         {

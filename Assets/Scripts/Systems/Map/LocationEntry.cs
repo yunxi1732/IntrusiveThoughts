@@ -103,6 +103,7 @@ public class LocationEntry : MonoBehaviour, IPointerClickHandler
     {
         //Debug.Log("LocationEntry clicked: " + gameObject.name);
         StoryPlayer.instance.currentLocation = locationName;
+        AudioManager.instance.PlaySFX("effect_interact");
 
         if (locationName == "出租屋")
         {
