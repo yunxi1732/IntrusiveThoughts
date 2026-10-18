@@ -97,6 +97,7 @@ public class DialogueSequence
 
     public bool CheckRelic(string targetRelic)
     {
+        if (seqType == "relicfail") return true;
         if (string.IsNullOrWhiteSpace(relic)) return string.IsNullOrWhiteSpace(targetRelic);
         if (string.IsNullOrWhiteSpace(targetRelic)) return false;
         foreach (var item in relic.Split(';', '；'))
