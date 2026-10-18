@@ -50,10 +50,10 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
         //点击npc后触发剧情交互
         StoryPlayer.instance.interactiveRelic = null; // 清空当前交互遗物
         // 尝试开始与该NPC相关的剧情
-        if (!StoryManager.instance.TryStart(npcData.id))
+        if (StoryManager.instance.TryStart(npcData.id)
+            && StoryPlayer.instance.DialoguePanel.activeInHierarchy)
         {
-            // 如果未能成功开始剧情，可以在这里处理相应逻辑
-            StoryManager.instance.TryStart(npcData.id);
+            AudioManager.instance.PlaySFX(4);
         }
     }
 }

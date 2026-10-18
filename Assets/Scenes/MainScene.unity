@@ -2978,7 +2978,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EmergenceEffect
   duration: 0.3
-  magnitude: 8
+  magnitude: 15
   enableBackgroundFlash: 0
   rectTransform: {fileID: 1613465456}
   backgroundImage: {fileID: 1607328086}
