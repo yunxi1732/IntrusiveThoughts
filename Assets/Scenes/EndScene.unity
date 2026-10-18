@@ -289,6 +289,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 4200000000}
+        m_TargetAssemblyTypeName: EndingController, Assembly-CSharp
+        m_MethodName: PlaySFX
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &120503012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1108,8 +1120,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 73321468}
   m_HandleRect: {fileID: 73321467}
   m_Direction: 2
-  m_Value: 1.0000001
-  m_Size: 0.38476136
+  m_Value: 1
+  m_Size: 0.32183766
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

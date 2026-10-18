@@ -8,6 +8,9 @@ public class AudioManager : MonoBehaviour
 
     public AudioSource musicSource;
     public AudioSource sfxSource;
+    private AudioSource dialogueSfxSource;
+    private bool dialogueSfxWasPlaying;
+    public bool IsDialogueSfxPlaying => dialogueSfxSource != null && dialogueSfxSource.isPlaying;
     [Header("场景 / 剧情音乐")]
     [SerializeField] private AudioClip bgm_bedroom1;
     [SerializeField] private AudioClip bgm_bedroom2;
@@ -23,12 +26,16 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip effect_bubble_select;
     [SerializeField] private AudioClip effect_bubble_cancel;
     [SerializeField] private AudioClip effect_emergence;
-    [SerializeField] private AudioClip effect_button;
-    [SerializeField] private AudioClip effect_error;
-    [SerializeField] private AudioClip effect_interact;
+    [Header("音效数组")]
+    [SerializeField] private AudioClip[] clickSfx = new AudioClip[7];
+    private readonly System.Collections.Generic.Dictionary<string, AudioClip> dialogueClips = new();
     [Range(0f, 1f)] public float masterVolume = 0.5f;
     [Range(0f, 1f)] public float musicVolume = 0.5f;
     [Range(0f, 1f)] public float sfxVolume = 0.8f;
+    [Header("输出增益（1 为原始音量）")]
+    [Range(1f, 4f)] public float outputGain = 2f;
+    [Header("编辑器音频诊断")]
+    public bool logAudioPlayback = false;
     private float musicMultiplier = 20f;
     private float sfxMultiplier = 20f;
 
@@ -48,6 +55,17 @@ public class AudioManager : MonoBehaviour
         musicSource.loop = true;
         sfxSource.playOnAwake = false;
         sfxSource.loop = false;
+        dialogueSfxSource = gameObject.AddComponent<AudioSource>();
+        dialogueSfxSource.playOnAwake = false;
+        dialogueSfxSource.loop = false;
+        // 提前加载短音效，播放时只读取缓存。
+        foreach (AudioClip clip in Resources.LoadAll<AudioClip>("Audios/sfx"))
+        {
+            dialogueClips[clip.name] = clip;
+            clip.LoadAudioData();
+        }
+        foreach (AudioClip clip in clickSfx)
+            if (clip != null) clip.LoadAudioData();
         ApplyVolumes();
     }
 
@@ -92,10 +110,26 @@ public class AudioManager : MonoBehaviour
         PlaySceneMusic();
     }
 
+    private void ConfigureOutputGain()
+    {
+        AudioListener listener = FindFirstObjectByType<AudioListener>();
+        if (listener == null) return;
+        AudioOutputGain gain = listener.GetComponent<AudioOutputGain>();
+        if (gain == null) gain = listener.gameObject.AddComponent<AudioOutputGain>();
+        gain.Gain = outputGain;
+    }
+
     private void PlaySceneMusic()
     {
+        ConfigureOutputGain();
+        if (StoryManager.instance != null && StoryManager.instance.IsOpening)
+        {
+            StopMusic();
+            return;
+        }
         switch (SceneManager.GetActiveScene().name)
         {
+            case "MainScene": PlayMusic(bgm_sunset); break;
             case "BedRoomScene":
                 int day = DateController.instance != null ? DateController.instance.currentDate : 0;
                 PlayMusic(day >= 5 ? bgm_bedroom2 : bgm_bedroom1);
@@ -116,7 +150,13 @@ public class AudioManager : MonoBehaviour
     public void PlayLocationMusic(string location)
     {
         if (SceneManager.GetActiveScene().name != "LocationScene") return;
-        AudioClip clip = location == "公园" ? bgm_park : location == "街道" ? bgm_meteor : null;
+        AudioClip clip = location switch
+        {
+            "公园" => bgm_park,
+            "商圈" => sound_mall,
+            "街道" => sound_traffic,
+            _ => null,
+        };
         // 相同地点的初始化通知不重启当前曲目；换地点时 PlayMusic 会停止旧曲。
         PlayMusic(clip);
     }
@@ -141,6 +181,8 @@ public class AudioManager : MonoBehaviour
         StopMusic();
         if (clip == null) return;
         musicSource.clip = clip;
+        musicSource.loop = true;
+        TracePlayback("BGM", clip, musicSource);
         musicSource.Play();
     }
 
@@ -153,30 +195,77 @@ public class AudioManager : MonoBehaviour
 
     public void PlaySFX(AudioClip clip)
     {
-        if (clip != null) sfxSource.PlayOneShot(clip);
+        if (clip == null) return;
+        TracePlayback("交互音效", clip, sfxSource);
+        sfxSource.PlayOneShot(clip);
     }
 
-    public void PlaySFX(string id)
+    [System.Diagnostics.Conditional("UNITY_EDITOR")]
+    private void TracePlayback(string channel, AudioClip clip, AudioSource source)
     {
-        Debug.Log($"Playing SFX with ID: {id}", this);
-        switch (id)
+        if (!logAudioPlayback) return;
+        Debug.Log($"[AudioPlayback] {channel} clip={clip.name} frame={Time.frameCount} "
+            + $"time={Time.realtimeSinceStartup:F3} source={source.GetInstanceID()} "
+            + $"scene={SceneManager.GetActiveScene().name}\n"
+            + new System.Diagnostics.StackTrace(1, true), this);
+    }
+
+    public System.Collections.IEnumerator PlayOpeningTruck()
+    {
+        if (sound_truck == null)
         {
-            case "sound_mall": PlaySFX(sound_mall); break;
-            case "sound_traffic": PlaySFX(sound_traffic); break;
-            case "sound_truck": PlaySFX(sound_truck); break;
-            case "effect_bubble_select": PlaySFX(effect_bubble_select); break;
-            case "effect_bubble_cancel": PlaySFX(effect_bubble_cancel); break;
-            case "effect_emergence": PlaySFX(effect_emergence); break;
-            case "effect_button": PlaySFX(effect_button); break;
-            case "effect_error": PlaySFX(effect_error); break;
-            case "effect_interact": PlaySFX(effect_interact); break;
-            default: Debug.LogWarning($"未配置的音效 ID：{id}", this); break;
+            Debug.LogWarning("开场卡车音效未配置，直接进入游戏。", this);
+            yield break;
         }
+        sfxSource.Stop();
+        sfxSource.loop = false;
+        sfxSource.clip = sound_truck;
+        TracePlayback("开场音效", sound_truck, sfxSource);
+        sfxSource.Play();
+        while (sfxSource.isPlaying) yield return null;
+        sfxSource.clip = null;
+    }
+
+    public void PlaySFX(int index)
+    {
+        if (index < 0 || index >= clickSfx.Length)
+        {
+            Debug.LogWarning($"点击音效索引超出范围：{index}", this);
+            return;
+        }
+        PlaySFX(clickSfx[index]);
+    }
+
+    public void PlayEmergenceSFX() => PlaySFX(effect_emergence);
+
+    public void PlayDialogueSFX(string id)
+    {
+        if (!dialogueClips.TryGetValue(id, out AudioClip clip))
+        {
+            Debug.LogWarning($"找不到台词音效资源：Audios/sfx/{id}", this);
+            return;
+        }
+        // 独立通道，按钮点击等交互声音不影响台词音效的跳过锁定。
+        TracePlayback("台词音效", clip, dialogueSfxSource);
+        dialogueSfxSource.PlayOneShot(clip);
+        NotifyDialogueSfxState();
+    }
+
+    private void Update() => NotifyDialogueSfxState();
+
+    private void NotifyDialogueSfxState()
+    {
+        bool playing = IsDialogueSfxPlaying;
+        if (dialogueSfxWasPlaying == playing) return;
+        dialogueSfxWasPlaying = playing;
+        if (StoryManager.instance != null) StoryManager.instance.RefreshSkipAvailability();
     }
 
     public void StopSFX()
     {
         if (sfxSource != null) sfxSource.Stop();
+        if (dialogueSfxSource != null) dialogueSfxSource.Stop();
+        NotifyDialogueSfxState();
     }
 
     // 保留已有滑条同步：滑条数值转分贝，再转 AudioSource 的线性增益。
@@ -193,8 +282,10 @@ public class AudioManager : MonoBehaviour
 
     public void ApplyVolumes()
     {
+        ConfigureOutputGain();
         musicSource.volume = SourceVolume(musicVolume, musicMultiplier);
         sfxSource.volume = SourceVolume(sfxVolume, sfxMultiplier);
+        if (dialogueSfxSource != null) dialogueSfxSource.volume = SourceVolume(sfxVolume, sfxMultiplier);
     }
 
     public bool SetVolume(string channel, float value, float multiplier = 20f)

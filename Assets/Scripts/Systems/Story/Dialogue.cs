@@ -17,6 +17,8 @@ public class DialogueLine
     public string leave;   //本句读完后离开的 NPC ID，使用分号分隔
 
     public Sprite GetCharacterSprite() {
+        // FIFA 表示本句不显示立绘，主角也遵守此标记。
+        if (string.Equals(tag?.Trim(), "FIFA", StringComparison.OrdinalIgnoreCase)) return null;
         if (character =="余予")
         {
             //sprite for 余予

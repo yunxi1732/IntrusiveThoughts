@@ -7,6 +7,11 @@ using System.Collections.Generic;
 
 public class MapController : MonoBehaviour
 {
+    public void PlaySFX(int index)
+    {
+        AudioManager.instance.PlaySFX(index);
+    }
+
     //单例模式
     public static MapController instance { get; private set; }
 

@@ -55,7 +55,6 @@ public class Location_UI : MonoBehaviour
             return;
         }
 
-        AudioManager.instance.PlaySFX("effect_button");
 
         //结束剧情交互
         StoryManager.instance.ResetStory();

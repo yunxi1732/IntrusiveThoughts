@@ -8,6 +8,9 @@ public class EmergenceEffect : MonoBehaviour
     public float duration = 0.3f;      // 总时长
     public float magnitude = 8f;       // 震动幅度（像素）
 
+    [Header("背景闪烁（可选）")]
+    public bool enableBackgroundFlash = false;
+
     public RectTransform rectTransform;
     public Image backgroundImage;
     private Vector2 originalPos;
@@ -26,7 +29,7 @@ public class EmergenceEffect : MonoBehaviour
         if (rectTransform == null) return;
         rectTransform.anchoredPosition = originalPos;
         StartCoroutine(ShakeCoroutine());
-        StartCoroutine(BackGroundCoroutine());
+        if (enableBackgroundFlash) StartCoroutine(BackGroundCoroutine());
     }
 
     private IEnumerator ShakeCoroutine()

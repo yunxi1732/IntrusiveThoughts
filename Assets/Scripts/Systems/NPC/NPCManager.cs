@@ -33,6 +33,57 @@ public class NPCManager : MonoBehaviour
     [Header("Player Info")]
     public Sprite playerIcon;
 
+    private string chenxingDefaultIconString;
+    private bool chenxingSpecialIcon;
+
+    private void OnEnable()
+    {
+        if (instance != this) return;
+        EventManager1P<bool>.StartListening(GameEvents.ChenxingIconChanged, ApplyChenxingIcon);
+        GameStateAccess.Changed += CheckChenxingIcon;
+        EventManager1P<int>.StartListening(GameEvents.DayChanged, OnDateChanged);
+    }
+
+    private void OnDisable()
+    {
+        if (instance != this) return;
+        EventManager1P<bool>.StopListening(GameEvents.ChenxingIconChanged, ApplyChenxingIcon);
+        GameStateAccess.Changed -= CheckChenxingIcon;
+        EventManager1P<int>.StopListening(GameEvents.DayChanged, OnDateChanged);
+    }
+
+    private void OnDateChanged(int day) => CheckChenxingIcon();
+
+    // 也覆盖读档、新游戏及直接恢复剧情状态的路径。
+    private void LateUpdate() => CheckChenxingIcon();
+
+    private void CheckChenxingIcon()
+    {
+        if (instance != this || DateController.instance == null || StoryManager.instance == null) return;
+        bool special = DateController.instance.currentDate >= 5
+            && StoryManager.instance.GetStoryState("story.seq_day4_chenxing7") == 1;
+        if (special != chenxingSpecialIcon)
+            EventManager1P<bool>.TriggerEvent(GameEvents.ChenxingIconChanged, special);
+    }
+
+    private void ApplyChenxingIcon(bool special)
+    {
+        var npc = GetNPCDataByName("辰星");
+        if (npc == null || string.IsNullOrEmpty(chenxingDefaultIconString)) return;
+        string names = special ? "char_chenxing2_xiaorenteshu" : chenxingDefaultIconString;
+        var sprites = LoadSprites(names, npc.id, "iconString");
+        var icon = sprites.Find(sprite => sprite != null);
+        if (icon == null) return;
+        npc.iconString = names;
+        npc.icons = sprites;
+        npc.icon = icon;
+        chenxingSpecialIcon = special;
+        foreach (var entry in FindObjectsByType<NPCEntry>(FindObjectsSortMode.None))
+            if (entry.npcData == npc) entry.RefreshIcon();
+        foreach (var location in FindObjectsByType<LocationEntry>(FindObjectsSortMode.None))
+            if (location.npcIconPanel != null) location.ShowNPCs();
+    }
+
     private NPCData RequireNpc(string npcId)
     {
         if (string.IsNullOrWhiteSpace(npcId))
@@ -106,6 +157,11 @@ public class NPCManager : MonoBehaviour
         Debug.Log(wrappedJson);
 
         foreach(NPCData data in gameData.npcs) {
+            if (data.id == "辰星")
+            {
+                chenxingDefaultIconString = data.iconString;
+                chenxingSpecialIcon = false;
+            }
             Debug.Log("Adding NPC: " + data.id);
             data.icons = LoadSprites(data.iconString, data.id, "iconString");
             data.models = LoadSprites(data.modelString, data.id, "modelString");

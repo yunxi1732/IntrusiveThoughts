@@ -1,6 +1,6 @@
 ﻿sequenceId,index,character,content,relics,tag,image,sfx,waitTime,action,leave,,,
 seq_tut_1,,,,,,cg_ppt,,,,,,,
-seq_tut_1,,,,,,cg_dayun,,,图片抖动，播放音效sound_truck,,,,
+seq_tut_1,,,,,,cg_dayun,sound_truck,,图片抖动，播放音效sound_truck,,,,
 seq_tut_1,1,余予,（时间仿佛停滞了一个世纪。不，简直就像时间本身把我的五官和脑袋都塞住了似的。）,,,,,,,,,,
 seq_tut_1,2,余予,（只记得街道和公司大楼都绚丽地在空中翻转了好几圈。）,,,,,,,,,,
 seq_tut_1,3,余予,（等等，我现在好像还在家里……遭遇车祸以后被好心人送回家了吗。）,,,,,,,,,,

@@ -41,24 +41,36 @@ public class StoryPlayer : MonoBehaviour
     public string currentCharacter;  //当前交互对象
     public bool canInteract = true;  //是否可以交互跳过
     private bool autoCheckPending;
+    private bool openingTruckFinished;
     [Header("场景小人离开动画")]
     [Min(0f)] public float npcLeaveDuration = 0.4f;
 
     private void OnEnable()
     {
         EventManager1P<bool>.StartListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
+        EventManager1P<bool>.StartListening(GameEvents.SkipAvailabilityChanged, OnSkipAvailabilityChanged);
         SetSkipButtonVisible(StoryManager.instance != null && StoryManager.instance.IsPlaying);
     }
 
     private void OnDisable()
     {
         EventManager1P<bool>.StopListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
+        EventManager1P<bool>.StopListening(GameEvents.SkipAvailabilityChanged, OnSkipAvailabilityChanged);
     }
 
     private void SetSkipButtonVisible(bool playing)
     {
-        if (skipButton != null) skipButton.SetActive(playing);
+        if (skipButton != null)
+        {
+            bool allowed = StoryManager.instance != null && StoryManager.instance.CanSkip;
+            skipButton.SetActive(playing && allowed);
+            var button = skipButton.GetComponent<Button>();
+            if (button != null) button.interactable = allowed;
+        }
     }
+
+    private void OnSkipAvailabilityChanged(bool allowed)
+        => SetSkipButtonVisible(StoryManager.instance != null && StoryManager.instance.IsPlaying);
 
     void Start()
     {
@@ -69,6 +81,7 @@ public class StoryPlayer : MonoBehaviour
         StoryManager.instance.OnLine += HandleDialogueLine;
         StoryManager.instance.OnDialogueEnd += HandleDialogueEnd;
         GameStateAccess.Changed += OnStateChange;
+        StoryManager.instance.RefreshSkipAvailability();
         SetSkipButtonVisible(StoryManager.instance.IsPlaying);
     }
 
@@ -94,6 +107,7 @@ public class StoryPlayer : MonoBehaviour
     private void LateUpdate()
     {
         if (!autoCheckPending || StoryManager.instance == null) return;
+        if (StoryManager.instance.IsOpening) return;
         if (SaveSlot_UI.instance != null && SaveSlot_UI.instance.IsOpen) return;
         string scene = SceneManager.GetActiveScene().name;
         if (scene != "BedRoomScene" && scene != "LocationScene") return;
@@ -109,6 +123,22 @@ public class StoryPlayer : MonoBehaviour
         if (line == null)
             return;
 
+        // 每次读到本句只触发一次；无对白的 CG 行也可播放音效。
+        if (StoryManager.instance.IsOpeningSound)
+        {
+            openingTruckFinished = false;
+            canInteract = false;
+            StartCoroutine(FinishOpeningAfterTruck());
+        }
+        else if (AudioManager.instance != null && !string.IsNullOrWhiteSpace(line.sfx))
+            AudioManager.instance.PlayDialogueSFX(line.sfx.Trim());
+
+        Sprite sprite = line.GetCharacterSprite();
+        CharacterImg.sprite = sprite;
+        CharacterImg.enabled = sprite != null;
+        CharacterShadowImg.sprite = sprite;
+        CharacterShadowImg.enabled = sprite != null;
+        CharacterShadowImg.GetComponent<CanvasGroup>().alpha = sprite != null ? 1f : 0f;
 
         //如果line的readTime不为空，需要设置等待时长，时间结束后才可以交互跳过
         if (line.waitTime > 0)
@@ -145,16 +175,6 @@ public class StoryPlayer : MonoBehaviour
             //处理对白逻辑
             DialogueCharacter.text = line.character;
             DialogueText.text = line.content;
-            Sprite sprite = line.GetCharacterSprite();
-            if (sprite != null)
-            {
-                CharacterImg.sprite = sprite;
-                CharacterShadowImg.sprite = sprite;
-                CharacterShadowImg.GetComponent<CanvasGroup>().alpha = 1;
-            } else
-            {
-                CharacterShadowImg.GetComponent<CanvasGroup>().alpha = 0;
-            }
             if(StoryManager.instance != null && StoryManager.instance.IsEmergence)
             {
                 emergenceEffect?.PlayEmergenceShake();
@@ -171,6 +191,15 @@ public class StoryPlayer : MonoBehaviour
         //处理交互状态
         interactiveRelic = line.relics;
         currentCharacter = line.character;
+    }
+
+    private IEnumerator FinishOpeningAfterTruck()
+    {
+        // 先让本帧的第二张 CG 完成显示，再开始播放卡车声。
+        yield return null;
+        if (AudioManager.instance != null) yield return AudioManager.instance.PlayOpeningTruck();
+        openingTruckFinished = true;
+        canInteract = true;
     }
 
     public bool IsMatchRelic(string relicId)
@@ -253,6 +282,12 @@ public class StoryPlayer : MonoBehaviour
     {
         if (canInteract && !StoryManager.instance.IsProcessingLeave)
         {
+            if (StoryManager.instance.IsOpeningSound)
+            {
+                if (!openingTruckFinished) return;
+                StoryManager.instance.CompleteOpening();
+                return;
+            }
             StoryManager.instance.NextDialogue();
         }
     }

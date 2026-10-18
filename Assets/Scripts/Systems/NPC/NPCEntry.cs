@@ -34,9 +34,14 @@ public class NPCEntry : MonoBehaviour, IPointerClickHandler
         }
     }
 
+    public void RefreshIcon()
+    {
+        if (iconImage == null) iconImage = GetComponentInChildren<Image>(true);
+        if (iconImage != null && npcData != null) iconImage.sprite = npcData.icon;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        AudioManager.instance.PlaySFX("effect_interact");
         //如果当前在播放剧情，禁止交互
         if (StoryManager.instance.IsPlaying)
         {

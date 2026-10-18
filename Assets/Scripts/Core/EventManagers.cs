@@ -127,6 +127,12 @@ public enum GameEvents
     // 音量同步（string 通道 bgm/sfx，float 为 0～1 的滑条值）。
     AudioVolumeChanged,
     InventoryChanged,
+    // 跳过权限变化（bool），教程完成或有有效存档后开放。
+    SkipAvailabilityChanged,
+    // 辰星特殊小人条件变化（bool：是否启用特殊图标）。
+    ChenxingIconChanged,
+    // 开场 CG 和卡车音效结束，开始初始化 day0 卧室。
+    Start,
 }
 
 public class ErrorSuppress

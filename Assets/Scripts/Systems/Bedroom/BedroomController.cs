@@ -9,6 +9,11 @@ using System.Collections.Generic;
 
 public class BedroomController : MonoBehaviour
 {
+    public void PlaySFX(int index)
+    {
+        AudioManager.instance.PlaySFX(index);
+    }
+
     //单例模式
     public static BedroomController instance { get; private set; }
 
@@ -31,6 +36,25 @@ public class BedroomController : MonoBehaviour
         if (instance == this) instance = null;
     }
 
+    private void OnEnable() => EventManagerNP.StartListening(GameEvents.Start, OnGameStart);
+    private void OnDisable() => EventManagerNP.StopListening(GameEvents.Start, OnGameStart);
+
+    private void OnGameStart()
+    {
+        // 新游戏状态已设为 day0；初始化完成后才开始场景音乐。
+        Bedroom_UI.instance.ShowRoom(true);
+        InitBedroom();
+        if (AudioManager.instance != null) AudioManager.instance.PlayBGM("bgm_bedroom1");
+    }
+
+    private System.Collections.IEnumerator PlayOpening()
+    {
+        // 等待场景 UI 的 Start 完成，避免覆盖 CG 显示。
+        yield return null;
+        if (!StoryManager.instance.StartSeqenceByID("seq_tut_1"))
+            Debug.LogError("找不到开场剧情 seq_tut_1。", this);
+    }
+
     //卧室状态
     public RelicEntry selectedRelic;
     private List<RelicEntry> relicEntries = new List<RelicEntry>();
@@ -39,6 +63,14 @@ public class BedroomController : MonoBehaviour
     void Start()
     {
         StoryPlayer.instance.currentLocation = "出租屋";
+        if (StoryManager.instance.IsOpening)
+        {
+            Bedroom_UI.instance.BedroomPanel.SetActive(false);
+            Bedroom_UI.instance.LivingRoomPanel.SetActive(false);
+            Inventory.instance.DisableInventory();
+            StartCoroutine(PlayOpening());
+            return;
+        }
         // 教程从卧室开始；正式游戏进家先到客厅。
         bool? restoredView = SaveManager.instance != null ? SaveManager.instance.ConsumeRestoredBedroomView() : null;
         Bedroom_UI.instance.ShowRoom(restoredView ?? DateController.instance.currentDate == 0);

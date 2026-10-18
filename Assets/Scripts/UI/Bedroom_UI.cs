@@ -89,7 +89,6 @@ public class Bedroom_UI : MonoBehaviour
     {
         if (StoryManager.instance != null && StoryManager.instance.IsPlaying) return;
         ShowRoom(bedroom);
-        AudioManager.instance.PlaySFX("effect_button");
     }
 
     public void ShowRoom(bool bedroom)
@@ -113,7 +112,6 @@ public class Bedroom_UI : MonoBehaviour
 
     public void OnCollectRelicClicked()
     {
-        AudioManager.instance.PlaySFX("effect_button");
         BedroomController.instance.CollectRelic();
     }
 
@@ -123,7 +121,6 @@ public class Bedroom_UI : MonoBehaviour
         if (StoryManager.instance.IsPlaying)
         {
             //播放交互失败音效
-            AudioManager.instance.PlaySFX("effect_error");
             return;
         }
 
@@ -135,7 +132,6 @@ public class Bedroom_UI : MonoBehaviour
             return;
         }
 
-        AudioManager.instance.PlaySFX("effect_button");
         //关闭遗物信息展示
         RelicInfoPanel.SetActive(false);
         //加载地图场景
@@ -152,7 +148,6 @@ public class Bedroom_UI : MonoBehaviour
 
     public void OnCancelSleepClicked()
     {
-        AudioManager.instance.PlaySFX("effect_button");
         if (SleepPanel != null) SleepPanel.SetActive(false);
     }
 
@@ -198,7 +193,6 @@ public class Bedroom_UI : MonoBehaviour
 
     public void ShowRelicInfo(RelicEntry entry, Vector3 worldPosition)
     {
-        AudioManager.instance.PlaySFX("effect_button");
         RelicInfoPanel.SetActive(true);
         //MoveToWorldPosition(canvas, RelicInfoPanel.GetComponent<RectTransform>(), worldPosition);
         relicIcon.sprite = entry.relicData.icon;

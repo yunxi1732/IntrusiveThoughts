@@ -149,6 +149,8 @@ public class SaveManager : MonoBehaviour
                 npc.tags.Clear();
             }
             StoryManager.instance.RestoreProgress(null);
+            StoryManager.instance.BeginOpening();
+            if (AudioManager.instance != null) AudioManager.instance.StopMusic();
             GameState.instance.InitializeGameState();
             CurrentSlotId = 0;
             RestoredBedroomView = null;

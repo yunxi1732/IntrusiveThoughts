@@ -28,6 +28,30 @@ public class StoryManager : MonoBehaviour
     public bool IsProcessingLeave => processingLeave;
 
     public bool IsPlaying => current != null;
+    public bool CanSkip { get; private set; }
+
+    public void RefreshSkipAvailability()
+    {
+        bool allowed = !IsOpening && !(AudioManager.instance != null && AudioManager.instance.IsDialogueSfxPlaying)
+            && (GetStoryState("story.seq_tut_5") == 1
+            || (SaveManager.instance != null && SaveManager.instance.HasAnyValidSave()));
+        if (CanSkip == allowed) return;
+        CanSkip = allowed;
+        EventManager1P<bool>.TriggerEvent(GameEvents.SkipAvailabilityChanged, allowed);
+    }
+    public bool IsOpening { get; private set; }
+    public bool IsOpeningSound => IsOpening && current != null && current.id == "seq_tut_1"
+        && current.lines[lineIndex].image == "cg_dayun";
+
+    public void BeginOpening() => IsOpening = true;
+
+    public void CompleteOpening()
+    {
+        if (!IsOpeningSound) return;
+        IsOpening = false;
+        EventManagerNP.TriggerEvent(GameEvents.Start);
+        AdvanceLine();
+    }
     public bool IsEmergence => current != null && !string.IsNullOrEmpty(current.relic) && lineIndex == 0;
 
     //UI 订阅这些事件来显示对话
@@ -63,6 +87,7 @@ public class StoryManager : MonoBehaviour
     {
         if (!key.StartsWith("story.", StringComparison.Ordinal)) throw new ArgumentException("剧情状态必须使用 story. 前缀。");
         states[key] = value;
+        if (key == "story.seq_tut_5") RefreshSkipAvailability();
     }
 
     //从 Resources 下的 DialogueSequence.csv 和 DialogueLine.csv 加载对话
@@ -184,6 +209,7 @@ public class StoryManager : MonoBehaviour
     //推进到下一句，结束时触发 OnDialogueEnd
     public void NextDialogue()
     {
+        if (IsOpeningSound) return;
         if (current == null || processingLeave) return;
         var ids = ParseLeaveIds(current.lines[lineIndex].leave);
         if (ids.Count > 0)
@@ -229,6 +255,9 @@ public class StoryManager : MonoBehaviour
 
     public void SkipDialogue()
     {
+        RefreshSkipAvailability();
+        if (!CanSkip) return;
+        if (IsOpening) return;
         if (current == null) return;
         CancelLeaveAnimation();
         // 跳过不等待动画，但当前句和剩余台词的离开结果仍需执行。
@@ -260,6 +289,7 @@ public class StoryManager : MonoBehaviour
 
     public void ResetStory()
     {
+        IsOpening = false;
         CancelLeaveAnimation();
         current = null;
         lineIndex = 0;
@@ -268,6 +298,7 @@ public class StoryManager : MonoBehaviour
 
     private void BroadcastPlayingState()
     {
+        RefreshSkipAvailability();
         // 结束回调可能启动下一段对话，广播回调执行后的实际状态。
         EventManager1P<bool>.TriggerEvent(GameEvents.DialoguePlayingChanged, IsPlaying);
     }

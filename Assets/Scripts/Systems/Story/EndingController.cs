@@ -7,6 +7,11 @@ using UnityEngine.UI;
 // EndScene 的显示控制；NextButton 的 OnClick 由 Inspector 绑定。
 public class EndingController : MonoBehaviour
 {
+    public void PlaySFX(int index)
+    {
+        AudioManager.instance.PlaySFX(index);
+    }
+
     [SerializeField] private Image npcImage;
     [SerializeField] private TMP_Text endingText;
     [SerializeField] private TMP_Text title;

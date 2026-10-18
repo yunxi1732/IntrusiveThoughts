@@ -67,7 +67,6 @@ public class Inventory_UI : MonoBehaviour
     //点击背包按钮 - 打开背包
     public void OnOpenClicked()
     {
-        AudioManager.instance.PlaySFX("effect_button");
         InventoryPanel.SetActive(true);
         CloseDetailedPanel();
         RefreshBubbleInfo();
@@ -76,7 +75,6 @@ public class Inventory_UI : MonoBehaviour
     //点击关闭按钮 - 关闭背包
     public void OnCloseClicked()
     {
-        AudioManager.instance.PlaySFX("effect_button");
         CloseDetailedPanel();
         InventoryPanel.SetActive(false);
     }
@@ -174,7 +172,6 @@ public class Inventory_UI : MonoBehaviour
 
     public void ShowDetailedPanel(RelicData relic)
     {
-        AudioManager.instance.PlaySFX("effect_button");
         if (relic == null || detailedPanel == null) return;
         detailedPanel.SetActive(true);
         detailedPanel.transform.SetAsLastSibling();
