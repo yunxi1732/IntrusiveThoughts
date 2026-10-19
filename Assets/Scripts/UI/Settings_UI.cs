@@ -46,6 +46,11 @@ public class Settings_UI : MonoBehaviour
         quitConfirmPanel.SetActive(true);
     }
 
+    public void OnReturnMainButtonClicked()
+    {
+        quitConfirmPanel.SetActive(true);
+    }
+
     public void OnCancelQuitClicked()
     {
         if (quitConfirmPanel != null) quitConfirmPanel.SetActive(false);
@@ -54,12 +59,7 @@ public class Settings_UI : MonoBehaviour
     public void OnConfirmQuitClicked()
     {
         if (quitConfirmPanel == null || !quitConfirmPanel.activeInHierarchy) return;
-        if (SaveManager.instance != null) SaveManager.instance.SavePreferences();
-#if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-#else
-        Application.Quit();
-#endif
+        ScreenTransition.Instance.ReturnToMainMenu();
     }
 
     public void OnReturnButtonClicked()

@@ -365,6 +365,7 @@ public class SaveManager : MonoBehaviour
             ValidateProgress(data);
             string path = SlotPath(slotId);
             SaveFileStorage.WriteText(path, JsonUtility.ToJson(data, true), SavePassword);
+            StoryManager.instance.RefreshSavedSkipEligibility();
             CurrentSlotId = slotId;
             LastError = null;
             return true;
@@ -397,6 +398,7 @@ public class SaveManager : MonoBehaviour
             string path = SlotPath(slotId);
             foreach (string file in new[] { path, path + ".tmp", path + ".bak" })
                 if (File.Exists(file)) File.Delete(file);
+            if (StoryManager.instance != null) StoryManager.instance.RefreshSavedSkipEligibility();
             return true;
         }
         catch (Exception error)
@@ -420,6 +422,7 @@ public class SaveManager : MonoBehaviour
             if (!string.Equals(Path.GetDirectoryName(saveDirectory), persistentRoot.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar), StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("存档清理路径无效。");
             if (Directory.Exists(saveDirectory)) Directory.Delete(saveDirectory, true);
+            if (StoryManager.instance != null) StoryManager.instance.RefreshSavedSkipEligibility();
             CurrentSlotId = 0;
             RestoredBedroomView = null;
             globalProgress = new GlobalProgressData();

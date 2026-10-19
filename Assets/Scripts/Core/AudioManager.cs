@@ -9,7 +9,6 @@ public class AudioManager : MonoBehaviour
     public AudioSource musicSource;
     public AudioSource sfxSource;
     private AudioSource dialogueSfxSource;
-    private bool dialogueSfxWasPlaying;
     public bool IsDialogueSfxPlaying => dialogueSfxSource != null && dialogueSfxSource.isPlaying;
     [Header("场景 / 剧情音乐")]
     [SerializeField] private AudioClip bgm_bedroom1;
@@ -261,24 +260,12 @@ public class AudioManager : MonoBehaviour
         // 独立通道，按钮点击等交互声音不影响台词音效的跳过锁定。
         TracePlayback("台词音效", clip, dialogueSfxSource);
         dialogueSfxSource.PlayOneShot(clip);
-        NotifyDialogueSfxState();
-    }
-
-    private void Update() => NotifyDialogueSfxState();
-
-    private void NotifyDialogueSfxState()
-    {
-        bool playing = IsDialogueSfxPlaying;
-        if (dialogueSfxWasPlaying == playing) return;
-        dialogueSfxWasPlaying = playing;
-        if (StoryManager.instance != null) StoryManager.instance.RefreshSkipAvailability();
     }
 
     public void StopSFX()
     {
         if (sfxSource != null) sfxSource.Stop();
         if (dialogueSfxSource != null) dialogueSfxSource.Stop();
-        NotifyDialogueSfxState();
     }
 
     // 保留已有滑条同步：滑条数值转分贝，再转 AudioSource 的线性增益。

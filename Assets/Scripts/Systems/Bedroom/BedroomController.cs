@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 public class BedroomController : MonoBehaviour
 {
+
     public void PlaySFX(int index)
     {
         AudioManager.instance.PlaySFX(index);
@@ -99,6 +100,9 @@ public class BedroomController : MonoBehaviour
     public void SelectRelicEntry(RelicEntry entry)
     {
         if (entry.record == null || entry.record.collected) return;
+        var group = StayCanvas.instance.GetComponentInChildren<SettingButton_UI>().GetComponent<CanvasGroup>();
+        group.alpha = 0f;
+        group.interactable = false;
         entry.SynchronizeIcon();
         selectedRelic = entry;
         Bedroom_UI.instance.ShowRelicInfo(entry, entry.transform.position);

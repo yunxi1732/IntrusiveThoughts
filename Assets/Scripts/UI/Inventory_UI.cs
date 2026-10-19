@@ -40,6 +40,7 @@ public class Inventory_UI : MonoBehaviour
     public RectTransform bubbleInfoPanel;
     public GameObject detailedPanel;
     public Image relicBG;
+    public TextMeshProUGUI relicName;
     public TextMeshProUGUI relicDesc;
     public ScrollRect relicDescScroll;
 
@@ -164,7 +165,7 @@ public class Inventory_UI : MonoBehaviour
             var image = view.transform.Find("BubbleImage").GetComponent<Image>();
             image.sprite = relic.icon;
             image.preserveAspect = true;
-            view.transform.Find("BubbleTag").GetComponent<TextMeshProUGUI>().text = relic.tag;
+            view.transform.Find("BubbleTag").GetComponent<TextMeshProUGUI>().text = $"{relic.id} | {relic.tag}";
             view.transform.Find("DetailButton").GetComponent<Button>().onClick
                 .AddListener(() => ShowDetailedPanel(relic));
         }
@@ -183,6 +184,7 @@ public class Inventory_UI : MonoBehaviour
             color.a = 1f;
             relicBG.color = color;
         }
+        if (relicName != null) relicName.text = relic.id;
         if (relicDesc != null) relicDesc.text = relic.desc;
         if (relicDescScroll != null)
         {

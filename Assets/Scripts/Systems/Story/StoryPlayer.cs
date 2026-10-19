@@ -27,6 +27,7 @@ public class StoryPlayer : MonoBehaviour
     [Header("UI Panels")]
     public GameObject StoryPanel;   //剧情面板
     public GameObject skipButton;
+    [SerializeField] private StoryHistory_UI historyUI;
     public Image StoryImage;   //剧情图组件
     public Image CharacterImg;   //角色模型面板
     public Image CharacterShadowImg;   //角色阴影面板
@@ -42,6 +43,7 @@ public class StoryPlayer : MonoBehaviour
     public bool canInteract = true;  //是否可以交互跳过
     private bool autoCheckPending;
     private bool openingTruckFinished;
+    private Coroutine openingRoutine;
     [Header("开场 CG 抖动")]
     [Min(0f)] public float truckShakeDelay = 3.5f;
     [Min(0f)] public float truckShakeMagnitude = 50f;
@@ -135,7 +137,7 @@ public class StoryPlayer : MonoBehaviour
         {
             openingTruckFinished = false;
             canInteract = false;
-            StartCoroutine(FinishOpeningAfterTruck());
+            openingRoutine = StartCoroutine(FinishOpeningAfterTruck());
         }
         else if (AudioManager.instance != null && !string.IsNullOrWhiteSpace(line.sfx))
             AudioManager.instance.PlayDialogueSFX(line.sfx.Trim());
@@ -215,6 +217,7 @@ public class StoryPlayer : MonoBehaviour
         StopTruckImageShake();
         openingTruckFinished = true;
         canInteract = true;
+        openingRoutine = null;
     }
 
     private IEnumerator ShakeTruckImage(AudioSource source)
@@ -280,10 +283,14 @@ public class StoryPlayer : MonoBehaviour
         Debug.Log("Processing action: " + action);
         switch (action)
         {
+            case "enableskip":
+                StoryManager.instance.EnableSkip();
+                break;
             case "closeInventory":
                 //对话时隐藏背包
                 Inventory.instance.DisableInventory();
                 break;
+            case "showbag":
             case "showInventory":
                 //显示背包
                 Inventory.instance.EnableInventory();
@@ -324,6 +331,9 @@ public class StoryPlayer : MonoBehaviour
 
     public void OnDialogueClicked()
     {
+        if (historyUI != null && historyUI.IsOpen) return;
+        // 台词音效结束前不响应点击；不修改 canInteract，避免与 waitTime 相互覆盖。
+        if (AudioManager.instance != null && AudioManager.instance.IsDialogueSfxPlaying) return;
         if (canInteract && !StoryManager.instance.IsProcessingLeave)
         {
             if (StoryManager.instance.IsOpeningSound)
@@ -385,6 +395,14 @@ public class StoryPlayer : MonoBehaviour
 
     void HandleDialogueEnd(DialogueSequence sequence)
     {
+        if (openingRoutine != null)
+        {
+            StopCoroutine(openingRoutine);
+            openingRoutine = null;
+            StopTruckImageShake();
+            if (AudioManager.instance != null) AudioManager.instance.StopSFX();
+            canInteract = true;
+        }
         StoryPanel.SetActive(false);
         StoryImage.gameObject.SetActive(false);
         DialoguePanel.SetActive(false);

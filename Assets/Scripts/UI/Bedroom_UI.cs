@@ -31,14 +31,17 @@ public class Bedroom_UI : MonoBehaviour
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
     public Button outdoorButton;          //离开卧室按钮
+    [SerializeField] private GameObject nextDayButton;
     public Image DisplayNpcButton;          //显示NPC面板按钮
 
     [Header("遗物信息展示")]
     public Image relicIcon;
+    public TextMeshProUGUI relicName;
     public TextMeshProUGUI relicDescription;
     [SerializeField] private ScrollRect relicDescriptionScroll;
 
-    private bool isNPCDisplayed;
+    private bool isNPCDisplayed = true;
+    private CanvasGroup npcVisibility;
     private Image bedroomBackground;
     private Image livingRoomBackground;
     private readonly Sprite[] dailyBackgrounds = new Sprite[7];
@@ -57,6 +60,7 @@ public class Bedroom_UI : MonoBehaviour
     {
         if (instance != this) return;
         EventManager1P<int>.StopListening(GameEvents.DayChanged, RefreshDailyBackground);
+        SetCollectionUIVisible(true);
     }
 
     public void RefreshDailyBackground(int day)
@@ -119,6 +123,11 @@ public class Bedroom_UI : MonoBehaviour
     public void OnCollectRelicClicked()
     {
         BedroomController.instance.CollectRelic();
+    }
+
+    public void ShowSetBut()
+    {
+        SetSettingsVisible(isNPCDisplayed);
     }
 
     public void OnOutdoorButtonClicked()
@@ -203,6 +212,7 @@ public class Bedroom_UI : MonoBehaviour
         //MoveToWorldPosition(canvas, RelicInfoPanel.GetComponent<RectTransform>(), worldPosition);
         relicIcon.sprite = entry.relicData.icon;
         relicIcon.preserveAspect = true;
+        if (relicName != null) relicName.text = entry.relicData.id;
         relicDescription.text = entry.relicData.desc;
         if (relicDescriptionScroll != null)
         {
@@ -234,28 +244,79 @@ public class Bedroom_UI : MonoBehaviour
 
     void InitNPCPanel()
     {
+        isNPCDisplayed = true;
+        ApplyNPCVisibility();
+    }
+
+    private void LateUpdate()
+    {
+        // 只检查子物体，按钮显隐不参与剧情的 NPC 刷新。
+        bool hasNPC = false;
         if (NPCPanel != null)
         {
-            NPCPanel.SetActive(true);
-            isNPCDisplayed = true;
-            UpdateDisplayNpcButton();
+            foreach (Transform child in NPCPanel.transform)
+            {
+                // 刷新时旧 NPC 已停用，但 Destroy 要到帧末才移除它们。
+                if (child.gameObject.activeSelf && child.GetComponent<NPCEntry>() != null)
+                {
+                    hasNPC = true;
+                    break;
+                }
+            }
         }
+        if (DisplayNpcButton != null)
+            DisplayNpcButton.gameObject.SetActive(hasNPC);
     }
 
     public void SwitchNPCPanel()
     {
         if (NPCPanel == null) return;
-        if (isNPCDisplayed)
+        isNPCDisplayed = !isNPCDisplayed;
+        ApplyNPCVisibility();
+    }
+
+    private void ApplyNPCVisibility()
+    {
+        if (NPCPanel != null)
         {
-            NPCPanel.SetActive(false);
-            isNPCDisplayed = false;
+            if (npcVisibility == null)
+            {
+                npcVisibility = NPCPanel.GetComponent<CanvasGroup>();
+                if (npcVisibility == null) npcVisibility = NPCPanel.AddComponent<CanvasGroup>();
+            }
+            npcVisibility.alpha = isNPCDisplayed ? 1f : 0f;
+            npcVisibility.interactable = isNPCDisplayed;
+            npcVisibility.blocksRaycasts = isNPCDisplayed;
         }
-        else
-        {
-            NPCPanel.SetActive(true);
-            isNPCDisplayed = true;
-        }
+        SetCollectionUIVisible(isNPCDisplayed);
         UpdateDisplayNpcButton();
+    }
+
+    private void SetCollectionUIVisible(bool visible)
+    {
+        SetUIVisible(nextDayButton, visible);
+        if (outdoorButton != null) SetUIVisible(outdoorButton.gameObject, visible);
+        if (DateController.instance != null) SetUIVisible(DateController.instance.datePanel, visible);
+        SetSettingsVisible(visible);
+    }
+
+    private void SetSettingsVisible(bool visible)
+    {
+        if (StayCanvas.instance == null) return;
+        var settings = StayCanvas.instance.GetComponentInChildren<SettingButton_UI>(true);
+        if (settings == null) return;
+        bool showSettings = visible && (RelicInfoPanel == null || !RelicInfoPanel.activeSelf);
+        SetUIVisible(settings.gameObject, showSettings);
+    }
+
+    private static void SetUIVisible(GameObject target, bool visible)
+    {
+        if (target == null) return;
+        var group = target.GetComponent<CanvasGroup>();
+        if (group == null) group = target.AddComponent<CanvasGroup>();
+        group.alpha = visible ? 1f : 0f;
+        group.interactable = visible;
+        group.blocksRaycasts = visible;
     }
 
     void UpdateDisplayNpcButton()
