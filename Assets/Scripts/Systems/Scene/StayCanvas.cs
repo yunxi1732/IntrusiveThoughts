@@ -16,10 +16,57 @@ public class StayCanvas : MonoBehaviour
         }
         instance = this;
         DontDestroyOnLoad(gameObject);
+        if (canvas == null) canvas = GetComponent<Canvas>();
+        UpdateTutorialVisibility(SceneManager.GetActiveScene());
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public Canvas canvas;
+
+    [Header("新手教程")]
+    [SerializeField] private GameObject tutPanel;
+    [SerializeField] private GameObject tut1;
+    [SerializeField] private GameObject tut2;
+
+    private static bool CanShowTutorial(Scene scene)
+    {
+        return scene.name == "BedRoomScene" || scene.name == "LocationScene";
+    }
+
+    private void UpdateTutorialVisibility(Scene scene)
+    {
+        CloseTutorial();
+        if (tutPanel != null) tutPanel.SetActive(CanShowTutorial(scene));
+    }
+
+    public void OnQuestionClicked()
+    {
+        if (!CanShowTutorial(SceneManager.GetActiveScene())) return;
+        if ((tut1 != null && tut1.activeSelf) || (tut2 != null && tut2.activeSelf))
+            CloseTutorial();
+        else
+            ShowTutorial1();
+    }
+
+    public void ShowTutorial1()
+    {
+        if (!CanShowTutorial(SceneManager.GetActiveScene())) return;
+        if (tut2 != null) tut2.SetActive(false);
+        if (tut1 != null) tut1.SetActive(true);
+    }
+
+    public void ShowTutorial2()
+    {
+        if (!CanShowTutorial(SceneManager.GetActiveScene())) return;
+        if (tut1 != null) tut1.SetActive(false);
+        if (tut2 != null) tut2.SetActive(true);
+    }
+
+    public void CloseTutorial()
+    {
+        if (tut1 != null) tut1.SetActive(false);
+        if (tut2 != null) tut2.SetActive(false);
+    }
 
     [Header("鼠标光标（切片内左上角起算的像素热点）")]
     public Vector2 cursorHotspot = new Vector2(0f, 125f);
@@ -98,6 +145,7 @@ public class StayCanvas : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        UpdateTutorialVisibility(scene);
         // 找到新场景里的相机
         Camera cam = Camera.main;
         if (cam == null)
