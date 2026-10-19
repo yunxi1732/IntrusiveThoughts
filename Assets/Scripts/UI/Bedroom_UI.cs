@@ -26,20 +26,25 @@ public class Bedroom_UI : MonoBehaviour
     public GameObject BedroomPanel;   //卧室主面板
     public GameObject LivingRoomPanel;
     public GameObject RelicInfoPanel;   //遗物说明窗口
+    public GameObject NPCPanel;          //NPC面板
     public GameObject SleepPanel;      //结束当天的确认窗口
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
     public Button outdoorButton;          //离开卧室按钮
+    public Image DisplayNpcButton;          //显示NPC面板按钮
 
     [Header("遗物信息展示")]
     public Image relicIcon;
     public TextMeshProUGUI relicDescription;
     [SerializeField] private ScrollRect relicDescriptionScroll;
 
+    private bool isNPCDisplayed;
     private Image bedroomBackground;
     private Image livingRoomBackground;
     private readonly Sprite[] dailyBackgrounds = new Sprite[7];
     private readonly Sprite[] dailyLivingRoomBackgrounds = new Sprite[7];
+    public Sprite NPCOn;
+    public Sprite NPCOff;
 
     private void OnEnable()
     {
@@ -94,6 +99,7 @@ public class Bedroom_UI : MonoBehaviour
     public void ShowRoom(bool bedroom)
     {
         CloseRelicInfo();
+        InitNPCPanel();
         if (BedroomController.instance != null) BedroomController.instance.selectedRelic = null;
         BedroomPanel.SetActive(bedroom);
         LivingRoomPanel.SetActive(!bedroom);
@@ -224,6 +230,46 @@ public class Bedroom_UI : MonoBehaviour
 
         // 3. 设置 UI 位置
         uiElement.anchoredPosition = localPos;
+    }
+
+    void InitNPCPanel()
+    {
+        if (NPCPanel != null)
+        {
+            NPCPanel.SetActive(true);
+            isNPCDisplayed = true;
+            UpdateDisplayNpcButton();
+        }
+    }
+
+    public void SwitchNPCPanel()
+    {
+        if (NPCPanel == null) return;
+        if (isNPCDisplayed)
+        {
+            NPCPanel.SetActive(false);
+            isNPCDisplayed = false;
+        }
+        else
+        {
+            NPCPanel.SetActive(true);
+            isNPCDisplayed = true;
+        }
+        UpdateDisplayNpcButton();
+    }
+
+    void UpdateDisplayNpcButton()
+    {
+        if (DisplayNpcButton == null) return;
+
+        if (isNPCDisplayed)
+        {
+            DisplayNpcButton.sprite = NPCOn;
+        }
+        else
+        {
+            DisplayNpcButton.sprite = NPCOff;
+        }
     }
 
 }
