@@ -238,6 +238,7 @@ public class StoryManager : MonoBehaviour
     //推进到下一句，结束时触发 OnDialogueEnd
     public void NextDialogue()
     {
+        if (StoryPlayer.instance != null && StoryPlayer.instance.IsTrashConfirmationOpen) return;
         if (IsOpeningSound) return;
         // 同时保护直接推进对白的调用，音效结束后自然解除限制。
         if (AudioManager.instance != null && AudioManager.instance.IsDialogueSfxPlaying) return;
@@ -286,6 +287,7 @@ public class StoryManager : MonoBehaviour
 
     public void SkipDialogue()
     {
+        if (StoryPlayer.instance != null && StoryPlayer.instance.IsTrashConfirmationOpen) return;
         RefreshSkipAvailability();
         if (!CanSkip) return;
         if (current == null) return;

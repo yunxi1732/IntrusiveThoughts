@@ -102,6 +102,8 @@ InitTestScene*.unity*
 
 #Builds
 build/
+/newBuild/
+/newBuild.zip
 
 #vscode settings
 .vscode/*

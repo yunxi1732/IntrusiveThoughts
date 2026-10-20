@@ -26,6 +26,55 @@ public class StoryPlayer : MonoBehaviour
 
     [Header("UI Panels")]
     public GameObject StoryPanel;   //剧情面板
+    [SerializeField] private GameObject trashPanel;
+    private Bubble pendingTrashBubble;
+    private string pendingTrashInstanceId;
+    private DialogueLine pendingTrashLine;
+    public bool IsTrashConfirmationOpen => pendingTrashBubble != null;
+
+    public bool RequestTrashConfirmation(Bubble bubble)
+    {
+        if (IsTrashConfirmationOpen || bubble == null || bubble.bubbleData == null) return false;
+        if (StoryManager.instance == null || StoryManager.instance.CurrentLine == null || currentCharacter != "无常") return false;
+        if (trashPanel == null) { Debug.LogError("请绑定 StoryPlayer 的 TrashPanel。", this); return false; }
+        pendingTrashBubble = bubble;
+        pendingTrashInstanceId = bubble.bubbleData.sourceInstanceId;
+        pendingTrashLine = StoryManager.instance.CurrentLine;
+        trashPanel.SetActive(true);
+        trashPanel.transform.SetAsLastSibling();
+        return true;
+    }
+
+    public void OnConfirmTrashClicked()
+    {
+        if (!IsTrashConfirmationOpen) return;
+        var bubble = pendingTrashBubble;
+        bool valid = StoryManager.instance != null && StoryManager.instance.CurrentLine == pendingTrashLine
+            && currentCharacter == "无常" && bubble.bubbleData != null
+            && bubble.bubbleData.sourceInstanceId == pendingTrashInstanceId
+            && Inventory.instance != null && Inventory.instance.inventoryItems.Exists(
+                item => item.bubbleData.sourceInstanceId == pendingTrashInstanceId);
+        ClearTrashConfirmation();
+        if (valid) bubble.UseOnCurrentTarget();
+        else bubble.ReturnToOrigin();
+    }
+
+    public void OnCancelTrashClicked()
+    {
+        var bubble = pendingTrashBubble;
+        ClearTrashConfirmation();
+        if (bubble != null) bubble.ReturnToOrigin();
+    }
+
+    private void ClearTrashConfirmation()
+    {
+        pendingTrashBubble = null;
+        pendingTrashInstanceId = null;
+        pendingTrashLine = null;
+        if (trashPanel != null) trashPanel.SetActive(false);
+    }
+
+    private void OnTrashSceneChanged(Scene previous, Scene current) => OnCancelTrashClicked();
     public GameObject skipButton;
     [SerializeField] private StoryHistory_UI historyUI;
     public Image StoryImage;   //剧情图组件
@@ -55,6 +104,7 @@ public class StoryPlayer : MonoBehaviour
 
     private void OnEnable()
     {
+        SceneManager.activeSceneChanged += OnTrashSceneChanged;
         EventManager1P<bool>.StartListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
         EventManager1P<bool>.StartListening(GameEvents.SkipAvailabilityChanged, OnSkipAvailabilityChanged);
         SetSkipButtonVisible(StoryManager.instance != null && StoryManager.instance.IsPlaying);
@@ -62,6 +112,8 @@ public class StoryPlayer : MonoBehaviour
 
     private void OnDisable()
     {
+        SceneManager.activeSceneChanged -= OnTrashSceneChanged;
+        OnCancelTrashClicked();
         StopTruckImageShake();
         EventManager1P<bool>.StopListening(GameEvents.DialoguePlayingChanged, SetSkipButtonVisible);
         EventManager1P<bool>.StopListening(GameEvents.SkipAvailabilityChanged, OnSkipAvailabilityChanged);
@@ -83,6 +135,7 @@ public class StoryPlayer : MonoBehaviour
 
     void Start()
     {
+        if (trashPanel != null) trashPanel.SetActive(false);
         StoryPanel.SetActive(false);
         //关闭对话框
         DialoguePanel.SetActive(false);
@@ -270,7 +323,7 @@ public class StoryPlayer : MonoBehaviour
     public void DoAction(string actions)
     {
         if (string.IsNullOrEmpty(actions)) return;
-        foreach (var part in actions.Split(';'))
+        foreach (var part in actions.Split(';', '；'))
         {
             string action = part.Trim();
             if (action.Length > 0) DoSingleAction(action);
@@ -281,12 +334,23 @@ public class StoryPlayer : MonoBehaviour
     {
         //在这里处理特殊动作的逻辑，例如播放动画、触发事件等
         Debug.Log("Processing action: " + action);
+        if (action.Length >= 6 && action.StartsWith("play\"", StringComparison.Ordinal)
+            && action.IndexOf('"', 5) == action.Length - 1)
+        {
+            if (AudioManager.instance != null)
+                AudioManager.instance.PlayResourceBGM(action.Substring(5, action.Length - 6));
+            return;
+        }
         switch (action)
         {
+            case "stop":
+                if (AudioManager.instance != null) AudioManager.instance.RestoreSceneBGM();
+                break;
             case "enableskip":
                 StoryManager.instance.EnableSkip();
                 break;
             case "closeInventory":
+            case "closebag":
                 //对话时隐藏背包
                 Inventory.instance.DisableInventory();
                 break;
@@ -331,6 +395,7 @@ public class StoryPlayer : MonoBehaviour
 
     public void OnDialogueClicked()
     {
+        if (IsTrashConfirmationOpen) return;
         if (historyUI != null && historyUI.IsOpen) return;
         // 台词音效结束前不响应点击；不修改 canInteract，避免与 waitTime 相互覆盖。
         if (AudioManager.instance != null && AudioManager.instance.IsDialogueSfxPlaying) return;
@@ -395,6 +460,7 @@ public class StoryPlayer : MonoBehaviour
 
     void HandleDialogueEnd(DialogueSequence sequence)
     {
+        OnCancelTrashClicked();
         if (openingRoutine != null)
         {
             StopCoroutine(openingRoutine);

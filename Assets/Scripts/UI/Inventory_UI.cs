@@ -94,6 +94,8 @@ public class Inventory_UI : MonoBehaviour
     public void DisableInventory()
     {
         CloseDetailedPanel();
+        InventoryPanel.SetActive(false);
+        BubblePanel.SetActive(false);
         InventoryGroup.SetActive(false);
     }
 

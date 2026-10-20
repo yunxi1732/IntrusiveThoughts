@@ -44,7 +44,8 @@ public class BedroomController : MonoBehaviour
     {
         // 新游戏状态已设为 day0；初始化完成后才开始场景音乐。
         Bedroom_UI.instance.ShowRoom(true);
-        InitBedroom();
+        // 开场结束只初始化房间，背包由教程台词的 showbag 开放。
+        InitBedroom(enableInventory: false);
         if (AudioManager.instance != null) AudioManager.instance.PlayBGM("bgm_bedroom1");
     }
 
@@ -72,9 +73,9 @@ public class BedroomController : MonoBehaviour
             StartCoroutine(PlayOpening());
             return;
         }
-        // 教程从卧室开始；正式游戏进家先到客厅。
+        // 从地图回家默认先显示卧室；读档仍恢复保存时所在的房间。
         bool? restoredView = SaveManager.instance != null ? SaveManager.instance.ConsumeRestoredBedroomView() : null;
-        Bedroom_UI.instance.ShowRoom(restoredView ?? DateController.instance.currentDate == 0);
+        Bedroom_UI.instance.ShowRoom(restoredView ?? true);
         // 先按正确日期绑定遗物和面板，再播放剧情，避免覆盖剧情的 UI 动作。
         InitBedroom();
 
@@ -108,7 +109,7 @@ public class BedroomController : MonoBehaviour
         Bedroom_UI.instance.ShowRelicInfo(entry, entry.transform.position);
     }
 
-    public void InitBedroom()
+    public void InitBedroom(bool enableInventory = true)
     {
         Bedroom_UI.instance.RefreshDailyBackground(DateController.instance.currentDate);
         Bedroom_UI.instance.CloseRelicInfo();
@@ -139,7 +140,7 @@ public class BedroomController : MonoBehaviour
         }
 
         //显示背包按钮
-        Inventory.instance.EnableInventory();
+        if (enableInventory) Inventory.instance.EnableInventory();
         // 教程期间隐藏日期；教程结束后返回卧室才显示七天倒计时。
         DateController.instance.ShowDatePanel(DateController.instance.currentDate > 0);
         UpdateNPCs();

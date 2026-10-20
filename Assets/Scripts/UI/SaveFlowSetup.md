@@ -61,16 +61,25 @@ Settings_UI 新字段 Quit Confirm Panel / Quit Confirm Text：绑定退出确�
 | 关闭设置 | OnReturnButtonClicked() |
 
 退出指关闭应用；编辑器中停止播放。不会自动保存游戏进度。
-关闭设置/确认退出时只保存音量偏好，不写游戏槽位或结局解锁。
+关闭设置/确认退出不保存音量偏好；只有 ApplyVol 的 OnApplyVolumeClicked() 保存当前音量。
 
 ## 通关
 
 NextButton 继续绑定 EndingController.OnNextButtonClicked()。
 制作名单点“退出”会打开共用槽位面板；玩家确认保存后，该槽位标记“已通关”，再清理运行状态返回主菜单。
 取消选择则留在制作名单。新游戏从未保存过也能选择任意槽位保存通关记录。
-不再自动合并全局结局解锁；已有旧全局记录不会删除。
+进入制作名单时自动写入全局 hasCompletedGame 和 achievedEndings，不依赖玩家是否选槽保存。
+achievedEndings 保存 endingId、title、image、priority、firstAchievedOrder；只收录 priority 0～3，按优先级升序、同组首次达成顺序排序，重复结局不重复添加。
+此次全局写入保留上次已应用的音量偏好，不采集尚未 ApplyVol 的当前音量。新游戏、读取/覆盖/删除单个槽位不重置全局记录；清除全部存档会重置。
 
 ## 存档行为
+
+回忆面板 Memory_UI 在启动读取全局进度后、通关记录自动保存成功后刷新，打开/关闭面板不重新加载列表。
+主菜单 Memory 整个入口（含装饰图）仅在 HasCompletedGame 为 true 时显示。
+Content 中的 EndList 由编辑器手动摆放（目前 11 个），代码只更新已有条目，不生成条目，也不修改 Content 高度和布局；条目数应等于 CSV-End 中 priority 0～3 的结局数量。
+已达成项按全局顺序排列在前，使用当前 CSV 标题和图片，其余项图片透明且保留各场景条目的初始文字。
+两个按钮由玩家手动配置 Inspector On Click：将 MenuController 拖入，MemoryButton 选 Memory_UI.OnMemoryClicked()，MemoryBackButton 选 Memory_UI.OnBackClicked()。
+回忆滚动区域使用 MemoryScrollView：鼠标向上拖动浏览下方条目，向下拖动返回上方，禁用滚轮。Content 高度在场景中设为 4070（11 × 370），Viewport 高度 1100；代码不动态调整高度，增减条目时需同步调整场景数值。
 
 - 支持出租屋、地点场景、地图保存，等待对话、离场和转场全部结束。
 - 每次保存重新选槽位，不依赖之前读取或保存的槽位。
@@ -87,5 +96,6 @@ NextButton 继续绑定 EndingController.OnNextButtonClicked()。
 4. 分别在地图、楼道和出租屋保存，确认读取后地点、人物、遗物、日期一致。
 5. 有对话、离场或转场时保存入口应拒绝；弹窗打开时剧情不自动抢播。
 6. 从未手动保存过的一轮通关，在制作名单退出时保存，检查“已通关”与结局 ID。
-7. 在通关选槽时取消，应留在制作名单且不写盘；保存后回主菜单，游戏方式选择仍可用。
-8. 设置退出选择返回时继续当前游戏，选择确认时退出且不覆盖槽位。
+7. 在通关选槽时取消，应留在制作名单且不写槽位；全局通关记录已在制作名单出现时保存。保存后回主菜单，游戏方式选择仍可用。
+8. 多轮达成不同结局，重启后确认全局通关标记仍为 true、结局无重复，priority 为 0→3，同组保留首次达成顺序；未应用的音量不随通关保存。
+9. 设置退出选择返回时继续当前游戏，选择确认时退出且不覆盖槽位。

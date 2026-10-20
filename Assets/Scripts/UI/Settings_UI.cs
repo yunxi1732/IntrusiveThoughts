@@ -14,6 +14,9 @@ public class Settings_UI : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            if (SettingsPanel != null)
+                foreach (var control in SettingsPanel.GetComponentsInChildren<VolumeSlider_UI>(true))
+                    control.InitializeBinding();
         }
         else
         {
@@ -64,10 +67,14 @@ public class Settings_UI : MonoBehaviour
 
     public void OnReturnButtonClicked()
     {
-        if (SaveManager.instance != null) SaveManager.instance.SavePreferences();
         SettingsPanel.SetActive(false);
         if (UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "MainScene"
             && Menu_UI.instance != null)
             Menu_UI.instance.MainPanel.SetActive(true);
+    }
+
+    public void OnApplyVolumeClicked()
+    {
+        if (SaveManager.instance != null) SaveManager.instance.SavePreferences();
     }
 }

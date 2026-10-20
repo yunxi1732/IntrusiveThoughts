@@ -12,6 +12,7 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     private Vector2 originalPosition;
     private Transform originalParent;
     private Image icon;
+    private bool dragAllowed;
 
     void Awake()
     {
@@ -42,6 +43,8 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
     public void OnBeginDrag(PointerEventData eventData)
     {
         droppedSuccessfully = false;
+        dragAllowed = StoryPlayer.instance == null || !StoryPlayer.instance.IsTrashConfirmationOpen;
+        if (!dragAllowed) return;
         // // 记录原始位置
         // originalPosition = rect.anchoredPosition;
         // originalParent = rect.parent;
@@ -52,51 +55,73 @@ public class Bubble : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHa
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (!dragAllowed) return;
         // 移动端要用 eventData.delta 除以 canvas.scaleFactor
         rect.anchoredPosition += eventData.delta / canvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        if (!dragAllowed) return;
+        dragAllowed = false;
         canvasGroup.blocksRaycasts = true;
 
-        // 回原位
-        ReturnToOrigin();
-        // 如果成功接收，则消耗该物品并触发剧情分支
-        Debug.Log("Dropped successfully: " + droppedSuccessfully);
-        if (droppedSuccessfully)
+        if (!droppedSuccessfully) { ReturnToOrigin(); return; }
+        if (StoryPlayer.instance.currentCharacter == "无常")
         {
-            //检查遗物是否匹配
-            string relicName = StoryPlayer.instance.interactiveRelic;
-            string target = StoryPlayer.instance.currentCharacter;
-            if (!string.IsNullOrEmpty(relicName) && StoryPlayer.instance.IsMatchRelic(relicData.id))
-            {
-                Debug.Log("遗物使用成功: " + relicData.id + ", 期望: " + relicName);
-                //开始涌现剧情
-                // 缓存 ID，刷新气泡槽位后本组件可能绑定到另一件物品。
-                string instanceId = bubbleData.sourceInstanceId;
-                if (StoryManager.instance.TryStart(target, relicData))
-                {
-                    AudioManager.instance.PlayEmergenceSFX();
-                    StoryPlayer.instance.emergenceEffect.PlayParticles();
-                    Inventory.instance.RemoveRelic(instanceId);
-                }
-            } else
-            {
-                AudioManager.instance.PlaySFX(4);
-                //获取使用对象
-                StoryManager.instance.TryStart(target, relicData, "relicfail");
-                Debug.Log("遗物使用失败: " + relicData.id + ", 期望: " + relicName);
-            }
+            if (!StoryPlayer.instance.RequestTrashConfirmation(this)) ReturnToOrigin();
+            return;
         }
+        UseOnCurrentTarget();
+    }
+
+    public void UseOnCurrentTarget()
+    {
+        try
+        {
+            // 如果成功接收，则消耗该物品并触发剧情分支
+            Debug.Log("Dropped successfully: " + droppedSuccessfully);
+            if (droppedSuccessfully)
+            {
+                //检查遗物是否匹配
+                string relicName = StoryPlayer.instance.interactiveRelic;
+                string target = StoryPlayer.instance.currentCharacter;
+                if (!string.IsNullOrEmpty(relicName) && StoryPlayer.instance.IsMatchRelic(relicData.id))
+                {
+                    Debug.Log("遗物使用成功: " + relicData.id + ", 期望: " + relicName);
+                    //开始涌现剧情
+                    // 缓存 ID，刷新气泡槽位后本组件可能绑定到另一件物品。
+                    string instanceId = bubbleData.sourceInstanceId;
+                    if (StoryManager.instance.TryStart(target, relicData))
+                    {
+                        AudioManager.instance.PlayEmergenceSFX();
+                        StoryPlayer.instance.emergenceEffect.PlayParticles();
+                        Inventory.instance.RemoveRelic(instanceId);
+                    }
+                } else
+                {
+                    AudioManager.instance.PlaySFX(4);
+                    //获取使用对象
+                    StoryManager.instance.TryStart(target, relicData, "relicfail");
+                    Debug.Log("遗物使用失败: " + relicData.id + ", 期望: " + relicName);
+                }
+            }
+
+
+        }
+        finally { ReturnToOrigin(); }
     }
 
     private bool droppedSuccessfully = false;
 
-    public void MarkDropped() => droppedSuccessfully = true;
+    public void MarkDropped()
+    {
+        if (dragAllowed) droppedSuccessfully = true;
+    }
 
     public void ReturnToOrigin()
     {
+        droppedSuccessfully = false;
         rect.SetParent(originalParent);
         rect.anchoredPosition = originalPosition;
     }

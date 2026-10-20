@@ -28,6 +28,7 @@ public class Bedroom_UI : MonoBehaviour
     public GameObject RelicInfoPanel;   //遗物说明窗口
     public GameObject NPCPanel;          //NPC面板
     public GameObject SleepPanel;      //结束当天的确认窗口
+    [SerializeField] private GameObject talkspspsp;
     public TextMeshProUGUI sleepText;
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
@@ -120,6 +121,10 @@ public class Bedroom_UI : MonoBehaviour
     {
         RelicInfoPanel.SetActive(false);
     }
+    public void ClosespInfo()
+    {
+        talkspspsp.SetActive(false);
+    }
 
     public void OnCollectRelicClicked()
     {
@@ -148,6 +153,14 @@ public class Bedroom_UI : MonoBehaviour
             return;
         }
 
+        if (DateController.instance.currentDate == 5
+            && StoryManager.instance.GetState("story.seq_day5_sparrow2_onclick") != 1
+            && StoryManager.instance.GetState("story.seq_day5_sparrow2_auto") == 1)
+        {
+            talkspspsp.SetActive(true);
+            return;
+        }
+
         //关闭遗物信息展示
         RelicInfoPanel.SetActive(false);
         //加载地图场景
@@ -164,10 +177,19 @@ public class Bedroom_UI : MonoBehaviour
         if (DateController.instance.currentDate == 3 && StoryManager.instance.GetState("npc.麻雀.linestart") == 0)
         {
             //触发警告对话
-            sleepText.text = "麻雀好像还在楼道做什么……\n我有种直觉，如果就这么睡去，<color=red>有些话就再也没机会说了</color>。";
-        } else
+            sleepText.text = "麻雀好像还在楼道做什么……\r\n我有种直觉，如果现在不去找她，\r\n<color=red>有些话就再也没机会说了</color>。\r\n真的要睡吗？";
+        }
+        else
         {
-            sleepText.text = "确定睡觉吗？";
+            sleepText.text = "真的要现在睡觉吗？\r\n睡觉好像是H国人的遗物，不是我的。";
+        }
+
+        if (DateController.instance.currentDate == 5
+            && StoryManager.instance.GetState("story.seq_day5_sparrow2_auto") == 1
+            && StoryManager.instance.GetState("story.seq_day5_sparrow2_onclick") != 1)
+        {
+            talkspspsp.SetActive(true);
+            return;
         }
         SleepPanel.SetActive(true);
     }

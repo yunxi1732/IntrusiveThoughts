@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 //时间管理系统 todo
 //挂载在GameRoot场景中，不销毁
@@ -33,11 +34,19 @@ public class DateController : MonoBehaviour
     private void OnEnable()
     {
         EventManagerNP.StartListening(GameEvents.TutorialCompleted, OnTutorialCompleted);
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
+        OnActiveSceneChanged(default, SceneManager.GetActiveScene());
     }
 
     private void OnDisable()
     {
         EventManagerNP.StopListening(GameEvents.TutorialCompleted, OnTutorialCompleted);
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene previous, Scene current)
+    {
+        if (current.name == "EndScene" && datePanel != null) datePanel.SetActive(false);
     }
 
     private void OnTutorialCompleted()
@@ -58,7 +67,8 @@ public class DateController : MonoBehaviour
     {
         // 第 0 天只做教程；进入第 1 天后，由返回卧室的流程请求显示。
         UpdateDateText();
-        datePanel?.SetActive(show && currentDate >= 1 && currentDate <= 7);
+        datePanel?.SetActive(show && currentDate >= 1 && currentDate <= 7
+            && SceneManager.GetActiveScene().name != "EndScene");
     }
 
     public void PassDay()

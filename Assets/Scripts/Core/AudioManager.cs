@@ -16,6 +16,7 @@ public class AudioManager : MonoBehaviour
     [SerializeField] private AudioClip bgm_sunset;
     [SerializeField] private AudioClip bgm_park;
     [SerializeField] private AudioClip bgm_meteor;
+    [SerializeField] private AudioClip bgm_transparentsea;
     [SerializeField] private AudioClip sound_hallway;
     [Header("场景音效")]
     [SerializeField] private AudioClip sound_mall;
@@ -146,6 +147,7 @@ public class AudioManager : MonoBehaviour
                 PlayMusic(day >= 5 ? bgm_bedroom2 : bgm_bedroom1);
                 break;
             case "MapScene": PlayMusic(bgm_sunset); break;
+            case "EndScene": PlayMusic(bgm_transparentsea); break;
             case "LocationScene":
                 PlayLocationMusic(StoryPlayer.instance != null ? StoryPlayer.instance.currentLocation : null);
                 break;
@@ -182,9 +184,25 @@ public class AudioManager : MonoBehaviour
             case "bgm_sunset": PlayMusic(bgm_sunset); break;
             case "bgm_park": PlayMusic(bgm_park); break;
             case "bgm_meteor": PlayMusic(bgm_meteor); break;
+            case "bgm_transparentsea": PlayMusic(bgm_transparentsea); break;
             case "sound_hallway": PlayMusic(sound_hallway); break;
             default: Debug.LogWarning($"未配置的音乐 ID：{id}", this); break;
         }
+    }
+
+    // 台词 action 使用资源文件名，不依赖 Inspector 中的固定曲目映射。
+    public void PlayResourceBGM(string resourceName)
+    {
+        StopMusic();
+        if (string.IsNullOrWhiteSpace(resourceName)) return;
+        var clip = Resources.Load<AudioClip>("Audios/" + resourceName.Trim());
+        if (clip != null) PlayMusic(clip);
+    }
+
+    public void RestoreSceneBGM()
+    {
+        StopMusic();
+        PlaySceneMusic();
     }
 
     public void PlayMusic(AudioClip clip)

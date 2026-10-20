@@ -19,6 +19,29 @@ public class SaveManager : MonoBehaviour
     private bool entering;
     private GlobalProgressData globalProgress = new GlobalProgressData();
     private bool globalLoaded;
+    public bool HasCompletedGame => globalProgress.hasCompletedGame;
+    public bool IsGlobalProgressLoaded => globalLoaded;
+    public event Action GlobalEndingsChanged;
+
+    private void NotifyGlobalEndingsChanged()
+    {
+        if (GlobalEndingsChanged == null) return;
+        foreach (Action listener in GlobalEndingsChanged.GetInvocationList())
+        {
+            try { listener(); }
+            catch (Exception error) { Debug.LogException(error); }
+        }
+    }
+
+    // 返回副本，界面不能直接修改存档中的记录。
+    public List<EndingProgressData> GetAchievedEndings()
+    {
+        return globalProgress.achievedEndings.ConvertAll(entry => new EndingProgressData
+        {
+            endingId = entry.endingId, title = entry.title, image = entry.image,
+            priority = entry.priority, firstAchievedOrder = entry.firstAchievedOrder
+        });
+    }
     public string LastError { get; private set; }
     public bool? RestoredBedroomView { get; private set; }
     public bool? ConsumeRestoredBedroomView()
@@ -32,11 +55,11 @@ public class SaveManager : MonoBehaviour
     private void Start()
     {
         if (LoadGlobalProgress()) ApplyVolumePreferences();
+        NotifyGlobalEndingsChanged();
     }
 
     public float GetVolumePreference(string parameter)
     {
-        if (!globalLoaded) LoadGlobalProgress();
         var entry = globalProgress.volumeSettings.Find(item => item.parameter == parameter);
         return entry == null ? 1f : entry.value;
     }
@@ -51,6 +74,16 @@ public class SaveManager : MonoBehaviour
             if (data == null || data.version != 1) throw new InvalidDataException("全局数据格式无效。");
             data.volumeSettings = data.volumeSettings ?? new List<VolumePreferenceData>();
             data.unlockedEndingIds = data.unlockedEndingIds ?? new List<string>();
+            data.achievedEndings = data.achievedEndings ?? new List<EndingProgressData>();
+            var endingIds = new HashSet<string>();
+            var endingOrders = new HashSet<int>();
+            foreach (var entry in data.achievedEndings)
+                if (entry == null || string.IsNullOrWhiteSpace(entry.endingId)
+                    || !endingIds.Add(entry.endingId) || entry.priority < 0 || entry.priority > 3
+                    || entry.firstAchievedOrder < 0 || !endingOrders.Add(entry.firstAchievedOrder))
+                    throw new InvalidDataException("全局结局记录无效。");
+            SortAchievedEndings(data);
+            if (data.achievedEndings.Count > 0) data.hasCompletedGame = true;
             var parameters = new HashSet<string>();
             foreach (var entry in data.volumeSettings)
                 if (entry == null || string.IsNullOrWhiteSpace(entry.parameter) || !parameters.Add(entry.parameter)
@@ -69,26 +102,87 @@ public class SaveManager : MonoBehaviour
 
     private void ApplyVolumePreferences()
     {
-        foreach (var control in FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
-            control.LoadSlider(GetVolumePreference(control.parameter));
+        if (AudioManager.instance == null) return;
+        AudioManager.instance.SetVolume("bgm", GetVolumePreference("bgm"));
+        AudioManager.instance.SetVolume("sfx", GetVolumePreference("sfx"));
     }
 
     private void SaveGlobalProgress()
     {
-        if (!globalLoaded && !LoadGlobalProgress())
+        if (!globalLoaded)
             throw new InvalidDataException("全局数据未能读取，已停止覆盖保存。");
-        foreach (var control in FindObjectsByType<VolumeSlider_UI>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        if (AudioManager.instance == null)
+            throw new InvalidOperationException("音频管理器未初始化，无法保存音量。");
+        foreach (string channel in new[] { "bgm", "sfx" })
         {
-            if (control.slider == null || string.IsNullOrWhiteSpace(control.parameter)) continue;
-            var entry = globalProgress.volumeSettings.Find(item => item.parameter == control.parameter);
+            var entry = globalProgress.volumeSettings.Find(item => item.parameter == channel);
             if (entry == null)
             {
-                entry = new VolumePreferenceData { parameter = control.parameter };
+                entry = new VolumePreferenceData { parameter = channel };
                 globalProgress.volumeSettings.Add(entry);
             }
-            entry.value = Mathf.Clamp01(control.slider.value);
+            entry.value = Mathf.Clamp01(channel == "bgm" ? AudioManager.instance.musicVolume : AudioManager.instance.sfxVolume);
         }
         SaveFileStorage.WriteText(GlobalPath, JsonUtility.ToJson(globalProgress, true), SavePassword);
+    }
+
+    private static void SortAchievedEndings(GlobalProgressData data)
+    {
+        data.achievedEndings.Sort((left, right) =>
+        {
+            int priority = left.priority.CompareTo(right.priority);
+            return priority != 0 ? priority : left.firstAchievedOrder.CompareTo(right.firstAchievedOrder);
+        });
+    }
+
+    // 到达制作名单时保存全局通关记录；不采集当前音量，也不依赖槽位保存。
+    public bool RecordCompletedEndings(List<EndingData> endings)
+    {
+        try
+        {
+            if (!globalLoaded) throw new InvalidDataException("全局数据未能读取，已停止覆盖保存。");
+            if (endings == null || endings.Count == 0)
+                throw new InvalidDataException("本次没有有效的结局记录。");
+            // 写入失败时不污染内存，下一次可重试。
+            var updated = JsonUtility.FromJson<GlobalProgressData>(JsonUtility.ToJson(globalProgress));
+            int nextOrder = 0;
+            foreach (var entry in updated.achievedEndings)
+                nextOrder = Math.Max(nextOrder, checked(entry.firstAchievedOrder + 1));
+            bool changed = !updated.hasCompletedGame;
+            foreach (var ending in endings)
+            {
+                if (ending == null || string.IsNullOrWhiteSpace(ending.结局ID)
+                    || ending.Priority < 0 || ending.Priority > 3)
+                    throw new InvalidDataException("只能记录 priority 0～3 的剧情结局。");
+                if (updated.achievedEndings.Exists(entry => entry.endingId == ending.结局ID)) continue;
+                updated.achievedEndings.Add(new EndingProgressData
+                {
+                    endingId = ending.结局ID,
+                    title = ending.结局标题,
+                    image = ending.image,
+                    priority = ending.Priority,
+                    firstAchievedOrder = nextOrder++
+                });
+                if (!updated.unlockedEndingIds.Contains(ending.结局ID)) updated.unlockedEndingIds.Add(ending.结局ID);
+                changed = true;
+            }
+            if (changed)
+            {
+                updated.hasCompletedGame = true;
+                SortAchievedEndings(updated);
+                SaveFileStorage.WriteText(GlobalPath, JsonUtility.ToJson(updated, true), SavePassword);
+                globalProgress = updated;
+            }
+            LastError = null;
+            NotifyGlobalEndingsChanged();
+            return true;
+        }
+        catch (Exception error)
+        {
+            LastError = error.Message;
+            Debug.LogError($"通关记录保存失败：{error.Message}");
+            return false;
+        }
     }
     private string SlotPath(int slotId)
     {
@@ -118,7 +212,6 @@ public class SaveManager : MonoBehaviour
             }
             GameState.instance.RestoreBedroomProgress(data);
             StoryManager.instance.RestoreProgress(data);
-            if (LoadGlobalProgress()) ApplyVolumePreferences();
             CurrentSlotId = slotId;
             RestoredBedroomView = data.sceneName == "BedRoomScene" ? data.showingBedroom : (bool?)null;
             StoryPlayer.instance.currentLocation = data.locationName;
@@ -325,7 +418,7 @@ public class SaveManager : MonoBehaviour
         else Debug.LogError("尚未配置 SaveSlot_UI。请先绑定存档面板。");
     }
 
-    // 普通保存和通关保存都必须由玩家确认目标槽位。不写入全局结局解锁。
+    // 普通保存和通关保存都必须由玩家确认目标槽位；全局结局由结算界面单独保存。
     public bool SaveToSlot(int slotId, bool completedEnding = false, List<string> endingIds = null)
     {
         if (!CanSave(out string reason, completedEnding))
@@ -352,7 +445,7 @@ public class SaveManager : MonoBehaviour
                 endingCompleted = completedEnding,
                 achievedEndingIds = completedEnding ? new List<string>(new HashSet<string>(endingIds)) : new List<string>(),
                 sceneName = SceneManager.GetActiveScene().name,
-                locationName = completedEnding ? "结局结算" : SceneManager.GetActiveScene().name == "MapScene" ? "地图" : StoryPlayer.instance.currentLocation,
+                locationName = SceneManager.GetActiveScene().name == "MapScene" ? "地图" : StoryPlayer.instance.currentLocation,
                 showingBedroom = Bedroom_UI.instance != null && Bedroom_UI.instance.BedroomPanel.activeSelf,
                 currentDate = DateController.instance.currentDate,
                 bedroomInitialized = true,

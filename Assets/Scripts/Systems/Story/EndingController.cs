@@ -71,6 +71,15 @@ public class EndingController : MonoBehaviour
         {
             var ending = EndingRules.Select(endings, priority, GameStateAccess.Get);
             if (ending == null) continue;
+            if (priority == 4)
+            {
+                var completed = new List<EndingData>();
+                foreach (string id in achievedEndingIds)
+                    completed.Add(endings.Find(row => row.结局ID == id));
+                if (SaveManager.instance == null || !SaveManager.instance.RecordCompletedEndings(completed))
+                    throw new InvalidOperationException("全局通关记录保存失败，请重试。"
+                        + (SaveManager.instance != null ? SaveManager.instance.LastError : "缺少 SaveManager。"));
+            }
             currentPriority = priority;
             title.text = ending.结局标题;
             endingText.text = (ending.txt ?? "").Replace("\\n", "\n");
