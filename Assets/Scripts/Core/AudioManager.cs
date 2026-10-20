@@ -166,6 +166,7 @@ public class AudioManager : MonoBehaviour
             "公园" => bgm_park,
             "商圈" => sound_mall,
             "街道" => sound_traffic,
+            "楼道" => sound_hallway,
             _ => null,
         };
         // 相同地点的初始化通知不重启当前曲目；换地点时 PlayMusic 会停止旧曲。

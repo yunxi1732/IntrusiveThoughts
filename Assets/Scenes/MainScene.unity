@@ -15446,12 +15446,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
   musicSource: {fileID: 1422115282}
   sfxSource: {fileID: 152433396}
-  bgm_bedroom1: {fileID: 8300000, guid: 91c7c2e3810475c4d8e1eabde6e7092c, type: 3}
+  bgm_bedroom1: {fileID: 8300000, guid: f303f07a9c5a19049a123345b7f05158, type: 3}
   bgm_bedroom2: {fileID: 8300000, guid: dfbd04368697b3c4da0b6dee7d1be051, type: 3}
   bgm_sunset: {fileID: 8300000, guid: db73af742630ef54aa4704023d00f0f6, type: 3}
   bgm_park: {fileID: 8300000, guid: 6b20720d31e95b949aa2a7f7431692c8, type: 3}
   bgm_meteor: {fileID: 8300000, guid: acda54bdd4be0454bb1a18b28cb9356c, type: 3}
-  sound_hallway: {fileID: 0}
+  sound_hallway: {fileID: 8300000, guid: cc49412007f3c7743a931e9bd7c32345, type: 3}
   sound_mall: {fileID: 8300000, guid: a73935440606113459310ae54b53e7ad, type: 3}
   sound_traffic: {fileID: 8300000, guid: 31924b25c4c91c54c909f98ef5b4d546, type: 3}
   sound_truck: {fileID: 8300000, guid: b742ed7e328636d4492630720740f7a1, type: 3}

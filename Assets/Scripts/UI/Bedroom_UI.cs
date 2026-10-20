@@ -28,6 +28,7 @@ public class Bedroom_UI : MonoBehaviour
     public GameObject RelicInfoPanel;   //遗物说明窗口
     public GameObject NPCPanel;          //NPC面板
     public GameObject SleepPanel;      //结束当天的确认窗口
+    public TextMeshProUGUI sleepText;
     public Button collectButton;     //确认收集遗物按钮
     public Button closeButton;       //关闭遗物说明窗口按钮
     public Button outdoorButton;          //离开卧室按钮
@@ -157,7 +158,17 @@ public class Bedroom_UI : MonoBehaviour
     public void OnEndDayClicked()
     {
         if (!CanSleep()) return;
-        if (SleepPanel == null) { Debug.LogError("请绑定 Bedroom_UI 的 SleepPanel。", this); return; }
+        if (SleepPanel == null || sleepText == null) { Debug.LogError("请绑定 Bedroom_UI 的 SleepPanel 或 sleepText。", this); return; }
+
+        //检测特殊条件，决定使用何种睡觉提示文本
+        if (DateController.instance.currentDate == 3 && StoryManager.instance.GetState("npc.麻雀.linestart") == 0)
+        {
+            //触发警告对话
+            sleepText.text = "麻雀好像还在楼道做什么……\n我有种直觉，如果就这么睡去，<color=red>有些话就再也没机会说了</color>。";
+        } else
+        {
+            sleepText.text = "确定睡觉吗？";
+        }
         SleepPanel.SetActive(true);
     }
 
@@ -176,8 +187,8 @@ public class Bedroom_UI : MonoBehaviour
             //播放交互失败音效
             return false;
         }
-        //如果教程2没有完成，无法睡觉
-        if (StoryManager.instance.GetState("story.tutorial.3") != 1)
+        //如果麻雀教程没有完成，无法睡觉
+        if (StoryManager.instance.GetState("story.seq_day1_start") != 1)
         {
             //触发警告对话
             StoryManager.instance.TryStart(null, null, "tutorial2");

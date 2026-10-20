@@ -3694,7 +3694,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1035778648
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4078,6 +4078,7 @@ MonoBehaviour:
   RelicInfoPanel: {fileID: 2065802022}
   NPCPanel: {fileID: 1947767784}
   SleepPanel: {fileID: 1035778647}
+  sleepText: {fileID: 395671660}
   collectButton: {fileID: 1111503701}
   closeButton: {fileID: 1336842679}
   outdoorButton: {fileID: 1318265944}
