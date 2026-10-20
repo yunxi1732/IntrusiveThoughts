@@ -16,7 +16,7 @@ SaveSlot_UI 字段：
 - Confirm Text：确认提示文字。
 - Message Text：失败原因提示，可选但推荐配置。
 - Slots：4 个元素，每个填写 Slot Id（1～4）、Button 和 Summary（TMP 文本）。
-  Summary 显示 Day、地点、已通关；空槽显示空槽位，损坏槽显示不兼容提示。
+  Summary：普通存档显示 Day、地点，通关存档只显示“已通关”；空槽显示空槽位，损坏槽显示不兼容提示。
 
 按钮 OnClick：
 

@@ -89,7 +89,7 @@ public class SaveSlot_UI : MonoBehaviour
             if (view.button != null) view.button.interactable = mode != Mode.Load || valid;
             if (view.summary != null)
                 view.summary.text = valid
-                    ? $"Day {data.currentDate} | {data.locationName}" + (data.endingCompleted ? "已通关" : "")
+                    ? (data.endingCompleted ? "已通关" : $"Day {data.currentDate} | {data.locationName}")
                     : exists ? "存档损坏或不兼容" : "空槽位";
         }
     }
