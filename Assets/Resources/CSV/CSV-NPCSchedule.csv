@@ -12,7 +12,7 @@
 辰星,出租屋,0,day==2;  story.seq_day2_chenxing2 ==1,
 麻雀,出租屋,1,day==2;  story.seq_day2_chenxing2 ==1,
 辰星,出租屋,,day == 3; npc.辰星.honest == 1,
-辰星,街道,,day == 4; story.seq_day3_chenxing5 == 1,
+辰星,街道,,day == 4; npc.麻雀.sketchfree == 1,
 麻雀,街道,,day == 4; story.seq_day3_chenxing5 == 1; story.seq_day4_chenxing6 != 1,
 麻雀,出租屋,1,day == 4; story.seq_day4_chenxing6 == 1,
 辰星,街道,,day >= 5; day <= 7; story.seq_day4_chenxing7 ==1; npc.辰星.doom != 1,替换小人char_chenxing2_xiaorenteshu
