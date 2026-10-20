@@ -72,6 +72,7 @@ seq_day5_sparrow2_missed2,出租屋,麻雀,,,,FALSE,day == 5; npc.麻雀.linesta
 seq_day6_sparrow2_missed3,商圈,,,,,FALSE,day == 6; npc.麻雀.linestart ==0; npc.麻雀.anotherstory != 1,story.seq_day6_sparrow2_missed3 = 1,,,,,,,,,,,,,,,,,,,,
 seq_day6_sparrow2_missed3_emg,商圈,,降噪耳机; 麻雀的速写本,,,TRUE,day == 6; npc.麻雀.linestart ==0; npc.麻雀.anotherstory != 1,npc.麻雀.anotherstory = 1,updatenpc,,,,,,,,,,,,,,,,,,,
 seq_day7_sparrow2_missed4,出租屋,？？？,,,,FALSE,day == 7; npc.麻雀.linestart ==0; npc.麻雀.anotherstory == 1,,,,,,,,,,,,,,,,,,,,,
+seq_day7_sparrow2_missed5,出租屋,？？？,,,,FALSE,day == 7; npc.麻雀.linestart ==0; npc.麻雀.anotherstory == 0,,,,,,,,,,,,,,,,,,,,,
 seq_recycle1,商圈,无常,,,,TRUE,day >= 1; day <= 7; story.seq_day1_start == 1,story.seq_recycle1 = 1,,,,,,,,,,,,,,,,,,,,
 seq_recycle2,商圈,无常,,,,FALSE,day >= 1; day <= 7; story.seq_recycle1 == 1; story.seq_day1_start == 1,,,,,,,,,,,,,,,,,,,,,
 seq_recycle2_emg,商圈,无常,any,,,FALSE,day >= 1; day <= 7; story.seq_recycle1 == 1; story.seq_day1_start == 1,,,,,,,,,,,,,,,,,,,,,
