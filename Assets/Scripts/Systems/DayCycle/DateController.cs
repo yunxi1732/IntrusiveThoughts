@@ -30,6 +30,7 @@ public class DateController : MonoBehaviour
     public Image dateImage;   //日期改用 Resources/UI/day1～day7 图片
     public int currentDate;   //0 为教程；教程结束事件将日期推进到第 1 天
     private readonly Sprite[] dailyDateSprites = new Sprite[7];
+    private Sprite endingDateSprite;
 
     private void OnEnable()
     {
@@ -46,7 +47,10 @@ public class DateController : MonoBehaviour
 
     private void OnActiveSceneChanged(Scene previous, Scene current)
     {
-        if (current.name == "EndScene" && datePanel != null) datePanel.SetActive(false);
+        if (current.name == "EndScene" || current.name == "MainScene")
+            ShowDatePanel(current.name == "EndScene");
+        else
+            UpdateDateText();
     }
 
     private void OnTutorialCompleted()
@@ -67,8 +71,9 @@ public class DateController : MonoBehaviour
     {
         // 第 0 天只做教程；进入第 1 天后，由返回卧室的流程请求显示。
         UpdateDateText();
-        datePanel?.SetActive(show && currentDate >= 1 && currentDate <= 7
-            && SceneManager.GetActiveScene().name != "EndScene");
+        string scene = SceneManager.GetActiveScene().name;
+        datePanel?.SetActive(scene != "MainScene"
+            && (scene == "EndScene" || (show && currentDate >= 1 && currentDate <= 7)));
     }
 
     public void PassDay()
@@ -96,6 +101,14 @@ public class DateController : MonoBehaviour
         if (dateImage == null && datePanel != null)
             dateImage = datePanel.GetComponent<Image>();
         if (dateImage == null) return;
+        if (SceneManager.GetActiveScene().name == "EndScene")
+        {
+            if (endingDateSprite == null) endingDateSprite = Resources.Load<Sprite>("UI/day_end");
+            dateImage.sprite = endingDateSprite;
+            dateImage.enabled = endingDateSprite != null;
+            if (endingDateSprite == null) Debug.LogWarning("日期图片缺失：Resources/UI/day_end", this);
+            return;
+        }
         if (currentDate < 1 || currentDate > 7)
         {
             dateImage.sprite = null;

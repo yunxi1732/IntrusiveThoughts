@@ -9,7 +9,7 @@ public class DialogueLine
     public string character;
     [UnityEngine.TextArea] public string content;
     public string relics;  //关联的遗物名称，不为空时表示可以互动
-    public string tag;   //Resources/Sprites 下的立绘图片名；FIFA 表示不显示立绘
+    public string tag;   //Resources/Sprites 下的立绘图片名；FIFA字段（兼容 FIFA）表示不显示立绘
     public string image;  //关联的图片资源名称
     public string sfx;  //关联的音效资源名称
     public float waitTime;  //等待时长，单位为秒
@@ -18,7 +18,8 @@ public class DialogueLine
 
     public Sprite GetCharacterSprite() {
         string imageName = tag?.Trim();
-        if (string.Equals(imageName, "FIFA", StringComparison.OrdinalIgnoreCase)) return null;
+        if (string.Equals(imageName, "FIFA字段", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(imageName, "FIFA", StringComparison.OrdinalIgnoreCase)) return null;
         if (!string.IsNullOrEmpty(imageName))
         {
             Sprite sprite = Resources.Load<Sprite>("Sprites/" + imageName);
